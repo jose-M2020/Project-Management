@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/jose-M2020/GraphQL-mern#readme",
   "dependencies": {
+    "colors": "^1.4.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "express-graphql": "^0.12.0",
