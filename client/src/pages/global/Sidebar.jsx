@@ -17,6 +17,8 @@ import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import BugReportIcon from '@mui/icons-material/BugReport';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FolderCopyIcon from '@mui/icons-material/FolderCopy';
+import CloseIcon from '@mui/icons-material/Close';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -45,29 +47,37 @@ const Sidebar = () => {
   return (
     <Box
       sx={{
-        "& .pro-sidebar-inner": {
-          background: `${colors.primary[400]} !important`,
-        },
-        "& .pro-icon-wrapper": {
-          backgroundColor: "transparent !important",
-        },
-        "& .pro-inner-item": {
-          padding: "5px 35px 5px 20px !important",
-        },
-        "& .pro-inner-item:hover": {
-          color: "#868dfb !important",
-        },
-        "& .pro-menu-item.active": {
-          color: "#6870fa !important",
-        },
+        position: "sticky",
+        display: "flex",
+        height: "100vh",
+        top: 0,
+        bottom: 0,
+        zIndex: 10000,
       }}
     >
-      <ProSidebar>
-        <Menu iconShape="square">
+      <ProSidebar 
+        backgroundColor={colors.primary[400]}
+        rootStyles={{
+          border: 'none'
+        }}
+      >
+        <Menu iconShape="square"
+          menuItemStyles={{
+            button: ({ level, active, disabled }) => {
+                return {
+                  color: active && '#3e91d3 !important',
+                  backgroundColor: 'transparent',
+                  '&:hover': {
+                    color: '#868dfb !important',
+                    backgroundColor: 'transparent'
+                  }
+                };
+            }
+          }}
+        >
           {/* LOGO AND MENU ICON */}
           <MenuItem
-            onClick={() => collapseSidebar(!collapsed)}
-            icon={collapsed ? <MenuOutlinedIcon /> : undefined}
+            icon={collapsed && <MenuOutlinedIcon onClick={() => collapseSidebar(!collapsed)} />}
             style={{
               margin: "10px 0 20px 0",
               color: colors.grey[100],
@@ -81,10 +91,10 @@ const Sidebar = () => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                  ADMINIS
+                  IT Projects
                 </Typography>
-                <IconButton>
-                  <MenuOutlinedIcon />
+                <IconButton onClick={() => collapseSidebar(!collapsed)}>
+                  <CloseIcon />
                 </IconButton>
               </Box>
             )}
@@ -141,16 +151,16 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Clients"
-              to="/clienta"
-              icon={<ContactsOutlinedIcon />}
+              title="Tasks"
+              to="/tasks"
+              icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Manage Team"
-              to="/team"
-              icon={<PeopleOutlinedIcon />}
+              title="Calendar"
+              to="/calendar"
+              icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
@@ -166,19 +176,19 @@ const Sidebar = () => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Pages
+              Info
             </Typography>
             <Item
-              title="Calendar"
-              to="/calendar"
-              icon={<CalendarTodayOutlinedIcon />}
+              title="Clients"
+              to="/clienta"
+              icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Tasks"
-              to="/tasks"
-              icon={<FormatListBulletedIcon />}
+              title="Manage Team"
+              to="/team"
+              icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
@@ -229,7 +239,7 @@ const Sidebar = () => {
                 <Item
                 title="Profile"
                 to="/profile"
-                icon={<MapOutlinedIcon />}
+                icon={<AccountCircleIcon />}
                 selected={selected}
                 setSelected={setSelected}
                 />

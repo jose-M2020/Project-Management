@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 // import Header from './components/Header';
@@ -44,25 +44,23 @@ function App() {
         <ColorModeContext.Provider value={colorMode}>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Router>
-              {/* <Header /> */}
-              <div className='app'>
-                <Sidebar isSidebar={isSidebar} />
-                <main className='content'>
-                  <Topbar setIsSidebar={setIsSidebar} />
-                  <Routes>
-                    <Route path='/' element={<Home />} />
-                    <Route path='/projects/:id' element={<Project />} />
-                    <Route path='*' element={<NotFound />} />
-                  </Routes>
-                </main>
-              </div>
-            </Router>
+            {/* <Header /> */}
+            <div className='app'>
+              <Sidebar isSidebar={isSidebar} />
+              <main className='content'>
+                <Topbar setIsSidebar={setIsSidebar} />
+                <Routes>
+                  <Route path='/' element={<Home />} />
+                  <Route path='/projects/:id' element={<Project />} />
+                  <Route path='*' element={<NotFound />} />
+                </Routes>
+              </main>
+            </div>
           </ThemeProvider>
         </ColorModeContext.Provider>
       </ApolloProvider>
     </>
-  );
+  )
 }
 
 export default App;
