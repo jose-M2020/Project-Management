@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const DeveloperSchema = new mongoose.Schema({
   firstname: {
@@ -19,4 +19,4 @@ const DeveloperSchema = new mongoose.Schema({
   createdAt: {type:Date, default: Date.now, require: true}
 });
 
-module.exports = mongoose.model('Developer', DeveloperSchema);
+export default mongoose.model('Developer', DeveloperSchema);
