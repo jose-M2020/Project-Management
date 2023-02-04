@@ -49,19 +49,19 @@ export const resolvers = {
       clientID,
       technologies
     }) => {
-			const project = new Project({
-				name,
-				description,
-				repository,
-				url,
-				type,
-				status,
-				team,
-				clientID,
-				technologies
-			});
-			const savedProject = project.save();
-			return savedProject;
+	  const project = new Project({
+	  	name,
+	  	description,
+	  	repository,
+	  	url,
+	  	type,
+	  	status,
+	  	team,
+	  	clientID,
+	  	technologies
+	  });
+	  const savedProject = project.save();
+	  return savedProject;
 	},
     updateProject: async (_, args) => {
 	  const updatedProject = await Project.findByIdAndUpdate(
@@ -75,6 +75,10 @@ export const resolvers = {
 	deleteProject: async (_, { _id }) => {
 	  const deletedProject = await Project.findByIdAndDelete(_id);
 	  if (!deletedProject) throw new Error("Project not found");
+	   
+	  await Task.deleteMany({projectId: _id})
+	  await Event.deleteMany({projectId: _id})
+
 	  return deletedProject;
 	},
 		
@@ -117,13 +121,27 @@ export const resolvers = {
 	  firstname,
 	  lastname,
 	  email,
-	  phone
+	  phone,
+	  company: {
+		name,
+    	website,
+    	country,
+    	state,
+    	city
+	  }
     }) => {
 	  const client = new Client({
 		firstname,
 	  	lastname,
 	  	email,
 	  	phone,
+		company: {
+		  name,
+    	  website,
+    	  country,
+    	  state,
+    	  city
+		}
 	  });
 	  const savedClient = client.save();
 	  return savedClient;

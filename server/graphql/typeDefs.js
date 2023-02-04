@@ -14,6 +14,14 @@ export const typeDefs = gql`
     event(_id: ID!): Event
   }
 
+  input CompanyInput {
+    name: String!
+    website: String
+    country: String!
+    state: String!
+    city: String!
+  }
+
   type Mutation {
     createProject(
       name: String!,
@@ -61,14 +69,16 @@ export const typeDefs = gql`
       firstname: String!,
       lastname: String!,
       email: String!,
-      phone: Int!
+      phone: Int!,
+      company: CompanyInput
     ): Client
     updateClient(
       _id: ID!,
       firstname: String!,
       lastname: String!,
       email: String!,
-      phone: Int!
+      phone: Int!,
+      company: CompanyInput
     ): Client
     deleteClient(_id: ID!): Client
 
