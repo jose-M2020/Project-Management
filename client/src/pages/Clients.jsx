@@ -3,10 +3,10 @@ import { Box, useTheme } from '@mui/material'
 import { DataGrid } from "@mui/x-data-grid";
 import Header from '../components/Header'
 import Spinner from '../components/Spinner';
-import { GET_CLIENTS } from '../queries/clientQueries';
+import { GET_CLIENTS } from '../graphql/queries/clientQueries';
 import { tokens } from '../theme';
 
-const Client = () => {
+const Clients = () => {
   const { loading, error, data } = useQuery(GET_CLIENTS);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -76,4 +76,4 @@ const Client = () => {
   )
 };
 
-export default Client;
+export default Clients;

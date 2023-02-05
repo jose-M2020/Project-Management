@@ -15,8 +15,7 @@ const TaskSchema = new mongoose.Schema({
     type: String,
     enum: ['Not Started', 'In Progress', 'Completed'],
   },
-  date: {type:Date, default: Date.now, require: true},
-  createdAt: {type:Date, default: Date.now, require: true}
-});
+  date: {type:Date, default: Date.now, require: true}
+}, { timestamps: true });
 
 export default mongoose.model('Task', TaskSchema);

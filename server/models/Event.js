@@ -12,8 +12,7 @@ const EventSchema = new mongoose.Schema({
     ref: 'Project',
   },
   date: {type:Date, default: Date.now, require: true},
-  notify: {type:Boolean, default: false},
-  createdAt: {type:Date, default: Date.now, require: true}
-});
+  notify: {type:Boolean, default: false}
+}, { timestamps: true });
 
 export default mongoose.model('Event', EventSchema);

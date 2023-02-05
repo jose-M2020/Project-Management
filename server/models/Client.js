@@ -19,8 +19,7 @@ const ClientSchema = new mongoose.Schema({
     country: {type: String, required: true},
     state: {type: String, required: true},
     city: {type: String, required: true},
-  },
-  createdAt: {type:Date, default: Date.now, require: true}
-});
+  }
+},{ timestamps: true });
 
 export default mongoose.model('Client', ClientSchema);

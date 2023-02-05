@@ -47,7 +47,7 @@ export const resolvers = {
       status,
       team,
       clientID,
-      technologies
+      tags
     }) => {
 	  const project = new Project({
 	  	name,
@@ -58,7 +58,7 @@ export const resolvers = {
 	  	status,
 	  	team,
 	  	clientID,
-	  	technologies
+	  	tags
 	  });
 	  const savedProject = project.save();
 	  return savedProject;

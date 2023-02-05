@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "@apollo/client";
-import { GET_PROJECT } from "../queries/projectQueries";
-import { UPDATE_PROJECT } from "../mutations/projectMutations";
+import { GET_PROJECT } from "../graphql/queries/projectQueries";
+import { UPDATE_PROJECT } from "../graphql/mutations/projectMutations";
 
 export default function EditProjectForm({ project }) {
   const [name, setName] = useState(project.name);

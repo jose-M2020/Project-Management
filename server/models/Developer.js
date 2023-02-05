@@ -15,8 +15,7 @@ const DeveloperSchema = new mongoose.Schema({
   },
   position: {
     type: String,
-  },
-  createdAt: {type:Date, default: Date.now, require: true}
-});
+  }
+}, { timestamps: true });
 
 export default mongoose.model('Developer', DeveloperSchema);

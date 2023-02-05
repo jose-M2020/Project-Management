@@ -32,7 +32,7 @@ export const typeDefs = gql`
       status: String!,
       team: [ID],
       clientID: ID,
-      technologies: [String]
+      tags: [String]
     ): Project
     updateProject(
       _id: ID!, 
@@ -44,7 +44,7 @@ export const typeDefs = gql`
       status: String!,
       team: [ID],
       clientID: ID,
-      technologies: [String]
+      tags: [String]
     ): Project
     deleteProject(_id: ID!): Project
 
@@ -165,7 +165,7 @@ export const typeDefs = gql`
     status: String!
     team: [Developer]
     client: Client
-    technologies: [String]
+    tags: [String]
     tasks: [Task]
     createdAt: String
   }

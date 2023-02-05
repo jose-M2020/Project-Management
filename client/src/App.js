@@ -5,12 +5,13 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import Topbar from './pages/global/Topbar';
 import Sidebar from './pages/global/Sidebar';
 import Dashboard from './pages/dashboard';
-import Project from './pages/project';
-import ShowProject from './pages/project/ShowProject';
-import Task from './pages/Task';
+import Projects from './pages/project/Projects';
+import ProjectDetails from './pages/project/ProjectDetails';
+import ProjectForm from './pages/project/ProjectForm';
+import Tasks from './pages/Tasks';
 import Calendar from './pages/Calendar';
 import Bug from './pages/Bug';
-import Client from './pages/Client';
+import Clients from './pages/Clients';
 import Team from './pages/Team';
 import Faq from './pages/Faq';
 import Bar from './pages/chart/Bar';
@@ -61,12 +62,13 @@ function App() {
                 <Topbar setIsSidebar={setIsSidebar} />
                 <Routes>
                   <Route path='/' element={<Dashboard />} />
-                  <Route path='/projects' element={<Project />} />
-                  <Route path='/projects/:id' element={<ShowProject />} />
-                  <Route path='/tasks' element={<Task />} />
+                  <Route path='/projects' element={<Projects />} />
+                  <Route path='/projects/:id' element={<ProjectDetails />} />
+                  <Route path='/projects/add' element={<ProjectForm />} />
+                  <Route path='/tasks' element={<Tasks />} />
                   <Route path='/calendar' element={<Calendar />} />
                   <Route path='/bugs' element={<Bug />} />
-                  <Route path='/clients' element={<Client />} />
+                  <Route path='/clients' element={<Clients />} />
                   <Route path='/team' element={<Team />} />
                   <Route path='/faq' element={<Faq />} />
                   <Route path='/bar' element={<Bar />} />

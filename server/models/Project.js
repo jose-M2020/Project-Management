@@ -29,8 +29,7 @@ const ProjectSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client',
   },
-  technologies: { type: [String]},
-  createdAt: {type:Date, default: Date.now, require: true}
-});
+  tags: { type: [String]}
+}, { timestamps: true });
 
 export default mongoose.model('Project', ProjectSchema);

@@ -7,9 +7,9 @@ import Spinner from '../../components/Spinner';
 import ClientInfo from '../../components/ClientInfo';
 import DeleteProjectButton from '../../components/DeleteProjectButton';
 import EditProjectForm from '../../components/EditProjectForm';
-import { GET_PROJECT } from '../../queries/projectQueries';
+import { GET_PROJECT } from '../../graphql/queries/projectQueries';
 
-const ShowProject = () => {
+const ProjectDetails = () => {
   const { id } = useParams();
   const { loading, error, data } = useQuery(GET_PROJECT, { variables: { id } });
 
@@ -45,4 +45,4 @@ const ShowProject = () => {
   )
 };
 
-export default ShowProject;
+export default ProjectDetails;

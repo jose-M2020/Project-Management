@@ -2,7 +2,7 @@ import { Box } from '@mui/material'
 import React from 'react'
 import Header from '../components/Header'
 
-const Task = () => {
+const Tasks = () => {
   return (
     <Box m="20px">
       <Header title="TASKS" subtitle="All project tasks" />
@@ -11,4 +11,4 @@ const Task = () => {
   )
 }
 
-export default Task
+export default Tasks
