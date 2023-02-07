@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client';
 import ClientRow from './ClientRow';
 import Spinner from './Spinner';
-import { GET_CLIENTS } from '../queries/clientQueries';
+import { GET_CLIENTS } from '../graphql/queries/clientQueries';
 
 export default function Clients() {
   const { loading, error, data } = useQuery(GET_CLIENTS);

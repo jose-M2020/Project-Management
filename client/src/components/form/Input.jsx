@@ -12,7 +12,6 @@ const Input = ({options, ...props}) => {
           {...field}
           {...props}
           variant={props.variant ? props.variant : 'outlined'}
-          color="secondary"
           fullWidth
           helperText={(meta.touched && meta.error) && meta.error}
           error={meta.touched && !!(meta.error)}

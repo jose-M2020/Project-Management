@@ -60,7 +60,7 @@ export const resolvers = {
 	  	clientID,
 	  	tags
 	  });
-	  const savedProject = project.save();
+	  const savedProject = await project.save();
 	  return savedProject;
 	},
     updateProject: async (_, args) => {

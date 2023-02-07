@@ -14,12 +14,18 @@ const Clients = () => {
   if (error) return <p>Something Went Wrong</p>;
 
   const columns = [
-    { field: "id", headerName: "ID" },
+    { field: "_id", headerName: "ID" },
     {
-      field: "name",
-      headerName: "Name",
+      field: "firstname",
+      headerName: "First name",
       flex: 1,
-      cellClassName: "name-column--cell",
+      cellClassName: "firstname-column--cell",
+    },
+    {
+      field: "lastname",
+      headerName: "Last name",
+      flex: 1,
+      cellClassName: "lastname-column--cell",
     },
     {
       field: "email",
@@ -69,7 +75,12 @@ const Clients = () => {
             },
           }}
         >
-          <DataGrid checkboxSelection rows={data.clients} columns={columns} />
+          <DataGrid 
+            checkboxSelection
+            rows={data.clients}
+            columns={columns}
+            getRowId={(row) => row._id}  
+          />
         </Box>
       )}
     </Box>

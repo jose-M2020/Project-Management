@@ -4,25 +4,29 @@ const ADD_PROJECT = gql`
   mutation AddProject(
     $name: String!
     $description: String!
-    $status: ProjectStatus!
-    $clientId: ID!
+    $repository: String,
+    $url: String,
+    $type: String!,
+    $status: String,
+    $team: [ID],
+    $clientID: ID,
+    $tags: [String]
   ) {
-    addProject(
-      name: $name
-      description: $description
-      status: $status
-      clientId: $clientId
+    createProject(
+      name: $name,
+      description: $description,
+      repository: $repository,
+      url: $url,
+      type: $type,
+      status: $status,
+      team: $team,
+      clientID: $clientID,
+      tags: $tags
     ) {
-      id
+      _id
       name
       description
       status
-      client {
-        id
-        name
-        email
-        phone
-      }
     }
   }
 `;

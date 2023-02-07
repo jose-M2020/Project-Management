@@ -3,9 +3,11 @@ import mongoose from 'mongoose';
 const ProjectSchema = new mongoose.Schema({
   name: {
     type: String,
+    require: true
   },
   description: {
     type: String,
+    require: true
   },
   repository: {
     type: String,
@@ -15,11 +17,13 @@ const ProjectSchema = new mongoose.Schema({
   },
   type: {
     type: String,
+    require: true,
     enum: ['static web', 'ecommerce', 'app', 'design', 'other'],
   },
   status: {
     type: String,
     enum: ['Not Started', 'In Progress', 'Completed'],
+    default: 'Not Started'
   },
   team: [{
     type: mongoose.Schema.Types.ObjectId,
