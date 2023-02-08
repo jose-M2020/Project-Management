@@ -61,7 +61,6 @@ const ProjectDetails = () => {
                 <Box mb={5}>
                   <Box display='flex' alignItems='center'>
                     <Typography variant='h1' mb={2}>{data.project.name}</Typography>
-                    <Box>{statusIcon[data.project.status].icon} {data.project.status}</Box>
                   </Box>
                   <Box display="flex" gap={1} mb={2}>
                     {data.project?.tags?.map( (item, i) => (
