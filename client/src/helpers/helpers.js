@@ -2,22 +2,28 @@ import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import CachedIcon from '@mui/icons-material/Cached';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 
-export const statu = [
+export const status = [
     {
         name: 'Not Started',
-        icon: <AccessTimeOutlinedIcon />
+        icon: (props) => (
+          <AccessTimeOutlinedIcon {...props}/>
+        )
     },
     {
         name: 'In Progress',
-        icon: <CachedIcon />
+        icon: (props) => (
+            <CachedIcon {...props}/>
+          )
     },
     {
         name: 'Completed',
-        icon: <CheckOutlinedIcon />
+        icon: (props) => (
+            <CheckOutlinedIcon {...props}/>
+          )
     }
 ]
 
-export const status = {
+export const statusIcon = {
     'Not Started': {
         icon: <AccessTimeOutlinedIcon />
     },

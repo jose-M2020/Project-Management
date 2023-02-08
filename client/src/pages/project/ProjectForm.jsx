@@ -9,7 +9,7 @@ import Input from '../../components/form/Input';
 import Header from '../../components/Header';
 import AutoComplete from '../../components/form/AutoComplete';
 import { ADD_PROJECT } from '../../graphql/mutations/projectMutations';
-import { GET_PROJECTS } from '../../graphql/queries/projectQueries';
+import { GET_PROJECT, GET_PROJECTS } from '../../graphql/queries/projectQueries';
 import { useParams } from 'react-router-dom';
 
 const initialValues={
@@ -40,15 +40,12 @@ const schema = yup.object().shape({
 
 const transformData = (data, field) => {
   if(data){
-    return (data[field]).reduce((acc, current) => (
-      [
-        ...acc,
-        {
-          label: `${current.firstname} ${current.lastname}`,
-          value: current._id
-        }
-      ]
-    ), [])
+    return (data[field]).map((item) =>(
+      {
+        label: `${item.firstname} ${item.lastname}`,
+        value: item._id
+      }
+    ))
   }
 }
 
@@ -63,7 +60,9 @@ const tagsOptions = [
 
 const ProjectForm = () => {
   const { id } = useParams();
-  
+  const { loading2, error2, project } = useQuery(GET_PROJECT, { variables: { id } });
+  console.log(project)
+
   const [activeStep, setActiveStep] = useState(0);
   const [activeSteps, setActiveSteps] = useState(false);
   const { loading, error, data } = useQuery(gql`

@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Box, Chip, Divider, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { Box, Chip, Divider, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, MenuItem, Select, TextField, Typography } from '@mui/material';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import CachedIcon from '@mui/icons-material/Cached';
 import { Link, useParams } from 'react-router-dom';
@@ -8,7 +8,9 @@ import Spinner from '../../components/Spinner';
 import ClientInfo from '../../components/ClientInfo';
 import { GET_PROJECT } from '../../graphql/queries/projectQueries';
 import CircularProgressWithLabel from '../../components/project/CircularProgressWithLabel';
-import { status } from '../../helpers/helpers';
+import { status, statusIcon } from '../../helpers/helpers';
+import CustomButton from '../../components/CustomButton';
+import Input from '../../components/form/Input';
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -30,30 +32,28 @@ const ProjectDetails = () => {
             <Grid item xs={4}>
               <CircularProgressWithLabel 
                 label="Task completed"
-                progress="44"
+                progress={44}
                 marginBottom={3}
               />
               <Typography variant="h3">Tasks</Typography>
               <Divider />
               <Box>
-              <List>
-                <ListItem disablePadding>
-                  <ListItemButton>
-                    <ListItemIcon>
-                      <HourglassEmptyIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Not done" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton>
-                    <ListItemIcon>
-                      <CachedIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="In progress" />
-                  </ListItemButton>
-                </ListItem>
-              </List>
+                <List>
+                  {data.project.tasks.lenght ? (
+                    (data.project.tasks).map( (item, i) => (
+                      <ListItem disablePadding>
+                        <ListItemButton>
+                          <ListItemIcon>
+                            {statusIcon[item.title].icon}
+                          </ListItemIcon>
+                          <ListItemText primary={item.title} />
+                        </ListItemButton>
+                      </ListItem>
+                    ))
+                  ) : (
+                    <Typography>No Tasks</Typography>
+                  )}                
+                </List>
               </Box>
             </Grid>
             <Grid item xs={8}>
@@ -61,25 +61,94 @@ const ProjectDetails = () => {
                 <Box mb={5}>
                   <Box display='flex' alignItems='center'>
                     <Typography variant='h1' mb={2}>{data.project.name}</Typography>
-                    <Box>{status[data.project.status].icon} {data.project.status}</Box>
+                    <Box>{statusIcon[data.project.status].icon} {data.project.status}</Box>
                   </Box>
-                  <Box display="flex" gap={1}>
+                  <Box display="flex" gap={1} mb={2}>
                     {data.project?.tags?.map( (item, i) => (
                       <Chip key={i} label={item} variant="outlined" color="secondary" />
                     ))}
                   </Box>
-                  <p>{data.project.description}</p>
-
-                  <h5 className='mt-3'>Project Status</h5>
-                  <p className='lead'>{data.project.status}</p>
+                  <Typography mb={2}>{data.project.description}</Typography>
+                  <Typography mb={2}>Type: {data.project.type}</Typography>
+                  {data.project.client && (
+                    <Typography mb={2}>
+                      Client: {data.project.client.firstname} {data.project.client.lastname}
+                    </Typography>
+                  )}
+                  
+                  <Typography mb={2}>Repository: {data.project?.repository}</Typography>
+                  <Typography mb={2}>URL: {data.project?.url}</Typography>
                 </Box>
                 <Box mb={5}>
                   <Typography variant="h3">Collaborators</Typography>
                   <Divider />
+                  <Box mt={2}>
+                    {data.project.team.lenght ? (
+                      (data.project.team).map( (item, i) => (
+                        <Box>
+                          {item.firsname} {item.lastname}
+                        </Box>
+                      ))
+                    ) : (
+                      <Typography>No collaborator</Typography>
+                    )}
+                  </Box>
                 </Box>
                 <Box>
                   <Typography variant="h3">Actions</Typography>
                   <Divider />
+                  <Box mt={2} display='flex' justifyContent='space-between' alignItems='center'>
+                    <Box>
+                      <Typography variant='h5' fontWeight='bold'>Change Status</Typography>
+                      <Typography>Change the project status</Typography>
+                    </Box>
+                    <TextField
+                      select
+                      defaultValue={data.project.status}
+                    >
+                      {status.map((option) => (
+                        <MenuItem key={option.name} value={option.name} display='flex' alignItems='center' >
+                          {option.icon({mr: '22px'})}
+                          <Typography variant='span'>{option.name}</Typography>
+                        </MenuItem>
+                      ))}
+                    </TextField>
+
+                    {/* <Select
+                      defaultValue={data.project.status}
+                      labelId="demo-simple-select-error-label"
+                      id="demo-simple-select-error"
+                      label="Age"
+                      renderValue={(value) => `${statusIcon[value].icon} ${value}`}
+                    >
+                      {status.map((option) => (
+                        <MenuItem key={option.name} value={option.name} >
+                          {option.icon({mr: '22px'})} {option.name}
+                        </MenuItem>
+                      ))}
+                    </Select> */}
+                  </Box>
+                  <Box mt={2} display='flex' justifyContent='space-between' alignItems='center'>
+                    <Box>
+                      <Typography variant='h5' fontWeight='bold'>Edit</Typography>
+                      <Typography>Change the project status</Typography>
+                    </Box>
+                    <CustomButton
+                      text='Edit Project'
+                      component={Link} to={`/projects/${data.project._id}/edit`}
+                      btnstyle="primary"
+                    />
+                  </Box>
+                  <Box mt={2} display='flex' justifyContent='space-between' alignItems='center'>
+                    <Box>
+                      <Typography variant='h5' fontWeight='bold'>Delete</Typography>
+                      <Typography>Change the project status</Typography>
+                    </Box>
+                    <CustomButton
+                      text='Delete Project'
+                      btnstyle="primary"
+                    />
+                  </Box>
                 </Box>
                 {/* <ClientInfo client={data.project.client} /> */}
 

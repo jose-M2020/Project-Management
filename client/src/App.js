@@ -65,6 +65,7 @@ function App() {
                   <Route path='/projects' element={<Projects />} />
                   <Route path='/projects/:id' element={<ProjectDetails />} />
                   <Route path='/projects/add' element={<ProjectForm />} />
+                  <Route path='/projects/:id/edit' element={<ProjectForm />} />
                   <Route path='/tasks' element={<Tasks />} />
                   <Route path='/calendar' element={<Calendar />} />
                   <Route path='/bugs' element={<Bug />} />
