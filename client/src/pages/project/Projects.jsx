@@ -6,7 +6,6 @@ import Spinner from '../../components/Spinner';
 import Header from '../../components/Header';
 import ProjectCard from '../../components/project/ProjectCard';
 import CustomButton from '../../components/CustomButton';
-import { Link } from 'react-router-dom';
 
 const Projects = () => {
   const { loading, error, data } = useQuery(GET_PROJECTS);
@@ -21,11 +20,11 @@ const Projects = () => {
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="PROJECTS" subtitle="Managing projects" />
-          <CustomButton
-            text='Add Project'
-            component={Link} to="/projects/add"
-            btnstyle="primary"
-          />
+        <CustomButton
+          text='Add Project'
+          link='/projects/add'
+          btnstyle="primary"
+        />
       </Box>
       {loading ? (
         <Spinner />

@@ -1,6 +1,8 @@
 import { gql } from "graphql-tag";
 import Task from "../models/Task.js";
 import Project from "../models/Project.js";
+import Developer from "../models/Developer.js";
+import Client from "../models/Client.js";
 
 export const typeDefs = gql`
   extend type Query {
@@ -50,7 +52,6 @@ export const typeDefs = gql`
     createdAt: String
   }
 `;
-
 
 export const resolvers = {
   Query: {
@@ -109,6 +110,12 @@ export const resolvers = {
   Project: {
     tasks: async (parent) => {
       return await Task.find({ projectId: parent._id });
+    },
+    team: async (parent) => {
+      return await Developer.find({ _id: parent.team });
+    },
+    client: async (parent) => {
+      return await Client.find({ _id: parent.clientId });
     }
   },
 }

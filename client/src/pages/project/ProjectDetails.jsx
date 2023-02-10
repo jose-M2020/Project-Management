@@ -1,22 +1,47 @@
-import { useQuery } from '@apollo/client';
-import { Box, Chip, Divider, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, MenuItem, Select, TextField, Typography } from '@mui/material';
-import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
-import CachedIcon from '@mui/icons-material/Cached';
-import { Link, useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useMutation, useQuery } from '@apollo/client';
+import { Backdrop, Box, Chip, Divider, Fade, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, MenuItem, Modal, TextField, Typography } from '@mui/material';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import Header from '../../components/Header';
 import Spinner from '../../components/Spinner';
-import ClientInfo from '../../components/ClientInfo';
 import { GET_PROJECT } from '../../graphql/queries/projectQueries';
 import CircularProgressWithLabel from '../../components/project/CircularProgressWithLabel';
 import { status, statusIcon } from '../../helpers/helpers';
 import CustomButton from '../../components/CustomButton';
-import Input from '../../components/form/Input';
+import { DELETE_PROJECT } from '../../graphql/mutations/projectMutations';
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+};
 
 const ProjectDetails = () => {
   const { id } = useParams();
   const { loading, error, data } = useQuery(GET_PROJECT, { variables: { id } });
+  const [open, setOpen] = useState(false);
+  const [deleteProject, { loading: deleting, error: deleteError }] =
+      useMutation(DELETE_PROJECT, {
+        refetchQueries: ["getProjects"],
+      });
 
   if (error) return <p>Something Went Wrong</p>;
+  
+  const handleModal = () => setOpen(!open);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const result = await deleteProject({
+			variables: { id },
+		});
+		if (result.data.deleteProject._id) {
+			Navigate("/projects");
+		}  
+  }
 
   return (
     <Box m="20px">
@@ -82,10 +107,10 @@ const ProjectDetails = () => {
                   <Typography variant="h3">Collaborators</Typography>
                   <Divider />
                   <Box mt={2}>
-                    {data.project.team.lenght ? (
-                      (data.project.team).map( (item, i) => (
+                    {data?.project?.team.lenght ? (
+                      (data?.project?.team).map( (item, i) => (
                         <Box>
-                          {item.firsname} {item.lastname}
+                          {item?.firsname} {item?.lastname}
                         </Box>
                       ))
                     ) : (
@@ -96,7 +121,7 @@ const ProjectDetails = () => {
                 <Box>
                   <Typography variant="h3">Actions</Typography>
                   <Divider />
-                  <Box mt={2} display='flex' justifyContent='space-between' alignItems='center'>
+                  <Box my={3} display='flex' justifyContent='space-between' alignItems='center'>
                     <Box>
                       <Typography variant='h5' fontWeight='bold'>Change Status</Typography>
                       <Typography>Change the project status</Typography>
@@ -127,7 +152,7 @@ const ProjectDetails = () => {
                       ))}
                     </Select> */}
                   </Box>
-                  <Box mt={2} display='flex' justifyContent='space-between' alignItems='center'>
+                  <Box my={3} display='flex' justifyContent='space-between' alignItems='center'>
                     <Box>
                       <Typography variant='h5' fontWeight='bold'>Edit</Typography>
                       <Typography>Change the project status</Typography>
@@ -138,7 +163,7 @@ const ProjectDetails = () => {
                       btnstyle="primary"
                     />
                   </Box>
-                  <Box mt={2} display='flex' justifyContent='space-between' alignItems='center'>
+                  <Box my={3} display='flex' justifyContent='space-between' alignItems='center'>
                     <Box>
                       <Typography variant='h5' fontWeight='bold'>Delete</Typography>
                       <Typography>Change the project status</Typography>
@@ -146,7 +171,37 @@ const ProjectDetails = () => {
                     <CustomButton
                       text='Delete Project'
                       btnstyle="primary"
+                      onClick={handleModal}
                     />
+                    <Modal
+                      aria-labelledby="transition-modal-title"
+                      aria-describedby="transition-modal-description"
+                      open={open}
+                      onClose={handleModal}
+                      closeAfterTransition
+                      BackdropComponent={Backdrop}
+                      BackdropProps={{
+                        timeout: 500,
+                      }}
+                    >
+                      <Fade in={open}>
+                        <Box sx={style}>
+                          <Typography id="transition-modal-title" variant="h4" component="h2">
+                            Are you sure you want to delete this project?
+                          </Typography>
+                          <Typography id="transition-modal-description" sx={{ my: 2 }}>
+                            This repository will permanently delete with related tasks and events.
+                          </Typography>
+                          <form onSubmit={handleSubmit}>
+                            <CustomButton
+                              text='Delete Project'
+                              btnstyle="primary"
+                              type='submit'
+                            />
+                          </form>
+                        </Box>
+                      </Fade>
+                    </Modal>
                   </Box>
                 </Box>
                 {/* <ClientInfo client={data.project.client} /> */}

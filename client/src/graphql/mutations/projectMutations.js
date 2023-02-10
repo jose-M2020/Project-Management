@@ -33,8 +33,8 @@ const ADD_PROJECT = gql`
 
 const DELETE_PROJECT = gql`
   mutation DeleteProject($id: ID!) {
-    deleteProject(id: $id) {
-      id
+    deleteProject(_id: $id) {
+      _id
     }
   }
 `;

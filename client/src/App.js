@@ -11,8 +11,9 @@ import ProjectForm from './pages/project/ProjectForm';
 import Tasks from './pages/Tasks';
 import Calendar from './pages/Calendar';
 import Bug from './pages/Bug';
-import Clients from './pages/Clients';
-import Team from './pages/Team';
+import Clients from './pages/client/Clients';
+import ClientForm from './pages/client/ClientForm';
+import Team from './pages/team/Team';
 import Faq from './pages/Faq';
 import Bar from './pages/chart/Bar';
 import Pie from './pages/chart/Pie';
@@ -70,6 +71,7 @@ function App() {
                   <Route path='/calendar' element={<Calendar />} />
                   <Route path='/bugs' element={<Bug />} />
                   <Route path='/clients' element={<Clients />} />
+                  <Route path='/clients/add' element={<ClientForm />} />
                   <Route path='/team' element={<Team />} />
                   <Route path='/faq' element={<Faq />} />
                   <Route path='/bar' element={<Bar />} />

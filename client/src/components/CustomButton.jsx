@@ -1,8 +1,9 @@
 import { useTheme } from '@emotion/react';
 import { Button, CircularProgress } from '@mui/material';
+import { Link } from 'react-router-dom';
 import { tokens } from '../theme';
 
-const CustomButton = ({text, ...props}) => {
+const CustomButton = ({text, link, ...props}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -41,6 +42,10 @@ const CustomButton = ({text, ...props}) => {
         disabled: 'true',
         startIcon: <CircularProgress size={20} thickness={6}  />
       }}
+      {...(link && {
+        component: Link,
+        to: link
+      })}
     >
       {props.loading ? 'Submitting' : text}
     </Button>

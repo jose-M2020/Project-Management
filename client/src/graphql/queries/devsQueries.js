@@ -1,17 +1,20 @@
 import { gql } from '@apollo/client';
 
 export const GET_DEVS = gql`
-  query getProjects {
+  query getDevelopers {
     developers {
       _id
       firstname
       lastname
+      email,
+      phone
+      position
     }
   }
 `;
 
 export const GET_DEVSNAME = gql`
-  query getProjects {
+  query getDevelopers {
     developers {
       _id
       firstname
@@ -21,7 +24,7 @@ export const GET_DEVSNAME = gql`
 `;
 
 export const GET_DEV = gql`
-  query getProject($id: ID!) {
+  query getDeveloper($id: ID!) {
     developers(id: $id) {
       id
       name

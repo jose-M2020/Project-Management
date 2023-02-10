@@ -1,13 +1,14 @@
 import { useQuery } from '@apollo/client';
 import { Box, useTheme } from '@mui/material'
 import { DataGrid } from "@mui/x-data-grid";
-import Header from '../components/Header'
-import Spinner from '../components/Spinner';
-import { GET_CLIENTS } from '../graphql/queries/clientQueries';
-import { tokens } from '../theme';
+import CustomButton from '../../components/CustomButton';
+import Header from '../../components/Header'
+import Spinner from '../../components/Spinner';
+import { GET_DEVS } from '../../graphql/queries/devsQueries';
+import { tokens } from '../../theme';
 
-const Clients = () => {
-  const { loading, error, data } = useQuery(GET_CLIENTS);
+const Team = () => {
+  const { loading, error, data } = useQuery(GET_DEVS);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   
@@ -37,12 +38,23 @@ const Clients = () => {
       headerName: "Phone Number",
       flex: 1,
     },
-    
+    {
+      field: "position",
+      headerName: "Position",
+      flex: 1,
+    },
   ];
 
   return (
     <Box m="20px">
-      <Header title="CLIENTS" subtitle="List of clients" />
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Header title="TEAM" subtitle="Managing the team members" />
+        <CustomButton
+          text='Add member'
+          link='/team/add'
+          btnstyle="primary"
+        />
+      </Box>
       {loading || error ? (
         <Spinner />
       ) : (
@@ -77,7 +89,7 @@ const Clients = () => {
         >
           <DataGrid 
             checkboxSelection
-            rows={data.clients}
+            rows={data.developers}
             columns={columns}
             getRowId={(row) => row._id}  
           />
@@ -87,4 +99,4 @@ const Clients = () => {
   )
 };
 
-export default Clients;
+export default Team;
