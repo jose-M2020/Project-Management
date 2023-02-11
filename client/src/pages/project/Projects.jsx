@@ -38,7 +38,12 @@ const Projects = () => {
             ))}
           </Grid2>
         ) : (
-          <p>No Projects</p>
+          <Box sx={{
+            marginTop: 3,
+            textAlign: 'center'
+          }}>
+            <Typography variant='h2'>No Projects</Typography>
+          </Box>
         )
       )}
     </Box>

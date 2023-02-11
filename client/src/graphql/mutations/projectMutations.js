@@ -9,7 +9,7 @@ const ADD_PROJECT = gql`
     $type: String!,
     $status: String,
     $team: [ID],
-    $clientID: ID,
+    $clientId: ID,
     $tags: [String]
   ) {
     createProject(
@@ -20,7 +20,7 @@ const ADD_PROJECT = gql`
       type: $type,
       status: $status,
       team: $team,
-      clientID: $clientID,
+      clientId: $clientId,
       tags: $tags
     ) {
       _id

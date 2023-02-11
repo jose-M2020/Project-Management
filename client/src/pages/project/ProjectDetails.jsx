@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Backdrop, Box, Chip, Divider, Fade, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, MenuItem, Modal, TextField, Typography } from '@mui/material';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Header from '../../components/Header';
 import Spinner from '../../components/Spinner';
 import { GET_PROJECT } from '../../graphql/queries/projectQueries';
@@ -23,6 +23,7 @@ const style = {
 
 const ProjectDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { loading, error, data } = useQuery(GET_PROJECT, { variables: { id } });
   const [open, setOpen] = useState(false);
   const [deleteProject, { loading: deleting, error: deleteError }] =
@@ -33,13 +34,16 @@ const ProjectDetails = () => {
   if (error) return <p>Something Went Wrong</p>;
   
   const handleModal = () => setOpen(!open);
-  const handleSubmit = async (e) => {
+
+  const handleDelete = async (e) => {
     e.preventDefault();
+
     const result = await deleteProject({
 			variables: { id },
 		});
 		if (result.data.deleteProject._id) {
-			Navigate("/projects");
+			navigate('/projects');
+      console.log('redirecting to')
 		}  
   }
 
@@ -107,10 +111,10 @@ const ProjectDetails = () => {
                   <Typography variant="h3">Collaborators</Typography>
                   <Divider />
                   <Box mt={2}>
-                    {data?.project?.team.lenght ? (
+                    {data?.project?.team.length ? (
                       (data?.project?.team).map( (item, i) => (
-                        <Box>
-                          {item?.firsname} {item?.lastname}
+                        <Box key={i}>
+                          <Typography>{item?.firstname} {item?.lastname}</Typography>
                         </Box>
                       ))
                     ) : (
@@ -192,7 +196,7 @@ const ProjectDetails = () => {
                           <Typography id="transition-modal-description" sx={{ my: 2 }}>
                             This repository will permanently delete with related tasks and events.
                           </Typography>
-                          <form onSubmit={handleSubmit}>
+                          <form onSubmit={handleDelete}>
                             <CustomButton
                               text='Delete Project'
                               btnstyle="primary"

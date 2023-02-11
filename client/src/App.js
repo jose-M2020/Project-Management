@@ -10,7 +10,7 @@ import ProjectDetails from './pages/project/ProjectDetails';
 import ProjectForm from './pages/project/ProjectForm';
 import Tasks from './pages/Tasks';
 import Calendar from './pages/Calendar';
-import Bug from './pages/Bug';
+import Bugs from './pages/bug/Bugs';
 import Clients from './pages/client/Clients';
 import ClientForm from './pages/client/ClientForm';
 import Team from './pages/team/Team';
@@ -69,7 +69,7 @@ function App() {
                   <Route path='/projects/:id/edit' element={<ProjectForm />} />
                   <Route path='/tasks' element={<Tasks />} />
                   <Route path='/calendar' element={<Calendar />} />
-                  <Route path='/bugs' element={<Bug />} />
+                  <Route path='/bugs' element={<Bugs />} />
                   <Route path='/clients' element={<Clients />} />
                   <Route path='/clients/add' element={<ClientForm />} />
                   <Route path='/team' element={<Team />} />

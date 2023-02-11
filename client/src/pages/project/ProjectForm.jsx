@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import * as yup from 'yup';
@@ -10,19 +11,6 @@ import Header from '../../components/Header';
 import AutoComplete from '../../components/form/AutoComplete';
 import { ADD_PROJECT } from '../../graphql/mutations/projectMutations';
 import { GET_PROJECT, GET_PROJECTS } from '../../graphql/queries/projectQueries';
-import { useParams } from 'react-router-dom';
-
-let initialValues = {
-    name: '',
-    description: '',
-    repository: '',
-    url: '',
-    type: '',
-    status: 'Not Started',
-    team: [],
-    clientID: '',
-    tags: []
-};
 
 const schema = yup.object().shape({
   name: yup.string().required(),
@@ -60,11 +48,27 @@ const tagsOptions = [
 
 const ProjectForm = () => {
   const { id } = useParams();
-  const { loading: projectLoading, data: projectData } = useQuery(GET_PROJECT, { variables: { id } });
-  initialValues = projectData?.project;
-
+  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [activeSteps, setActiveSteps] = useState(false);
+  
+  // TODO: Query by condition
+  const { loading: projectLoading, data: projectData } = useQuery(GET_PROJECT, { variables: { id } });
+  
+  const initialValues = id ? projectData?.project : (
+    {
+      name: '',
+      description: '',
+      repository: '',
+      url: '',
+      type: '',
+      status: 'Not Started',
+      team: [],
+      clientId: '',
+      tags: []
+    }
+  )
+  
   const { loading, data } = useQuery(gql`
     query {
       developers {
@@ -93,10 +97,9 @@ const ProjectForm = () => {
   const devsOptions = transformData(data, 'developers');
 
   const onSubmit = async (values, actions) => {
-    console.log(values);
     createProject({ variables: values});
-    // console.log(postLoading);
-    actions.resetForm();
+    // actions.resetForm();
+    navigate('/projects');
   }
 
   const handleNext = () => {
@@ -107,64 +110,16 @@ const ProjectForm = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
+  useEffect(()=>{
+		if(id){
+      setActiveSteps(true)
+    }
+	}, [id, projectData])
+
   return (
     <Box m="20px">
       <Header title="NEW PROJECT" subtitle="Fill the fields to create new project" />
-      {/* <Formik
-        initialValues={initialValues}
-        validationSchema={schema}
-        onSubmit={onSubmit}
-      >
-        {({setFieldValue}) => (
-          <Form>
-            <Typography variant='h3'>Project</Typography>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: [3],
-                maxWidth: '550px',
-                marginX: 'auto',
-                marginBottom: '10px'
-              }}
-            >
-              <Input label="Name*" name="name" />
-              <Input label="Description*" name="description" multiline rows={4} />
-              <Input label="Type" name="type" />
-              {!loading && (
-                <>
-                  <AutoComplete label="Client" 
-                              name="clientID" 
-                              options={clientsOptions}
-                  />
-                  <AutoComplete label="Team" 
-                              name="team" 
-                              options={devsOptions}
-                              multiple
-                  />
-                </>
-              )}
-              <AutoComplete label="Tags" 
-                            name="tags" 
-                            options={tagsOptions} 
-                            multiple
-                            freeSolo
-                />
-              <Input label="Repository" name="repository" 
-                     icon={<LanguageIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />} 
-                     variant="standard"     
-              />
-              <Input label="URL" name="url" 
-                     icon={<LanguageIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />} 
-                     variant="standard"     
-              />              
-              <CustomButton text='Create project' type="submit" />
-            </Box>
-          </Form>
-        )}
-      </Formik> */}
-
-      { !projectLoading && (
+      { (!projectLoading) && (
         <Formik
           initialValues={initialValues}
           validationSchema={schema}
@@ -205,7 +160,7 @@ const ProjectForm = () => {
                       {!loading && (
                         <>
                           <AutoComplete label="Client" 
-                                      name="clientID" 
+                                      name="clientId" 
                                       options={clientsOptions}
                           />
                           <AutoComplete label="Team" 

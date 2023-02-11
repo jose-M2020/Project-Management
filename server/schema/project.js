@@ -1,6 +1,7 @@
 import { gql } from "graphql-tag";
-import Task from "../models/Task.js";
 import Project from "../models/Project.js";
+import Task from "../models/Task.js";
+import Event from "../models/Event.js";
 import Developer from "../models/Developer.js";
 import Client from "../models/Client.js";
 
@@ -19,7 +20,7 @@ export const typeDefs = gql`
       type: String!,
       status: String,
       team: [ID],
-      clientID: ID,
+      clientId: ID,
       tags: [String]
     ): Project
     updateProject(
@@ -47,7 +48,7 @@ export const typeDefs = gql`
     status: String
     team: [Developer]
     client: Client
-    tags: [String]
+    tags: [String]!
     tasks: [Task]
     createdAt: String
   }
@@ -71,7 +72,7 @@ export const resolvers = {
       type,
       status,
       team,
-      clientID,
+      clientId,
       tags
     }) => {
       const project = new Project({
@@ -82,7 +83,7 @@ export const resolvers = {
         type,
         status,
         team,
-        clientID,
+        clientId,
         tags
       });
       const savedProject = await project.save();
@@ -115,7 +116,7 @@ export const resolvers = {
       return await Developer.find({ _id: parent.team });
     },
     client: async (parent) => {
-      return await Client.find({ _id: parent.clientId });
+      return await Client.findOne({ _id: parent?.clientId });
     }
   },
 }

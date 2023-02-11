@@ -56,11 +56,11 @@ export const resolvers = {
       projectId
     }) => {
       const event = new Event({
-      title,
-      description,
-      date,
-      notify,
-      projectId
+        title,
+        description,
+        date,
+        notify,
+        projectId
       });
       const savedEvent = event.save();
       return savedEvent;
