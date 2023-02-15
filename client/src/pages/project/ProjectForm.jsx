@@ -46,6 +46,14 @@ const tagsOptions = [
   { label: 'PHP', value: 'PHP' },
 ]
 
+const flatData = (data, field) => {
+  if(data){
+    const array = data[field].map((item) => (item._id))
+    data[field] = array;
+    return data;
+  }
+}
+
 const ProjectForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -64,7 +72,7 @@ const ProjectForm = () => {
       type: '',
       status: 'Not Started',
       team: [],
-      clientId: '',
+      clientId: null,
       tags: []
     }
   )
@@ -93,13 +101,19 @@ const ProjectForm = () => {
 		],
 	});
 
-  const clientsOptions = transformData(data, 'clients');
-  const devsOptions = transformData(data, 'developers');
+  // const clientsOptions = transformData(data, 'clients');
+  // const devsOptions = transformData(data, 'developers');
 
   const onSubmit = async (values, actions) => {
-    createProject({ variables: values});
-    // actions.resetForm();
-    navigate('/projects');
+    if(id) {
+      console.log(values);
+
+    } else {
+      createProject({ variables: values});
+      actions.resetForm();
+    }
+
+    // navigate('/projects');
   }
 
   const handleNext = () => {
@@ -159,14 +173,46 @@ const ProjectForm = () => {
                     <Box sx={{ display: 'flex', gap: 3, flexDirection: 'column' }}>
                       {!loading && (
                         <>
-                          <AutoComplete label="Client" 
-                                      name="clientId" 
-                                      options={clientsOptions}
+                          <AutoComplete 
+                            label="Client" 
+                            name="clientId" 
+                            options={data.clients}
+                            value={data.clients.find((option) => (
+                              option._id === values?.clientId
+                            )) || null}
+                            setLabel={(option) => `${option.firstname} ${option.lastname}`}
+                            valueField='_id'
                           />
-                          <AutoComplete label="Team" 
-                                      name="team" 
-                                      options={devsOptions}
-                                      multiple
+                          {/* <AutoComplete 
+                            label="Client" 
+                            name="clientId" 
+                            options={clientsOptions}
+                            value={clientsOptions.find((option) => (
+                              option.value === values?.clientId
+                            )) || null}
+                            // getOptionLabel={option => `${option.firstname} ${option.lastname}`}
+                          /> */}
+                          <AutoComplete 
+                            label="Team" 
+                            name="team" 
+                            options={data?.developers}
+                            setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
+                            valueField='_id'
+                            multiple
+                            // value={data?.developers.map((option) => {
+                            //   // console.log(values?.team.find(item => item._id === option._id))
+                            //   const finded = values?.team.find(item => item._id === option._id);
+                            //   console.log(finded)
+                            //   return finded
+                            // }) || null}
+                            // value={values.team}
+                            value={data?.developers.reduce((acc, item) => (
+                              values.team.find(dev => dev._id === item._id) ? 
+                                [...acc,
+                                  item._id
+                                ]
+                              : acc
+                            ), [])}
                           />
                         </>
                       )}
@@ -185,12 +231,32 @@ const ProjectForm = () => {
                   </StepLabel>
                   <StepContent>
                     <Box sx={{ display: 'flex', gap: 3, flexDirection: 'column' }}>
-                      <AutoComplete label="Tags" 
-                                    name="tags" 
-                                    options={tagsOptions} 
-                                    multiple
-                                    freeSolo
-                        />
+                      {/* <AutoComplete 
+                        label="Tags" 
+                        name="tags" 
+                        value={values.tags}
+                        options={tagsOptions} 
+                        multiple
+                        freeSolo
+                      /> */}
+                      <AutoComplete 
+                        label="Tags" 
+                        name="tags" 
+                        // value={values.tags}
+                        value={tagsOptions.map(tag => (
+                          values.tags.includes(tag.value) && tag
+                        ))}
+                        // value={tagsOptions.reduce((acc, item) => (
+                        //   values.tags.includes(item.value) ? 
+                        //     [...acc,
+                        //       item.value
+                        //     ]
+                        //   : acc
+                        // ), [])}
+                        options={tagsOptions} 
+                        multiple
+                        freeSolo
+                      />
                       <Input label="Repository" name="repository" 
                             icon={<LanguageIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />} 
                             variant="standard"     
@@ -204,7 +270,7 @@ const ProjectForm = () => {
                             <CustomButton text='Back' onClick={handleBack} btnstyle="secondary" />
                           )} 
                           <CustomButton 
-                            text='Create project' 
+                            text={id ? 'Update project' : 'Create project'} 
                             onClick={async () => {
                               const isValid = await schema.isValid(values);
                               !isValid && setActiveSteps(true);

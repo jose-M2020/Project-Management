@@ -24,15 +24,19 @@ export const GET_PROJECT = gql`
       type
       status
       team{
+        _id
         firstname
         lastname
       }
       client{
+        _id
         firstname
         lastname
       }
+      clientId
       tags
       tasks{
+        _id
         title
       }
       createdAt

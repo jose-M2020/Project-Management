@@ -2,22 +2,24 @@ import { Chip, TextField } from '@mui/material'
 import Autocomplete from '@mui/material/Autocomplete';
 import { useFormikContext } from 'formik';
 
-const AutoComplete = ({options, ...props}) => {
+const AutoComplete = ({options, setLabel, valueField = 'value', ...props}) => {
   const { setFieldValue } = useFormikContext();
 
   return (
     <Autocomplete
-      getOptionLabel={(option) => option.label}
+      getOptionLabel={(option) => (
+        setLabel ? setLabel(option) : option.label
+      )}
       options={options}
-      onChange={(e, value) => {
+      onChange={(_, value) => {
         const val = props.multiple ? (
-            value.flatMap(item => (
-              (typeof item === 'string') ? item : (item?.value)
+            value.map(item => (
+              (typeof item === 'string') ? item : (item[valueField])
             ))
           ) : (
-            value?.value
+            value ? value[valueField] : value
           )
-        
+          
         setFieldValue(props.name, val);
       }}
       sx={{
@@ -34,7 +36,11 @@ const AutoComplete = ({options, ...props}) => {
               <Chip 
                 variant="outlined"
                 label={
-                  (typeof option === 'string') ? option : (option?.label)
+                  (typeof option === 'string') ? (
+                    option 
+                  ) : (
+                    setLabel ? setLabel(option) : option.label
+                  )
                 } 
                 {...getTagProps({ index })}
               />

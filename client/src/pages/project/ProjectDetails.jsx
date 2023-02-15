@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { Backdrop, Box, Chip, Divider, Fade, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, MenuItem, Modal, TextField, Typography } from '@mui/material';
+import { Backdrop, Box, Stack, Chip, Divider, Fade, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, MenuItem, Modal, TextField, Typography } from '@mui/material';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Header from '../../components/Header';
 import Spinner from '../../components/Spinner';
@@ -125,88 +125,90 @@ const ProjectDetails = () => {
                 <Box>
                   <Typography variant="h3">Actions</Typography>
                   <Divider />
-                  <Box my={3} display='flex' justifyContent='space-between' alignItems='center'>
-                    <Box>
-                      <Typography variant='h5' fontWeight='bold'>Change Status</Typography>
-                      <Typography>Change the project status</Typography>
-                    </Box>
-                    <TextField
-                      select
-                      defaultValue={data.project.status}
-                    >
-                      {status.map((option) => (
-                        <MenuItem key={option.name} value={option.name} display='flex' alignItems='center' >
-                          {option.icon({mr: '22px'})}
-                          <Typography variant='span'>{option.name}</Typography>
-                        </MenuItem>
-                      ))}
-                    </TextField>
+                  <Stack spacing={2}>
+                    <Box display='flex' justifyContent='space-between' alignItems='center'>
+                      <Box>
+                        <Typography variant='h5' fontWeight='bold'>Change Status</Typography>
+                        <Typography>Change the project status</Typography>
+                      </Box>
+                      <TextField
+                        select
+                        defaultValue={data.project.status}
+                      >
+                        {status.map((option) => (
+                          <MenuItem key={option.name} value={option.name} display='flex' alignItems='center' >
+                            {option.icon({mr: '22px'})}
+                            <Typography variant='span'>{option.name}</Typography>
+                          </MenuItem>
+                        ))}
+                      </TextField>
 
-                    {/* <Select
-                      defaultValue={data.project.status}
-                      labelId="demo-simple-select-error-label"
-                      id="demo-simple-select-error"
-                      label="Age"
-                      renderValue={(value) => `${statusIcon[value].icon} ${value}`}
-                    >
-                      {status.map((option) => (
-                        <MenuItem key={option.name} value={option.name} >
-                          {option.icon({mr: '22px'})} {option.name}
-                        </MenuItem>
-                      ))}
-                    </Select> */}
-                  </Box>
-                  <Box my={3} display='flex' justifyContent='space-between' alignItems='center'>
-                    <Box>
-                      <Typography variant='h5' fontWeight='bold'>Edit</Typography>
-                      <Typography>Change the project status</Typography>
+                      {/* <Select
+                        defaultValue={data.project.status}
+                        labelId="demo-simple-select-error-label"
+                        id="demo-simple-select-error"
+                        label="Age"
+                        renderValue={(value) => `${statusIcon[value].icon} ${value}`}
+                      >
+                        {status.map((option) => (
+                          <MenuItem key={option.name} value={option.name} >
+                            {option.icon({mr: '22px'})} {option.name}
+                          </MenuItem>
+                        ))}
+                      </Select> */}
                     </Box>
-                    <CustomButton
-                      text='Edit Project'
-                      component={Link} to={`/projects/${data.project._id}/edit`}
-                      btnstyle="primary"
-                    />
-                  </Box>
-                  <Box my={3} display='flex' justifyContent='space-between' alignItems='center'>
-                    <Box>
-                      <Typography variant='h5' fontWeight='bold'>Delete</Typography>
-                      <Typography>Change the project status</Typography>
+                    <Box display='flex' justifyContent='space-between' alignItems='center'>
+                      <Box>
+                        <Typography variant='h5' fontWeight='bold'>Edit</Typography>
+                        <Typography>Change the project status</Typography>
+                      </Box>
+                      <CustomButton
+                        text='Edit Project'
+                        component={Link} to={`/projects/${data.project._id}/edit`}
+                        btnstyle="primary"
+                      />
                     </Box>
-                    <CustomButton
-                      text='Delete Project'
-                      btnstyle="primary"
-                      onClick={handleModal}
-                    />
-                    <Modal
-                      aria-labelledby="transition-modal-title"
-                      aria-describedby="transition-modal-description"
-                      open={open}
-                      onClose={handleModal}
-                      closeAfterTransition
-                      BackdropComponent={Backdrop}
-                      BackdropProps={{
-                        timeout: 500,
-                      }}
-                    >
-                      <Fade in={open}>
-                        <Box sx={style}>
-                          <Typography id="transition-modal-title" variant="h4" component="h2">
-                            Are you sure you want to delete this project?
-                          </Typography>
-                          <Typography id="transition-modal-description" sx={{ my: 2 }}>
-                            This repository will permanently delete with related tasks and events.
-                          </Typography>
-                          <form onSubmit={handleDelete}>
-                            <CustomButton
-                              text='Delete Project'
-                              btnstyle="primary"
-                              type='submit'
-                            />
-                          </form>
-                        </Box>
-                      </Fade>
-                    </Modal>
-                  </Box>
+                    <Box display='flex' justifyContent='space-between' alignItems='center'>
+                      <Box>
+                        <Typography variant='h5' fontWeight='bold'>Delete</Typography>
+                        <Typography>Change the project status</Typography>
+                      </Box>
+                      <CustomButton
+                        text='Delete Project'
+                        btnstyle="primary"
+                        onClick={handleModal}
+                      />
+                      <Modal
+                        aria-labelledby="transition-modal-title"
+                        aria-describedby="transition-modal-description"
+                        open={open}
+                        onClose={handleModal}
+                        closeAfterTransition
+                        BackdropComponent={Backdrop}
+                        BackdropProps={{
+                          timeout: 500,
+                        }}
+                      >
+                        <Fade in={open}>
+                          <Box sx={style}>
+                            <Typography id="transition-modal-title" variant="h4" component="h2">
+                              Are you sure you want to delete this project?
+                            </Typography>
+                            <Typography id="transition-modal-description" sx={{ my: 2 }}>
+                              This repository will permanently delete with related tasks and events.
+                            </Typography>
+                            <form onSubmit={handleDelete}>
+                              <CustomButton
+                                text='Delete Project'
+                                btnstyle="primary"
+                                type='submit'
+                              />
+                            </form>
+                          </Box>
+                        </Fade>
+                      </Modal>
+                    </Box>
+                  </Stack>
                 </Box>
                 {/* <ClientInfo client={data.project.client} /> */}
 

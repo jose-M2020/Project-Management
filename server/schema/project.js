@@ -48,6 +48,7 @@ export const typeDefs = gql`
     status: String
     team: [Developer]
     client: Client
+    clientId: ID
     tags: [String]!
     tasks: [Task]
     createdAt: String
