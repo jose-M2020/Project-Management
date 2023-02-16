@@ -7,6 +7,12 @@ const EventSchema = new mongoose.Schema({
   description: {
     type: String,
   },
+  start: {
+    type: String,
+  },
+  end: {
+    type: String,
+  },
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',

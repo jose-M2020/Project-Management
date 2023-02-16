@@ -209,7 +209,7 @@ const ProjectForm = () => {
                             value={data?.developers.reduce((acc, item) => (
                               values.team.find(dev => dev._id === item._id) ? 
                                 [...acc,
-                                  item._id
+                                  item
                                 ]
                               : acc
                             ), [])}

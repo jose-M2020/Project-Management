@@ -1,5 +1,6 @@
 import { gql } from "graphql-tag";
 import Event from "../models/Event.js";
+import Project from "../models/Project.js";
 
 export const typeDefs = gql`
   extend type Query {
@@ -11,7 +12,9 @@ export const typeDefs = gql`
     createEvent(
       title: String!,
       description: String!,
-      date: String!,
+      start: String!,
+      end: String!,
+      # date: String!,
       notify: String,
       projectId: ID
     ): Event
@@ -19,7 +22,9 @@ export const typeDefs = gql`
       _id: ID!,
       title: String!,
       description: String!,
-      date: String!,
+      start: String!,
+      end: String!,
+      # date: String!,
       notify: String,
       projectId: ID
     ): Event
@@ -30,9 +35,12 @@ export const typeDefs = gql`
     _id: ID!
     title: String!
     description: String!
+    start: String!
+    end: String!
     date: String!
     notify: String
     project: Project
+    projectId: ID
     createdAt: String
   }
 `;
@@ -47,6 +55,7 @@ export const resolvers = {
       return await Event.findById(_id);
     }
   },
+  
   Mutation: {
     createEvent: async (_, {
       title,
@@ -76,6 +85,12 @@ export const resolvers = {
       const deletedEvent = await Event.findByIdAndDelete(_id);
       if (!deletedEvent) throw new Error("Event not found");
       return deletedEvent;
+    },
+  },
+
+  Event: {
+    project: async (parent) => {
+      return await Project.find({ _id: parent.projectId });
     },
   }
 }
