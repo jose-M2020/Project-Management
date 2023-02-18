@@ -11,11 +11,11 @@ export const typeDefs = gql`
   extend type Mutation {
     createEvent(
       title: String!,
-      description: String!,
+      description: String,
       start: String!,
       end: String!,
       # date: String!,
-      notify: String,
+      notify: Boolean,
       projectId: ID
     ): Event
     updateEvent(
@@ -34,11 +34,11 @@ export const typeDefs = gql`
   type Event {
     _id: ID!
     title: String!
-    description: String!
+    description: String
     start: String!
     end: String!
-    date: String!
-    notify: String
+    date: String
+    notify: Boolean
     project: Project
     projectId: ID
     createdAt: String
@@ -49,7 +49,7 @@ export const typeDefs = gql`
 export const resolvers = {
   Query: {
     events: async () => {
-      return await Event.find();
+      return await Event.find().sort({start: -1});
     },
     event: async (_, { _id }) => {
       return await Event.findById(_id);
@@ -60,6 +60,8 @@ export const resolvers = {
     createEvent: async (_, {
       title,
       description,
+      start,
+      end,
       date,
       notify,
       projectId
@@ -67,6 +69,8 @@ export const resolvers = {
       const event = new Event({
         title,
         description,
+        start,
+        end,
         date,
         notify,
         projectId
@@ -90,7 +94,8 @@ export const resolvers = {
 
   Event: {
     project: async (parent) => {
-      return await Project.find({ _id: parent.projectId });
+      return (parent?.projectId) && (await Project.find({ _id: parent?.projectId }))
+      ;
     },
   }
 }

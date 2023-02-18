@@ -8,7 +8,10 @@ export const GET_EVENTS = gql`
       description
       start
       end
-      project
+      project{
+        _id
+        name
+      }
       notify
     }
   }

@@ -10,7 +10,9 @@ import listPlugin from "@fullcalendar/list";
 import {
   Backdrop,
   Box,
+  Checkbox,
   Fade,
+  FormControlLabel,
   List,
   ListItem,
   ListItemText,
@@ -19,12 +21,15 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import Header from "../components/Header";
 import { tokens } from "../theme";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { GET_EVENTS } from "../graphql/queries/eventQueries";
 import Input from "../components/form/Input";
 import CustomButton from "../components/CustomButton";
+import { CREATE_EVENT, DELETE_EVENT } from '../graphql/mutations/eventMutations';
 
 const style = {
   position: 'absolute',
@@ -41,137 +46,157 @@ const style = {
 const schema = yup.object().shape({
   title: yup.string().required(),
   description: yup.string(),
-  start: yup.string().required(),
-  end: yup.string().required(),
-  projectId: yup.string(),
+  start: yup.string(),
+  end: yup.string(),
+  projectId: yup.string().nullable(),
   notify: yup.boolean(),
 });
 
 const Calendar = () => {
-  // const { loading, data } = useQuery(GET_EVENTS);
+  const { loading, data } = useQuery(GET_EVENTS);
   const [openModalCreate, setOpenModalCreate] = useState(false);
-  const handleOpenModalCreate = () => setOpenModalCreate(!openModalCreate);
+  const [openModalDelete, setOpenModalDelete] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [currentEvents, setCurrentEvents] = useState([]);
-  const [selectedDAte, setSelectedDAte] = useState({});
+  const [selectedDate, setSelectedDate] = useState({});
+  const [selectedEvent, setSelectedEvent] = useState({});
+  
+  const handleOpenModalCreate = () => setOpenModalCreate(!openModalCreate);
+  const handleOpenModalDelete = () => setOpenModalDelete(!openModalDelete);
+  
+  const [createEvent, { postLoading, postError }] = useMutation(CREATE_EVENT, {
+		refetchQueries: [
+			{
+				query: GET_EVENTS,
+			},
+			"getEvents",
+		],
+	});
+  const [deleteEvent, { loading: deleting, error: deleteError }] = useMutation(DELETE_EVENT, {
+    refetchQueries: ["getEvents"],
+  });
 
   const handleDateClick = selected => {
-    setSelectedDAte({
-      start: selected.startStr,
-      end: selected.endStr,
-      allDay: selected.allDay,
-    })
-
+    setSelectedDate(selected)
     setOpenModalCreate(true);
-    // const calendarApi = selected.view.calendar;
-    // calendarApi.unselect();
-    // console.log(selected);
-
-    // if (title) {
-    //   calendarApi.addEvent({
-    //     id: `${selected.dateStr}-${title}`,
-    //     title,
-    //     start: selected.startStr,
-    //     end: selected.endStr,
-    //     allDay: selected.allDay,
-    //   });
-    // }
   };
 
-  const handleEventClick = (selected) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete the event '${selected.event.title}'`
-      )
-    ) {
-      selected.event.remove();
+  const handleEventClick = async (selected) => {
+    setSelectedEvent(selected);
+    setOpenModalDelete(true);
+  };
+
+  const onSubmit = async (values, actions) => {
+    const calendarApi = selectedDate.view.calendar;
+    const variables = {
+      ...values,
+      start: selectedDate.startStr,
+      end: selectedDate.endStr,
+      allDay: selectedDate.allDay,
     }
-  };
+    console.log(variables)
+    // const {data: {createEvent: newEvent} } = await createEvent({ variables });
+    
+    // calendarApi.unselect();
+    // calendarApi.addEvent({
+    //   id: newEvent._id,
+    //   title: newEvent.title,
+    //   start: newEvent.start,
+    //   end: newEvent.end,
+    // });
 
-  const onSubmit = (values, actions) => {
-    console.log(selectedDAte);
+    // setOpenModalCreate(false);
+    // actions.resetForm();
+  }
+
+  const handleDelete = async e => {
+    e.preventDefault();
+
+    const result = await deleteEvent({
+			variables: { id: selectedEvent.event.id },
+		});
+
+		if (result.data.deleteEvent._id) {
+      setOpenModalDelete(false)
+    }
+
+    selectedEvent.event.remove();
   }
 
   return (
     <Box m="20px">
       <Header title="CALENDAR" subtitle="Managing events" />
       
-      <Box display="flex" justifyContent="space-between">
-        {/* CALENDAR SIDEBAR */}
-        <Box
-          flex="1 1 20%"
-          backgroundColor={colors.primary[400]}
-          p="15px"
-          borderRadius="4px"
-        >
-          <Typography variant="h5">Events</Typography>
-          <List>
-            {currentEvents.map((event) => (
-              <ListItem
-                key={event.id}
-                sx={{
-                  backgroundColor: colors.greenAccent[500],
-                  margin: "10px 0",
-                  borderRadius: "2px",
-                }}
-              >
-                <ListItemText
-                  primary={event.title}
-                  secondary={
-                    <Typography>
-                      {formatDate(event.start, {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </Typography>
-                  }
-                />
-              </ListItem>
-            ))}
-          </List>
-        </Box>
+      {!loading ? (
+        <Box display="flex" justifyContent="space-between">
+          {/* CALENDAR SIDEBAR */}
+          <Box
+            flex="1 1 20%"
+            backgroundColor={colors.primary[400]}
+            p="15px"
+            borderRadius="4px"
+          >
+            <Typography variant="h5">Events</Typography>
+            <List>
+              {data?.events.map((event) => (
+                <ListItem
+                  key={event._id}
+                  sx={{
+                    backgroundColor: colors.blueAccent[700],
+                    margin: "10px 0",
+                    borderRadius: "2px",
+                  }}
+                >
+                  <ListItemText
+                    primary={event.title}
+                    secondary={
+                      <Typography>
+                        {formatDate(event.start, {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Box>
 
-        {/* CALENDAR */}
-        <Box flex="1 1 100%" ml="15px">
-          <FullCalendar
-            height="75vh"
-            plugins={[
-              dayGridPlugin,
-              timeGridPlugin,
-              interactionPlugin,
-              listPlugin,
-            ]}
-            headerToolbar={{
-              left: "prev,next today",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
-            }}
-            initialView="dayGridMonth"
-            editable={true}
-            selectable={true}
-            selectMirror={true}
-            dayMaxEvents={true}
-            select={handleDateClick}
-            eventClick={handleEventClick}
-            eventsSet={(events) => setCurrentEvents(events)}
-            initialEvents={[
-              {
-                id: "12315",
-                title: "All-day event",
-                description: "dfsdsdsdsdsdsdsds-day event",
-                date: "2022-09-14",
-              },
-              {
-                id: "5123",
-                title: "Timed event",
-                date: "2022-09-28",
-              },
-            ]}
-          />
+          {/* CALENDAR */}
+          <Box flex="1 1 100%" ml="15px">
+            <FullCalendar
+              height="75vh"
+              plugins={[
+                dayGridPlugin,
+                timeGridPlugin,
+                interactionPlugin,
+                listPlugin,
+              ]}
+              headerToolbar={{
+                left: "prev,next today",
+                center: "title",
+                right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+              }}
+              initialView="dayGridMonth"
+              editable={true}
+              selectable={true}
+              selectMirror={true}
+              dayMaxEvents={true}
+              select={handleDateClick}
+              eventClick={handleEventClick}
+              eventsSet={(events) => setCurrentEvents(events)}
+              initialEvents={data?.events.map(({_id, ...props}) => (
+                {id: _id, ...props}
+              ))}
+            />
+          </Box>
         </Box>
-      </Box>
+      ) : (
+        <h5>Loading...</h5>
+      )}
 
       <Modal
         aria-labelledby="transition-modal-title"
@@ -186,8 +211,8 @@ const Calendar = () => {
       >
         <Fade in={openModalCreate}>
           <Box sx={style}>
-            <Typography id="transition-modal-title" variant="h6" component="h2">
-              Text in a modal
+            <Typography id="transition-modal-title" variant="h4" component="h2" mb={4}>
+              Create an event
             </Typography>
             <Formik
               initialValues={{
@@ -195,6 +220,7 @@ const Calendar = () => {
                 description: '',
                 start: '',
                 end: '',
+                projectId: null,
                 notify: false,
               }}
               validationSchema={schema}
@@ -219,11 +245,52 @@ const Calendar = () => {
                         />
                       </>
                     )} */}          
-                    <CustomButton text='Create event' type="submit" />
+                    <FormControlLabel 
+                      control={
+                        <Checkbox 
+                          icon={<NotificationsNoneOutlinedIcon />} 
+                          checkedIcon={<NotificationsIcon />}
+                        />
+                      }
+                      name="notify"
+                      label="Notify"
+                    />
+                    <CustomButton 
+                      text='Create event' 
+                      type="submit"  
+                      loading={postLoading}
+                    />
                   </Stack>
                 </Form>
               )}
             </Formik>
+          </Box>
+        </Fade>
+      </Modal>
+      
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={openModalDelete}
+        onClose={handleOpenModalDelete}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}
+      >
+        <Fade in={openModalDelete}>
+          <Box sx={style}>
+            <Typography id="transition-modal-title" variant="h4" mb={4}>
+              Are you sure you want to delete the event "{ selectedEvent?.event?.title }"?
+            </Typography>
+            <form onSubmit={handleDelete}>
+              <CustomButton
+                text='Delete Event'
+                btnstyle="primary"
+                type='submit'
+              />
+            </form>
           </Box>
         </Fade>
       </Modal>
