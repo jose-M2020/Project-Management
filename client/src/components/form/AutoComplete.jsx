@@ -3,10 +3,22 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { useFormikContext } from 'formik';
 
 const AutoComplete = ({options, setLabel, valueField = 'value', ...props}) => {
-  const { setFieldValue } = useFormikContext();
-
+  const { setFieldValue, values  } = useFormikContext();
+  
+  // TODO: show the new value added in autocomplete freeSolo, ONLY happens in the UI, in the value formik is added
+  const defaultValues = props.multiple ? (
+    options.filter(item => (
+      values[props?.name]?.includes(item[valueField])
+    ))
+  ) : (
+    options.find((item) => (
+      item[valueField] === values[props?.name]
+    )) || null
+  );
+  
   return (
     <Autocomplete
+      value={defaultValues}
       getOptionLabel={(option) => (
         setLabel ? setLabel(option) : option.label
       )}
@@ -19,7 +31,7 @@ const AutoComplete = ({options, setLabel, valueField = 'value', ...props}) => {
           ) : (
             value ? value[valueField] : value
           )
-          
+
         setFieldValue(props.name, val);
       }}
       sx={{

@@ -10,9 +10,7 @@ import listPlugin from "@fullcalendar/list";
 import {
   Backdrop,
   Box,
-  Checkbox,
   Fade,
-  FormControlLabel,
   List,
   ListItem,
   ListItemText,
@@ -30,6 +28,7 @@ import { GET_EVENTS } from "../graphql/queries/eventQueries";
 import Input from "../components/form/Input";
 import CustomButton from "../components/CustomButton";
 import { CREATE_EVENT, DELETE_EVENT } from '../graphql/mutations/eventMutations';
+import CheckboxField from "../components/form/CheckboxField";
 
 const style = {
   position: 'absolute',
@@ -38,7 +37,6 @@ const style = {
   transform: 'translate(-50%, -50%)',
   width: 400,
   bgcolor: 'background.paper',
-  border: '2px solid #000',
   boxShadow: 24,
   p: 4,
 };
@@ -94,7 +92,7 @@ const Calendar = () => {
       start: selectedDate.startStr,
       end: selectedDate.endStr,
       allDay: selectedDate.allDay,
-    }
+    }  
     console.log(variables)
     // const {data: {createEvent: newEvent} } = await createEvent({ variables });
     
@@ -211,9 +209,36 @@ const Calendar = () => {
       >
         <Fade in={openModalCreate}>
           <Box sx={style}>
-            <Typography id="transition-modal-title" variant="h4" component="h2" mb={4}>
-              Create an event
-            </Typography>
+            <Box mb={3}>
+              <Typography id="transition-modal-title" variant="h4" component="h2">
+                Create an event
+              </Typography>
+              <Typography variant="span">
+                {formatDate(selectedDate.start, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  ...(selectedDate?.startStr?.includes('T') && (
+                    {
+                      hour: "numeric",
+                      minute: 'numeric'
+                    }
+                  ))
+                })}
+                <Typography variant="span" mx={1}>-</Typography> 
+                {formatDate(selectedDate.end, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  ...(selectedDate?.startStr?.includes('T') && (
+                    {
+                      hour: "numeric",
+                      minute: 'numeric'
+                    }
+                  ))
+                })}
+              </Typography>
+            </Box>
             <Formik
               initialValues={{
                 title: '',
@@ -245,19 +270,26 @@ const Calendar = () => {
                         />
                       </>
                     )} */}          
-                    <FormControlLabel 
+                    {/* <FormControlLabel 
                       control={
                         <Checkbox 
                           icon={<NotificationsNoneOutlinedIcon />} 
                           checkedIcon={<NotificationsIcon />}
+                          name="notify"
                         />
                       }
                       name="notify"
                       label="Notify"
+                    /> */}
+
+                    <CheckboxField
+                      name='notify'
+                      label='Notify'
                     />
                     <CustomButton 
                       text='Create event' 
-                      type="submit"  
+                      type="submit"
+                      btnstyle="primary"
                       loading={postLoading}
                     />
                   </Stack>

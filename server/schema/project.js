@@ -30,9 +30,8 @@ export const typeDefs = gql`
       repository: String,
       url: String,
       type: String!,
-      status: String!,
       team: [ID],
-      clientID: ID,
+      clientId: ID,
       tags: [String]
     ): Project
     deleteProject(_id: ID!): Project

@@ -41,24 +41,35 @@ const DELETE_PROJECT = gql`
 
 const UPDATE_PROJECT = gql`
   mutation UpdateProject(
-    $id: ID!
+    $_id: ID!
     $name: String!
     $description: String!
-    $status: ProjectStatusUpdate!
+    $repository: String,
+    $url: String,
+    $type: String!,
+    $team: [ID],
+    $clientId: ID,
+    $tags: [String]
   ) {
     updateProject(
-      id: $id
+      _id: $_id
       name: $name
       description: $description
-      status: $status
+      repository: $repository
+      url: $url
+      type: $type
+      team: $team
+      clientId: $clientId
+      tags: $tags
     ) {
-      id
+      _id
       name
       description
       status
       client {
-        id
-        name
+        _id
+        firstname
+        lastname
         email
         phone
       }

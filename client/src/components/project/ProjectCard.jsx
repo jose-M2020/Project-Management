@@ -1,10 +1,9 @@
-import { Box, Button, Card, CardActions, CardContent, Chip, IconButton, Menu, MenuItem, Typography, useTheme } from "@mui/material";
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import { format } from 'date-fns'
+import { Box, Card, CardContent, Chip, IconButton, Menu, MenuItem, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
 import { tokens } from "../../theme";
 import { useState } from "react";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { formatDate } from "@fullcalendar/core";
 
 export default function ProjectCard({ project }) {
   const theme = useTheme();
@@ -62,7 +61,11 @@ export default function ProjectCard({ project }) {
           <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: '1 0 auto' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '5px'}}>
               <Typography component='div' variant="subtitle2">
-                {format(+project?.createdAt, 'MM/dd/yyyy')}
+                {formatDate(+project?.createdAt, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
               </Typography>
               <div>
                 <IconButton

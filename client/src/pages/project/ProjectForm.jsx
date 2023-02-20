@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { Form, Formik } from 'formik';
+import { Form, Formik, useFormikContext } from 'formik';
 import * as yup from 'yup';
 import { Box, Step, StepContent, StepLabel, Stepper } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
@@ -9,7 +9,7 @@ import CustomButton from '../../components/CustomButton';
 import Input from '../../components/form/Input';
 import Header from '../../components/Header';
 import AutoComplete from '../../components/form/AutoComplete';
-import { ADD_PROJECT } from '../../graphql/mutations/projectMutations';
+import { ADD_PROJECT, UPDATE_PROJECT } from '../../graphql/mutations/projectMutations';
 import { GET_PROJECT, GET_PROJECTS } from '../../graphql/queries/projectQueries';
 
 const schema = yup.object().shape({
@@ -26,16 +26,16 @@ const schema = yup.object().shape({
 //   email: yup.string().email(),
 });
 
-const transformData = (data, field) => {
-  if(data){
-    return (data[field]).map((item) =>(
-      {
-        label: `${item.firstname} ${item.lastname}`,
-        value: item._id
-      }
-    ))
-  }
-}
+// const transformData = (data, field) => {
+//   if(data){
+//     return (data[field]).map((item) =>(
+//       {
+//         label: `${item.firstname} ${item.lastname}`,
+//         value: item._id
+//       }
+//     ))
+//   }
+// }
 
 const tagsOptions = [
   { label: 'JavaScript', value: 'JavaScript' },
@@ -46,25 +46,33 @@ const tagsOptions = [
   { label: 'PHP', value: 'PHP' },
 ]
 
-const flatData = (data, field) => {
-  if(data){
-    const array = data[field].map((item) => (item._id))
-    data[field] = array;
-    return data;
-  }
-}
+// const flatData = (data, field) => {
+//   if(data){
+//     const array = data[field].map((item) => (item._id))
+//     data[field] = array;
+//     return data;
+//   }
+// }
 
 const ProjectForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [activeSteps, setActiveSteps] = useState(false);
-  
+
   // TODO: Query by condition
   const { loading: projectLoading, data: projectData } = useQuery(GET_PROJECT, { variables: { id } });
   
-  const initialValues = id ? projectData?.project : (
-    {
+  let initialValues
+  
+  if(id){
+    // projectData?.project.team = projectData?.project.team.map(item => item._id)
+    initialValues = {
+      ...projectData?.project,
+      team: projectData?.project.team.map(item => item._id),
+    };
+  }else { 
+    initialValues = {
       name: '',
       description: '',
       repository: '',
@@ -74,8 +82,8 @@ const ProjectForm = () => {
       team: [],
       clientId: null,
       tags: []
-    }
-  )
+    };
+  }
   
   const { loading, data } = useQuery(gql`
     query {
@@ -93,27 +101,29 @@ const ProjectForm = () => {
   `);
   
   const [createProject, { postLoading, postError }] = useMutation(ADD_PROJECT, {
-		refetchQueries: [
-			{
-				query: GET_PROJECTS,
-			},
+		refetchQueries: [{
+			query: GET_PROJECTS,
+		},
 			"getProjects",
 		],
 	});
+  const [updateProject] = useMutation(UPDATE_PROJECT, {
+    refetchQueries: [{ 
+      query: GET_PROJECT, variables: { id } 
+    }],
+  });
 
-  // const clientsOptions = transformData(data, 'clients');
-  // const devsOptions = transformData(data, 'developers');
 
   const onSubmit = async (values, actions) => {
     if(id) {
-      console.log(values);
-
+      updateProject({variables: values});
+      navigate(`/projects/${id}`);
     } else {
       createProject({ variables: values});
       actions.resetForm();
+      navigate('/projects');
     }
 
-    // navigate('/projects');
   }
 
   const handleNext = () => {
@@ -123,7 +133,7 @@ const ProjectForm = () => {
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
-
+  
   useEffect(()=>{
 		if(id){
       setActiveSteps(true)
@@ -177,21 +187,12 @@ const ProjectForm = () => {
                             label="Client" 
                             name="clientId" 
                             options={data.clients}
-                            value={data.clients.find((option) => (
-                              option._id === values?.clientId
-                            )) || null}
+                            // defaultValue={data.clients.find((option) => (
+                            //   option._id === values?.clientId
+                            // )) || null}
                             setLabel={(option) => `${option.firstname} ${option.lastname}`}
                             valueField='_id'
                           />
-                          {/* <AutoComplete 
-                            label="Client" 
-                            name="clientId" 
-                            options={clientsOptions}
-                            value={clientsOptions.find((option) => (
-                              option.value === values?.clientId
-                            )) || null}
-                            // getOptionLabel={option => `${option.firstname} ${option.lastname}`}
-                          /> */}
                           <AutoComplete 
                             label="Team" 
                             name="team" 
@@ -199,20 +200,6 @@ const ProjectForm = () => {
                             setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
                             valueField='_id'
                             multiple
-                            // value={data?.developers.map((option) => {
-                            //   // console.log(values?.team.find(item => item._id === option._id))
-                            //   const finded = values?.team.find(item => item._id === option._id);
-                            //   console.log(finded)
-                            //   return finded
-                            // }) || null}
-                            // value={values.team}
-                            value={data?.developers.reduce((acc, item) => (
-                              values.team.find(dev => dev._id === item._id) ? 
-                                [...acc,
-                                  item
-                                ]
-                              : acc
-                            ), [])}
                           />
                         </>
                       )}
@@ -231,28 +218,9 @@ const ProjectForm = () => {
                   </StepLabel>
                   <StepContent>
                     <Box sx={{ display: 'flex', gap: 3, flexDirection: 'column' }}>
-                      {/* <AutoComplete 
-                        label="Tags" 
-                        name="tags" 
-                        value={values.tags}
-                        options={tagsOptions} 
-                        multiple
-                        freeSolo
-                      /> */}
                       <AutoComplete 
                         label="Tags" 
-                        name="tags" 
-                        // value={values.tags}
-                        value={tagsOptions.map(tag => (
-                          values.tags.includes(tag.value) && tag
-                        ))}
-                        // value={tagsOptions.reduce((acc, item) => (
-                        //   values.tags.includes(item.value) ? 
-                        //     [...acc,
-                        //       item.value
-                        //     ]
-                        //   : acc
-                        // ), [])}
+                        name="tags"
                         options={tagsOptions} 
                         multiple
                         freeSolo
@@ -265,21 +233,21 @@ const ProjectForm = () => {
                             icon={<LanguageIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />} 
                             variant="standard"     
                       />    
-                        <Box sx={{ display: 'flex', mb: 2, gap: 1 }}>
-                          {!activeSteps && (
-                            <CustomButton text='Back' onClick={handleBack} btnstyle="secondary" />
-                          )} 
-                          <CustomButton 
-                            text={id ? 'Update project' : 'Create project'} 
-                            onClick={async () => {
-                              const isValid = await schema.isValid(values);
-                              !isValid && setActiveSteps(true);
-                            }} 
-                            type="submit"
-                            btnstyle="primary"
-                            loading={postLoading}
-                          />
-                        </Box>
+                      <Box sx={{ display: 'flex', mb: 2, gap: 1 }}>
+                        {!activeSteps && (
+                          <CustomButton text='Back' onClick={handleBack} btnstyle="secondary" />
+                        )} 
+                        <CustomButton 
+                          text={id ? 'Update project' : 'Create project'} 
+                          onClick={async () => {
+                            const isValid = await schema.isValid(values);
+                            !isValid && setActiveSteps(true);
+                          }} 
+                          type="submit"
+                          btnstyle="primary"
+                          loading={postLoading}
+                        />
+                      </Box>
                     </Box>
                   </StepContent>
                 </Step>
@@ -287,11 +255,7 @@ const ProjectForm = () => {
             </Form>
           )}
         </Formik>
-
       )}
-
-      
-      
     </Box>
   )
 }
