@@ -123,7 +123,6 @@ const ProjectForm = () => {
       actions.resetForm();
       navigate('/projects');
     }
-
   }
 
   const handleNext = () => {

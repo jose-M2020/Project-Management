@@ -94,8 +94,7 @@ export const resolvers = {
 
   Event: {
     project: async (parent) => {
-      return (parent?.projectId) && (await Project.find({ _id: parent?.projectId }))
-      ;
+      return (parent?.projectId) && (await Project.findOne({ _id: parent?.projectId }));
     },
   }
 }

@@ -29,6 +29,9 @@ import Input from "../components/form/Input";
 import CustomButton from "../components/CustomButton";
 import { CREATE_EVENT, DELETE_EVENT } from '../graphql/mutations/eventMutations';
 import CheckboxField from "../components/form/CheckboxField";
+import { GET_PROJECTNAMES } from "../graphql/queries/projectQueries";
+import AutoComplete from "../components/form/AutoComplete";
+import CustomModal from "../components/CustomModal";
 
 const style = {
   position: 'absolute',
@@ -52,6 +55,7 @@ const schema = yup.object().shape({
 
 const Calendar = () => {
   const { loading, data } = useQuery(GET_EVENTS);
+  const { loading: loadingProjects, data: projects } = useQuery(GET_PROJECTNAMES);
   const [openModalCreate, setOpenModalCreate] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const theme = useTheme();
@@ -92,20 +96,20 @@ const Calendar = () => {
       start: selectedDate.startStr,
       end: selectedDate.endStr,
       allDay: selectedDate.allDay,
-    }  
-    console.log(variables)
-    // const {data: {createEvent: newEvent} } = await createEvent({ variables });
+    }
     
-    // calendarApi.unselect();
-    // calendarApi.addEvent({
-    //   id: newEvent._id,
-    //   title: newEvent.title,
-    //   start: newEvent.start,
-    //   end: newEvent.end,
-    // });
+    const {data: {createEvent: newEvent} } = await createEvent({ variables });
+    
+    calendarApi.unselect();
+    calendarApi.addEvent({
+      id: newEvent._id,
+      title: newEvent.title,
+      start: newEvent.start,
+      end: newEvent.end,
+    });
 
-    // setOpenModalCreate(false);
-    // actions.resetForm();
+    setOpenModalCreate(false);
+    actions.resetForm();
   }
 
   const handleDelete = async e => {
@@ -202,10 +206,6 @@ const Calendar = () => {
         open={openModalCreate}
         onClose={handleOpenModalCreate}
         closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}
       >
         <Fade in={openModalCreate}>
           <Box sx={style}>
@@ -257,19 +257,15 @@ const Calendar = () => {
                   >
                     <Input label="Title*" name="title" />
                     <Input label="Description" name="description" multiline rows={4} />
-                    {/* {!loading && (
-                      <>
-                        <AutoComplete label="Client" 
-                                    name="clientID" 
-                                    options={clientsOptions}
-                        />
-                        <AutoComplete label="Team" 
-                                    name="team" 
-                                    options={devsOptions}
-                                    multiple
-                        />
-                      </>
-                    )} */}          
+                    {!loadingProjects && (
+                      <AutoComplete
+                        label="Project" 
+                        name="projectId" 
+                        options={projects.projects}
+                        valueField='_id'
+                        setLabel={option => option?.name}
+                      />
+                    )}      
                     {/* <FormControlLabel 
                       control={
                         <Checkbox 
@@ -300,7 +296,7 @@ const Calendar = () => {
         </Fade>
       </Modal>
       
-      <Modal
+      {/* <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openModalDelete}
@@ -325,7 +321,21 @@ const Calendar = () => {
             </form>
           </Box>
         </Fade>
-      </Modal>
+      </Modal> */}
+
+      <CustomModal
+        title={`Are you sure you want to delete the event "${ selectedEvent?.event?.title }"?`}
+        open={openModalDelete}
+        handleModal={handleOpenModalDelete}
+      >
+        <form onSubmit={handleDelete}>
+          <CustomButton
+            text='Delete Event'
+            btnstyle="primary"
+            type='submit'
+          />
+        </form>
+      </CustomModal>
     </Box>
   )
 }

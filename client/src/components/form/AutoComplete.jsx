@@ -6,15 +6,20 @@ const AutoComplete = ({options, setLabel, valueField = 'value', ...props}) => {
   const { setFieldValue, values  } = useFormikContext();
   
   // TODO: show the new value added in autocomplete freeSolo, ONLY happens in the UI, in the value formik is added
-  const defaultValues = props.multiple ? (
-    options.filter(item => (
-      values[props?.name]?.includes(item[valueField])
-    ))
-  ) : (
-    options.find((item) => (
-      item[valueField] === values[props?.name]
-    )) || null
-  );
+  
+  let defaultValues = '';
+
+  // if(values[props?.name]) {
+    defaultValues = props.multiple ? (
+      options.filter(item => (
+        values[props?.name]?.includes(item[valueField])
+      ))
+    ) : (
+      options?.find((item) => (
+        item[valueField] === values[props?.name]
+      )) || null
+    );
+  // }
   
   return (
     <Autocomplete
