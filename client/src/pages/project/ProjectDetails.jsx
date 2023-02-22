@@ -9,6 +9,7 @@ import CircularProgressWithLabel from '../../components/project/CircularProgress
 import { status, statusIcon } from '../../helpers/helpers';
 import CustomButton from '../../components/CustomButton';
 import { DELETE_PROJECT } from '../../graphql/mutations/projectMutations';
+import CustomModal from '../../components/CustomModal';
 
 const style = {
   position: 'absolute',
@@ -175,38 +176,26 @@ const ProjectDetails = () => {
                       </Box>
                       <CustomButton
                         text='Delete Project'
-                        btnstyle="primary"
+                        btnstyle='danger'
                         onClick={handleModal}
                       />
-                      <Modal
-                        aria-labelledby="transition-modal-title"
-                        aria-describedby="transition-modal-description"
+                      <CustomModal
+                        title='Are you sure you want to delete this project?'
+                        subtitle='This repository will permanently delete with related tasks and events.'
                         open={open}
-                        onClose={handleModal}
-                        closeAfterTransition
-                        BackdropComponent={Backdrop}
-                        BackdropProps={{
-                          timeout: 500,
-                        }}
+                        handleModal={handleModal}
                       >
-                        <Fade in={open}>
-                          <Box sx={style}>
-                            <Typography id="transition-modal-title" variant="h4" component="h2">
-                              Are you sure you want to delete this project?
-                            </Typography>
-                            <Typography id="transition-modal-description" sx={{ my: 2 }}>
-                              This repository will permanently delete with related tasks and events.
-                            </Typography>
-                            <form onSubmit={handleDelete}>
-                              <CustomButton
-                                text='Delete Project'
-                                btnstyle="primary"
-                                type='submit'
-                              />
-                            </form>
+                        <form onSubmit={handleDelete}>
+                          <Box display='flex' justifyContent='end'>
+                            <CustomButton
+                              text='Accept'
+                              btnstyle='danger'
+                              type='submit'
+                              loading={deleting}
+                            />
                           </Box>
-                        </Fade>
-                      </Modal>
+                        </form>
+                      </CustomModal>
                     </Box>
                   </Stack>
                 </Box>

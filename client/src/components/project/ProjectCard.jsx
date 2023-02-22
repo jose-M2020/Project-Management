@@ -4,6 +4,7 @@ import { tokens } from "../../theme";
 import { useState } from "react";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { formatDate } from "@fullcalendar/core";
+import { formatDateTime } from "../../helpers/helpers";
 
 export default function ProjectCard({ project }) {
   const theme = useTheme();
@@ -61,11 +62,7 @@ export default function ProjectCard({ project }) {
           <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: '1 0 auto' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '5px'}}>
               <Typography component='div' variant="subtitle2">
-                {formatDate(+project?.createdAt, {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
+                {formatDateTime(+project?.createdAt, false)}
               </Typography>
               <div>
                 <IconButton

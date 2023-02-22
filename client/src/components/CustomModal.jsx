@@ -1,17 +1,21 @@
-import { Box, Fade, Modal, Typography } from '@mui/material'
-
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 4,
-};
+import { Box, Fade, Modal, Typography, useTheme } from '@mui/material'
+import { tokens } from '../theme';
 
 const CustomModal = ({title, subtitle, open, handleModal, children}) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const style = {
+    borderRadius: '8px',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: colors.primary[500],
+    boxShadow: 24,
+    p: 4,
+  };
+
   return (
     <Modal
         aria-labelledby="transition-modal-title"

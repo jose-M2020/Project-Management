@@ -3,7 +3,7 @@ import { Button, CircularProgress } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { tokens } from '../theme';
 
-const CustomButton = ({text, link, ...props}) => {
+const CustomButton = ({text, link, loading = false , ...props}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -16,10 +16,10 @@ const CustomButton = ({text, link, ...props}) => {
   const styles = {
     primary: {
       ...mainStyles,
-      backgroundColor: colors.blueAccent[700],
-      color: colors.grey[100],
+      backgroundColor: colors.blueAccent[600],
+      color: '#e0e0e0',
       '&:hover': {
-        color: colors.grey[100],
+        backgroundColor: colors.blueAccent[700],
         boxShadow: `0 0 8px ${colors.blueAccent[600]}`,
       },
     },
@@ -31,6 +31,15 @@ const CustomButton = ({text, link, ...props}) => {
         color: colors.grey[100],
         boxShadow: `0 0 8px ${colors.blueAccent[600]}`,
       },
+    },
+    danger: {
+      ...mainStyles,
+      backgroundColor: colors.redAccent[500],
+      color: '#e0e0e0',
+      '&:hover': {
+        backgroundColor: colors.redAccent[600],
+        boxShadow: `0 0 8px ${colors.redAccent[600]}`,
+      },
     }
   }
   
@@ -38,16 +47,16 @@ const CustomButton = ({text, link, ...props}) => {
     <Button
       sx={styles[props.btnstyle]}
       {...props}
-      {...(props.loading) && {
-        disabled: 'true',
-        startIcon: <CircularProgress size={20} thickness={6}  />
+      {...(loading) && {
+        disabled: true,
+        startIcon: <CircularProgress color="inherit" size={20} thickness={6}  />
       }}
       {...(link && {
         component: Link,
         to: link
       })}
     >
-      {props.loading ? 'Submitting' : text}
+      {loading ? 'Submitting' : text}
     </Button>
   )
 }

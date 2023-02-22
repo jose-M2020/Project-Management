@@ -8,19 +8,20 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 import {
-  Backdrop,
+  Avatar,
   Box,
-  Fade,
   List,
   ListItem,
+  ListItemAvatar,
   ListItemText,
-  Modal,
   Stack,
   Typography,
   useTheme,
 } from "@mui/material";
-import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import DescriptionIcon from '@mui/icons-material/Description';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+// import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import Header from "../components/Header";
 import { tokens } from "../theme";
 import { useMutation, useQuery } from "@apollo/client";
@@ -32,17 +33,7 @@ import CheckboxField from "../components/form/CheckboxField";
 import { GET_PROJECTNAMES } from "../graphql/queries/projectQueries";
 import AutoComplete from "../components/form/AutoComplete";
 import CustomModal from "../components/CustomModal";
-
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 4,
-};
+import { formatDateTime } from "../helpers/helpers";
 
 const schema = yup.object().shape({
   title: yup.string().required(),
@@ -58,6 +49,8 @@ const Calendar = () => {
   const { loading: loadingProjects, data: projects } = useQuery(GET_PROJECTNAMES);
   const [openModalCreate, setOpenModalCreate] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
+  const [openModalDetails, setOpenModalDetails] = useState(false);
+  
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [currentEvents, setCurrentEvents] = useState([]);
@@ -65,7 +58,8 @@ const Calendar = () => {
   const [selectedEvent, setSelectedEvent] = useState({});
   
   const handleOpenModalCreate = () => setOpenModalCreate(!openModalCreate);
-  const handleOpenModalDelete = () => setOpenModalDelete(!openModalDelete);
+  const handleOpenModalDelete  = () => setOpenModalDelete(!openModalDelete);
+  const handleOpenModalDetails  = () => setOpenModalDetails(!openModalDetails);
   
   const [createEvent, { postLoading, postError }] = useMutation(CREATE_EVENT, {
 		refetchQueries: [
@@ -84,9 +78,14 @@ const Calendar = () => {
     setOpenModalCreate(true);
   };
 
-  const handleEventClick = async (selected) => {
+  const handleEventClick = selected => {
     setSelectedEvent(selected);
     setOpenModalDelete(true);
+  };
+  
+  const handleEventDetailsClick = selected => {
+    setSelectedEvent(selected);
+    setOpenModalDetails(true);
   };
 
   const onSubmit = async (values, actions) => {
@@ -148,7 +147,9 @@ const Calendar = () => {
                     backgroundColor: colors.blueAccent[700],
                     margin: "10px 0",
                     borderRadius: "2px",
+                    cursor: 'pointer'
                   }}
+                  onClick={() => handleEventDetailsClick(event)}
                 >
                   <ListItemText
                     primary={event.title}
@@ -200,141 +201,126 @@ const Calendar = () => {
         <h5>Loading...</h5>
       )}
 
-      <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        open={openModalCreate}
-        onClose={handleOpenModalCreate}
-        closeAfterTransition
-      >
-        <Fade in={openModalCreate}>
-          <Box sx={style}>
-            <Box mb={3}>
-              <Typography id="transition-modal-title" variant="h4" component="h2">
-                Create an event
-              </Typography>
-              <Typography variant="span">
-                {formatDate(selectedDate.start, {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  ...(selectedDate?.startStr?.includes('T') && (
-                    {
-                      hour: "numeric",
-                      minute: 'numeric'
-                    }
-                  ))
-                })}
-                <Typography variant="span" mx={1}>-</Typography> 
-                {formatDate(selectedDate.end, {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  ...(selectedDate?.startStr?.includes('T') && (
-                    {
-                      hour: "numeric",
-                      minute: 'numeric'
-                    }
-                  ))
-                })}
-              </Typography>
-            </Box>
-            <Formik
-              initialValues={{
-                title: '',
-                description: '',
-                start: '',
-                end: '',
-                projectId: null,
-                notify: false,
-              }}
-              validationSchema={schema}
-              onSubmit={onSubmit}
-            >
-              {() => (
-                <Form>
-                  <Stack spacing={2}
-                  >
-                    <Input label="Title*" name="title" />
-                    <Input label="Description" name="description" multiline rows={4} />
-                    {!loadingProjects && (
-                      <AutoComplete
-                        label="Project" 
-                        name="projectId" 
-                        options={projects.projects}
-                        valueField='_id'
-                        setLabel={option => option?.name}
-                      />
-                    )}      
-                    {/* <FormControlLabel 
-                      control={
-                        <Checkbox 
-                          icon={<NotificationsNoneOutlinedIcon />} 
-                          checkedIcon={<NotificationsIcon />}
-                          name="notify"
-                        />
-                      }
-                      name="notify"
-                      label="Notify"
-                    /> */}
-
-                    <CheckboxField
-                      name='notify'
-                      label='Notify'
-                    />
-                    <CustomButton 
-                      text='Create event' 
-                      type="submit"
-                      btnstyle="primary"
-                      loading={postLoading}
-                    />
-                  </Stack>
-                </Form>
-              )}
-            </Formik>
-          </Box>
-        </Fade>
-      </Modal>
       
-      {/* <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        open={openModalDelete}
-        onClose={handleOpenModalDelete}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}
+      <CustomModal
+        title='Create an event'
+        subtitle={`${formatDateTime(selectedDate.startStr)} - ${formatDateTime(selectedDate.endStr)}`}
+        open={openModalCreate}
+        handleModal={handleOpenModalCreate}
       >
-        <Fade in={openModalDelete}>
-          <Box sx={style}>
-            <Typography id="transition-modal-title" variant="h4" mb={4}>
-              Are you sure you want to delete the event "{ selectedEvent?.event?.title }"?
-            </Typography>
-            <form onSubmit={handleDelete}>
-              <CustomButton
-                text='Delete Event'
-                btnstyle="primary"
-                type='submit'
-              />
-            </form>
-          </Box>
-        </Fade>
-      </Modal> */}
-
+        <Formik
+          initialValues={{
+            title: '',
+            description: '',
+            start: '',
+            end: '',
+            projectId: null,
+            notify: false,
+          }}
+          validationSchema={schema}
+          onSubmit={onSubmit}
+        >
+          {() => (
+            <Form>
+              <Stack spacing={2}
+              >
+                <Input label="Title*" name="title" />
+                <Input label="Description" name="description" multiline rows={4} />
+                {!loadingProjects && (
+                  <AutoComplete
+                    label="Project" 
+                    name="projectId" 
+                    options={projects.projects}
+                    valueField='_id'
+                    setLabel={option => option?.name}
+                  />
+                )}      
+                {/* <FormControlLabel 
+                  control={
+                    <Checkbox 
+                      icon={<NotificationsNoneOutlinedIcon />} 
+                      checkedIcon={<NotificationsIcon />}
+                      name="notify"
+                    />
+                  }
+                  name="notify"
+                  label="Notify"
+                /> */}
+                <CheckboxField
+                  name='notify'
+                  label='Notify'
+                />
+                <CustomButton 
+                  text='Create event' 
+                  type="submit"
+                  btnstyle="primary"
+                  loading={postLoading}
+                />
+              </Stack>
+            </Form>
+          )}
+        </Formik>
+      </CustomModal>
       <CustomModal
         title={`Are you sure you want to delete the event "${ selectedEvent?.event?.title }"?`}
         open={openModalDelete}
         handleModal={handleOpenModalDelete}
       >
         <form onSubmit={handleDelete}>
-          <CustomButton
-            text='Delete Event'
-            btnstyle="primary"
-            type='submit'
-          />
+          <Box display='flex' justifyContent='end'>
+            <CustomButton
+              text='Delete Event'
+              btnstyle="danger"
+              type='submit'
+              loading={deleting}
+            />
+          </Box>
+            
         </form>
+      </CustomModal>
+      <CustomModal
+        open={openModalDetails}
+        handleModal={handleOpenModalDetails}
+      >
+        <Typography variant="span">
+          {formatDateTime(selectedEvent.start)} - {formatDateTime(selectedEvent.end)}
+        </Typography>
+        <Typography variant="h3" mt={1} mb={2}>{ selectedEvent?.title }</Typography>
+        <List sx={{ width: '100%', padding: 0 }}>
+          <ListItem disableGutters>
+            <ListItemAvatar>
+              <Avatar sx={{ bgcolor: colors.blueAccent[300] }}>
+                <DescriptionIcon />
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText 
+              primary="Description"
+              secondary={selectedEvent?.description || 'No description'} 
+            />
+          </ListItem>
+          <ListItem disableGutters>
+            <ListItemAvatar>
+              <Avatar sx={{ bgcolor: colors.blueAccent[300] }}>
+                <AttachFileIcon />
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText 
+              primary="Project"
+              secondary={selectedEvent?.project?.name || 'No linked project'} 
+            />
+          </ListItem>
+          <ListItem disableGutters>
+            <ListItemAvatar>
+              <Avatar sx={{ bgcolor: colors.blueAccent[300] }}>
+                <NotificationsIcon />
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText 
+              primary="Notify"
+              secondary={selectedEvent?.notify ? 'Activated' : 'Disabled'} 
+            />
+          </ListItem>
+        </List>
       </CustomModal>
     </Box>
   )

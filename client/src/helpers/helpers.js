@@ -1,3 +1,4 @@
+import { formatDate } from '@fullcalendar/core';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import CachedIcon from '@mui/icons-material/Cached';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
@@ -34,3 +35,17 @@ export const statusIcon = {
         icon: <CheckOutlinedIcon />
     },
 }
+
+export const formatDateTime = (date, showTime = true) => (
+    formatDate(date, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      ...((showTime && date?.includes('T')) && (
+        {
+          hour: "numeric",
+          minute: 'numeric'
+        }
+      ))
+    })
+  )
