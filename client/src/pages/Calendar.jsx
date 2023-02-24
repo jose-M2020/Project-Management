@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, Formik } from 'formik';
 import * as yup from 'yup';
 import { formatDate } from '@fullcalendar/core'
@@ -24,7 +24,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 // import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import Header from "../components/Header";
 import { tokens } from "../theme";
-import { useMutation, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { GET_EVENTS } from "../graphql/queries/eventQueries";
 import Input from "../components/form/Input";
 import CustomButton from "../components/CustomButton";
@@ -45,25 +45,20 @@ const schema = yup.object().shape({
 });
 
 const Calendar = () => {
-  const { loading, data } = useQuery(GET_EVENTS);
-  const { loading: loadingProjects, data: projects } = useQuery(GET_PROJECTNAMES);
-  const [openModalCreate, setOpenModalCreate] = useState(false);
-  const [openModalDelete, setOpenModalDelete] = useState(false);
-  const [openModalDetails, setOpenModalDetails] = useState(false);
-  
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [currentEvents, setCurrentEvents] = useState([]);
+  
   const [selectedDate, setSelectedDate] = useState({});
   const [selectedEvent, setSelectedEvent] = useState({});
   
-  const handleOpenModalCreate = () => setOpenModalCreate(!openModalCreate);
-  const handleOpenModalDelete  = () => setOpenModalDelete(!openModalDelete);
-  const handleOpenModalDetails  = () => setOpenModalDetails(!openModalDetails);
-  
+  // Apollo Client Events
+
+  const { loading, data } = useQuery(GET_EVENTS);
+  const [getProjects, { loading: loadingProjects, data: projectData = [] }] = useLazyQuery(GET_PROJECTNAMES);
+
   const [createEvent, { postLoading, postError }] = useMutation(CREATE_EVENT, {
-		refetchQueries: [
-			{
+    refetchQueries: [
+      {
 				query: GET_EVENTS,
 			},
 			"getEvents",
@@ -72,6 +67,18 @@ const Calendar = () => {
   const [deleteEvent, { loading: deleting, error: deleteError }] = useMutation(DELETE_EVENT, {
     refetchQueries: ["getEvents"],
   });
+
+  // Modals
+
+  const [openModalCreate, setOpenModalCreate] = useState(false);
+  const [openModalDelete, setOpenModalDelete] = useState(false);
+  const [openModalDetails, setOpenModalDetails] = useState(false);
+  
+  const handleOpenModalCreate = () => setOpenModalCreate(!openModalCreate);
+  const handleOpenModalDelete  = () => setOpenModalDelete(!openModalDelete);
+  const handleOpenModalDetails  = () => setOpenModalDetails(!openModalDetails);
+
+  // FullCalendar events
 
   const handleDateClick = selected => {
     setSelectedDate(selected)
@@ -125,6 +132,28 @@ const Calendar = () => {
     selectedEvent.event.remove();
   }
 
+  // Async AutoComplete 
+
+  const [open, setOpen] = useState(false);
+  const loadingProjectField = open && (projectData?.length === 0);
+
+  useEffect(() => {
+    let active = true;
+    if (!loadingProjectField) {
+      return undefined;
+    };
+
+    (async () => {
+      if (active && !loadingProjects) {
+        await getProjects();
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [loadingProjectField, getProjects, loadingProjects, projectData]);
+  
   return (
     <Box m="20px">
       <Header title="CALENDAR" subtitle="Managing events" />
@@ -190,7 +219,6 @@ const Calendar = () => {
               dayMaxEvents={true}
               select={handleDateClick}
               eventClick={handleEventClick}
-              eventsSet={(events) => setCurrentEvents(events)}
               initialEvents={data?.events.map(({_id, ...props}) => (
                 {id: _id, ...props}
               ))}
@@ -226,26 +254,17 @@ const Calendar = () => {
               >
                 <Input label="Title*" name="title" />
                 <Input label="Description" name="description" multiline rows={4} />
-                {!loadingProjects && (
-                  <AutoComplete
-                    label="Project" 
-                    name="projectId" 
-                    options={projects.projects}
-                    valueField='_id'
-                    setLabel={option => option?.name}
-                  />
-                )}      
-                {/* <FormControlLabel 
-                  control={
-                    <Checkbox 
-                      icon={<NotificationsNoneOutlinedIcon />} 
-                      checkedIcon={<NotificationsIcon />}
-                      name="notify"
-                    />
-                  }
-                  name="notify"
-                  label="Notify"
-                /> */}
+                <AutoComplete
+                  label="Project" 
+                  name="projectId" 
+                  options={projectData?.projects}
+                  valueField='_id'
+                  setLabel={option => option?.name}
+                  async={true}
+                  open={open}
+                  setOpen={setOpen}
+                  loading={loadingProjectField}
+                />
                 <CheckboxField
                   name='notify'
                   label='Notify'
@@ -285,7 +304,7 @@ const Calendar = () => {
         <Typography variant="span">
           {formatDateTime(selectedEvent.start)} - {formatDateTime(selectedEvent.end)}
         </Typography>
-        <Typography variant="h3" mt={1} mb={2}>{ selectedEvent?.title }</Typography>
+        <Typography variant="h3" mb={2}>{ selectedEvent?.title }</Typography>
         <List sx={{ width: '100%', padding: 0 }}>
           <ListItem disableGutters>
             <ListItemAvatar>

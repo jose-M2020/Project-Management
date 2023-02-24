@@ -26,14 +26,16 @@ const CustomModal = ({title, subtitle, open, handleModal, children}) => {
       >
         <Fade in={open}>
           <Box sx={style}>
-            <Box mb={3}>
-              <Typography id="transition-modal-title" variant="h4" component="h2">
-                {title}
-              </Typography>
-              <Typography variant="span">
-                {subtitle}
-              </Typography>
-            </Box>
+            {title && (
+              <Box mb={2}>
+                <Typography id="transition-modal-title" variant="h4" component="h2">
+                  {title}
+                </Typography>
+                <Typography variant="span">
+                  {subtitle}
+                </Typography>
+              </Box>
+            )}
             {children}
           </Box>
         </Fade>

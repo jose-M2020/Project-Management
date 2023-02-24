@@ -21,25 +21,33 @@ const Clients = () => {
       headerName: "First name",
       flex: 1,
       cellClassName: "firstname-column--cell",
+      editable: true
     },
     {
       field: "lastname",
       headerName: "Last name",
       flex: 1,
       cellClassName: "lastname-column--cell",
+      editable: true
     },
     {
       field: "email",
       headerName: "Email",
       flex: 1,
+      editable: true
     },
     {
       field: "phone",
       headerName: "Phone Number",
       flex: 1,
+      editable: true
     },
     
   ];
+
+  const handleEdit = (params) => {
+    console.log(params);
+  }
 
   return (
     <Box m="20px">
@@ -84,10 +92,12 @@ const Clients = () => {
           }}
         >
           <DataGrid 
-            checkboxSelection
             rows={data.clients}
             columns={columns}
-            getRowId={(row) => row._id}  
+            getRowId={(row) => row._id} 
+            onCellEditCommit={handleEdit}
+            checkboxSelection
+            disableSelectionOnClick
           />
         </Box>
       )}

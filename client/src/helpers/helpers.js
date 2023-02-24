@@ -37,15 +37,21 @@ export const statusIcon = {
 }
 
 export const formatDateTime = (date, showTime = true) => (
-    formatDate(date, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      ...((showTime && date?.includes('T')) && (
-        {
-          hour: "numeric",
-          minute: 'numeric'
-        }
-      ))
-    })
-  )
+  formatDate(date, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    ...((showTime && date?.includes('T')) && (
+      {
+        hour: "numeric",
+        minute: 'numeric'
+      }
+    ))
+  })
+)
+
+export const sleep = (delay = 0) => {
+  return new Promise( resolve => {
+    setTimeout(resolve, delay);
+  });
+}

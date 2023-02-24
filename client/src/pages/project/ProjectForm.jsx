@@ -21,9 +21,6 @@ const schema = yup.object().shape({
   team: yup.array(),
   clientID: yup.string(),
   tags: yup.array().required(),
-
-//   phone: yup.number().required().positive().integer(),
-//   email: yup.string().email(),
 });
 
 // const transformData = (data, field) => {

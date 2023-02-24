@@ -32,7 +32,22 @@ const cache = new InMemoryCache({
             return incoming;
           },
         },
+        developers: {
+          merge(existing, incoming) {
+            return incoming;
+          },
+        },
         projects: {
+          merge(existing, incoming) {
+            return incoming;
+          },
+        },
+        tasks: {
+          merge(existing, incoming) {
+            return incoming;
+          },
+        },
+        events: {
           merge(existing, incoming) {
             return incoming;
           },
