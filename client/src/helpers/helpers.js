@@ -36,8 +36,10 @@ export const statusIcon = {
     },
 }
 
-export const formatDateTime = (date, showTime = true) => (
-  formatDate(date, {
+export const formatDateTime = (date, showTime = true) => {
+  // const dateFormat = +date ? (new Date(+date)).toDateString() : date;
+  
+  return formatDate(date, {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -48,7 +50,7 @@ export const formatDateTime = (date, showTime = true) => (
       }
     ))
   })
-)
+}
 
 export const sleep = (delay = 0) => {
   return new Promise( resolve => {

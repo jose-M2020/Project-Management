@@ -141,7 +141,7 @@ const Sidebar = () => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Data
+              Activity
             </Typography>
             <Item
               title="Projects"
@@ -164,19 +164,19 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
+            {/* <Item
               title="Bugs"
               to="/bugs"
               icon={<BugReportIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
             <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Info
+              Users
             </Typography>
             <Item
               title="Clients"
@@ -192,20 +192,20 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
+            {/* <Item
               title="FAQ Page"
               to="/faq"
               icon={<HelpOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
 
             <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Charts
+              Statistics 
             </Typography>
             <Item
               title="Bar Chart"
@@ -235,7 +235,7 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Box sx={{marginTop: 2}}>
+            {/* <Box sx={{marginTop: 2}}>
                 <Item
                 title="Profile"
                 to="/profile"
@@ -243,7 +243,7 @@ const Sidebar = () => {
                 selected={selected}
                 setSelected={setSelected}
                 />
-            </Box>
+            </Box> */}
           </Box>
         </Menu>
       </ProSidebar>

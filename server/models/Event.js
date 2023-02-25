@@ -7,6 +7,7 @@ const EventSchema = new mongoose.Schema({
   description: {
     type: String,
   },
+  // TODO: change start and end to type Date
   start: {
     type: String,
   },

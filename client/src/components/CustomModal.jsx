@@ -1,7 +1,7 @@
 import { Box, Fade, Modal, Typography, useTheme } from '@mui/material'
 import { tokens } from '../theme';
 
-const CustomModal = ({title, subtitle, open, handleModal, children}) => {
+const CustomModal = ({title, subtitle, open = false, handleClose, children}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const style = {
@@ -21,7 +21,7 @@ const CustomModal = ({title, subtitle, open, handleModal, children}) => {
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={open}
-        onClose={handleModal}
+        onClose={handleClose}
         closeAfterTransition
       >
         <Fade in={open}>

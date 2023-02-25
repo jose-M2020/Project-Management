@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { Form, Formik } from 'formik';
 import * as yup from 'yup';
-import { formatDate } from '@fullcalendar/core'
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -44,6 +43,19 @@ const schema = yup.object().shape({
   notify: yup.boolean(),
 });
 
+const reducer = (state, action) => {
+  const actions = {
+    handleOpen: {
+      [action.modalName]: true
+    },
+    handleClose: {
+      [action.modalName]: false
+    }
+  }
+
+  return actions[action.type];
+}
+
 const Calendar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -68,31 +80,29 @@ const Calendar = () => {
     refetchQueries: ["getEvents"],
   });
 
-  // Modals
+  // Modal
 
-  const [openModalCreate, setOpenModalCreate] = useState(false);
-  const [openModalDelete, setOpenModalDelete] = useState(false);
-  const [openModalDetails, setOpenModalDetails] = useState(false);
-  
-  const handleOpenModalCreate = () => setOpenModalCreate(!openModalCreate);
-  const handleOpenModalDelete  = () => setOpenModalDelete(!openModalDelete);
-  const handleOpenModalDetails  = () => setOpenModalDetails(!openModalDetails);
+  const [modalState, dispatch] = useReducer(reducer, {
+    create: false,
+    delete: false,
+    details: false
+  });
 
   // FullCalendar events
 
   const handleDateClick = selected => {
     setSelectedDate(selected)
-    setOpenModalCreate(true);
+    dispatch({ type: 'handleOpen', modalName: 'create' })
   };
 
   const handleEventClick = selected => {
     setSelectedEvent(selected);
-    setOpenModalDelete(true);
+    dispatch({ type: 'handleOpen', modalName: 'delete' })
   };
   
   const handleEventDetailsClick = selected => {
     setSelectedEvent(selected);
-    setOpenModalDetails(true);
+    dispatch({ type: 'handleOpen', modalName: 'details' })
   };
 
   const onSubmit = async (values, actions) => {
@@ -114,7 +124,7 @@ const Calendar = () => {
       end: newEvent.end,
     });
 
-    setOpenModalCreate(false);
+    dispatch({ type: 'handleClose', modalName: 'create' })
     actions.resetForm();
   }
 
@@ -126,7 +136,7 @@ const Calendar = () => {
 		});
 
 		if (result.data.deleteEvent._id) {
-      setOpenModalDelete(false)
+      dispatch({ type: 'handleClose', modalName: 'delete' })
     }
 
     selectedEvent.event.remove();
@@ -184,11 +194,7 @@ const Calendar = () => {
                     primary={event.title}
                     secondary={
                       <Typography>
-                        {formatDate(event.start, {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
+                        {formatDateTime(event.start)}
                       </Typography>
                     }
                   />
@@ -233,8 +239,10 @@ const Calendar = () => {
       <CustomModal
         title='Create an event'
         subtitle={`${formatDateTime(selectedDate.startStr)} - ${formatDateTime(selectedDate.endStr)}`}
-        open={openModalCreate}
-        handleModal={handleOpenModalCreate}
+        open={modalState.create}
+        handleClose={() => { 
+          dispatch({ type: 'handleClose', modalName: 'create' })
+        }}
       >
         <Formik
           initialValues={{
@@ -282,8 +290,10 @@ const Calendar = () => {
       </CustomModal>
       <CustomModal
         title={`Are you sure you want to delete the event "${ selectedEvent?.event?.title }"?`}
-        open={openModalDelete}
-        handleModal={handleOpenModalDelete}
+        open={modalState.delete}
+        handleClose={() => { 
+          dispatch({ type: 'handleClose', modalName: 'delete' })
+        }}
       >
         <form onSubmit={handleDelete}>
           <Box display='flex' justifyContent='end'>
@@ -298,8 +308,10 @@ const Calendar = () => {
         </form>
       </CustomModal>
       <CustomModal
-        open={openModalDetails}
-        handleModal={handleOpenModalDetails}
+        open={modalState.details}
+        handleClose={() => { 
+          dispatch({ type: 'handleClose', modalName: 'details' })
+        }}
       >
         <Typography variant="span">
           {formatDateTime(selectedEvent.start)} - {formatDateTime(selectedEvent.end)}

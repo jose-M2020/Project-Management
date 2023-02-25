@@ -49,7 +49,11 @@ export const typeDefs = gql`
 export const resolvers = {
   Query: {
     events: async () => {
-      return await Event.find().sort({start: -1});
+      const currentDate = new Date().toJSON().slice(0, 10); //Event.find({ start: { $gte: currentDate } })
+      
+      // TODO: find events from now on and return object with all events and events currently
+      return await Event.find()
+                        .sort({start: -1});
     },
     event: async (_, { _id }) => {
       return await Event.findById(_id);

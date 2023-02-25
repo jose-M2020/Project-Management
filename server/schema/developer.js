@@ -12,7 +12,7 @@ export const typeDefs = gql`
       firstname: String!,
       lastname: String!,
       email: String!,
-      phone: Int!,
+      phone: String!,
       position: String!
     ): Developer
     updateDeveloper(
@@ -20,7 +20,7 @@ export const typeDefs = gql`
       firstname: String!,
       lastname: String!,
       email: String!,
-      phone: Int!,
+      phone: String!,
       position: String!
     ): Developer
     deleteDeveloper(_id: ID!): Developer
@@ -31,7 +31,7 @@ export const typeDefs = gql`
     firstname: String!
     lastname: String!
     email: String!
-    phone: Int!
+    phone: String!
     position: String!
     createdAt: String
   }

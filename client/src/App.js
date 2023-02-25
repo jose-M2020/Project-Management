@@ -14,6 +14,7 @@ import Bugs from './pages/bug/Bugs';
 import Clients from './pages/client/Clients';
 import ClientForm from './pages/client/ClientForm';
 import Team from './pages/team/Team';
+import TeamForm from './pages/team/TeamForm';
 import Faq from './pages/Faq';
 import Bar from './pages/chart/Bar';
 import Pie from './pages/chart/Pie';
@@ -88,6 +89,7 @@ function App() {
                   <Route path='/clients' element={<Clients />} />
                   <Route path='/clients/add' element={<ClientForm />} />
                   <Route path='/team' element={<Team />} />
+                  <Route path='/team/add' element={<TeamForm />} />
                   <Route path='/faq' element={<Faq />} />
                   <Route path='/bar' element={<Bar />} />
                   <Route path='/pie' element={<Pie />} />
