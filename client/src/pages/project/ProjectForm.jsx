@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { gql, useMutation, useQuery } from '@apollo/client';
-import { Form, Formik, useFormikContext } from 'formik';
+import { useMutation, useQuery } from '@apollo/client';
+import { Form, Formik } from 'formik';
 import * as yup from 'yup';
 import { Box, Step, StepContent, StepLabel, Stepper } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
@@ -11,6 +11,9 @@ import Header from '../../components/Header';
 import AutoComplete from '../../components/form/AutoComplete';
 import { ADD_PROJECT, UPDATE_PROJECT } from '../../graphql/mutations/projectMutations';
 import { GET_PROJECT, GET_PROJECTS } from '../../graphql/queries/projectQueries';
+import { GET_DEVNAMES } from '../../graphql/queries/devsQueries';
+import useAsyncAutocomplete from '../../hooks/useAsyncAutocomplete';
+import { GET_CLIENTNAMES } from '../../graphql/queries/clientQueries';
 
 const schema = yup.object().shape({
   name: yup.string().required(),
@@ -81,21 +84,20 @@ const ProjectForm = () => {
       tags: []
     };
   }
+
+  const {
+    data: devData,
+    loading: loadingDevs,
+    open: devFieldOpen,
+    setOpen: setOpenDev
+  } = useAsyncAutocomplete(GET_DEVNAMES)
   
-  const { loading, data } = useQuery(gql`
-    query {
-      developers {
-        _id
-        firstname
-        lastname
-      }
-      clients {
-        _id
-        firstname
-        lastname
-      }
-    }
-  `);
+  const {
+    data: clientData,
+    loading: loadingClients,
+    open: clientFieldOpen,
+    setOpen: setOpenClient
+  } = useAsyncAutocomplete(GET_CLIENTNAMES)
   
   const [createProject, { postLoading, postError }] = useMutation(ADD_PROJECT, {
 		refetchQueries: [{
@@ -177,28 +179,32 @@ const ProjectForm = () => {
                   </StepLabel>
                   <StepContent>
                     <Box sx={{ display: 'flex', gap: 3, flexDirection: 'column' }}>
-                      {!loading && (
-                        <>
-                          <AutoComplete 
-                            label="Client" 
-                            name="clientId" 
-                            options={data.clients}
-                            // defaultValue={data.clients.find((option) => (
-                            //   option._id === values?.clientId
-                            // )) || null}
-                            setLabel={(option) => `${option.firstname} ${option.lastname}`}
-                            valueField='_id'
-                          />
-                          <AutoComplete 
-                            label="Team" 
-                            name="team" 
-                            options={data?.developers}
-                            setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
-                            valueField='_id'
-                            multiple
-                          />
-                        </>
-                      )}
+                      <AutoComplete 
+                        label="Client" 
+                        name="clientId" 
+                        options={clientData?.clients}
+                        // defaultValue={data.clients.find((option) => (
+                        //   option._id === values?.clientId
+                        // )) || null}
+                        setLabel={(option) => `${option.firstname} ${option.lastname}`}
+                        valueField='_id'
+                        async={true}
+                        open={clientFieldOpen}
+                        setOpen={setOpenClient}
+                        loading={loadingClients}
+                      />
+                      <AutoComplete 
+                        label="Team" 
+                        name="team" 
+                        options={devData?.developers}
+                        setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
+                        valueField='_id'
+                        multiple
+                        async={true}
+                        open={devFieldOpen}
+                        setOpen={setOpenDev}
+                        loading={loadingDevs}
+                      />
                       {!activeSteps && (
                         <Box sx={{ display: 'flex', mb: 2, gap: 1 }}>
                           <CustomButton text='Back' onClick={handleBack} btnstyle="secondary" />

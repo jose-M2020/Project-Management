@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { Backdrop, Box, Stack, Chip, Divider, Fade, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, MenuItem, Modal, TextField, Typography } from '@mui/material';
+import { Box, Stack, Chip, Divider, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, MenuItem, TextField, Typography } from '@mui/material';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Header from '../../components/Header';
 import Spinner from '../../components/Spinner';
@@ -8,19 +8,8 @@ import { GET_PROJECT } from '../../graphql/queries/projectQueries';
 import CircularProgressWithLabel from '../../components/project/CircularProgressWithLabel';
 import { status, statusIcon } from '../../helpers/helpers';
 import CustomButton from '../../components/CustomButton';
-import { DELETE_PROJECT } from '../../graphql/mutations/projectMutations';
+import { CHANGE_STATUS, DELETE_PROJECT } from '../../graphql/mutations/projectMutations';
 import CustomModal from '../../components/CustomModal';
-
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 4,
-};
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -31,6 +20,12 @@ const ProjectDetails = () => {
       useMutation(DELETE_PROJECT, {
         refetchQueries: ["getProjects"],
       });
+      
+  const [updateProject] = useMutation(CHANGE_STATUS, {
+    refetchQueries: [{ 
+      query: GET_PROJECT, variables: { id: data?.project?._id } 
+    }],
+  });
 
   if (error) return <p>Something Went Wrong</p>;
   
@@ -46,6 +41,15 @@ const ProjectDetails = () => {
 			navigate('/projects');
       console.log('redirecting to')
 		}  
+  }
+
+  const handleStatusChange = (e) => {
+    const {target: {value}} = e;
+    
+    updateProject({variables: {
+      _id: data?.project?._id,
+      status: value
+    }});
   }
 
   return (
@@ -135,11 +139,14 @@ const ProjectDetails = () => {
                       <TextField
                         select
                         defaultValue={data.project.status}
+                        onChange={handleStatusChange}
                       >
                         {status.map((option) => (
-                          <MenuItem key={option.name} value={option.name} display='flex' alignItems='center' >
-                            {option.icon({mr: '22px'})}
-                            <Typography variant='span'>{option.name}</Typography>
+                          <MenuItem key={option.name} value={option.name} >
+                            <Box display='flex'>
+                              {option.icon()}
+                              <Typography variant='span' ml='3px'>{option.name}</Typography>
+                            </Box>
                           </MenuItem>
                         ))}
                       </TextField>
@@ -183,7 +190,7 @@ const ProjectDetails = () => {
                         title='Are you sure you want to delete this project?'
                         subtitle='This repository will permanently delete with related tasks and events.'
                         open={open}
-                        handleModal={handleModal}
+                        handleClose={handleModal}
                       >
                         <form onSubmit={handleDelete}>
                           <Box display='flex' justifyContent='end'>

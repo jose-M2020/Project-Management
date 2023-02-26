@@ -4,7 +4,6 @@ import Task from "../models/Task.js";
 import Event from "../models/Event.js";
 import Developer from "../models/Developer.js";
 import Client from "../models/Client.js";
-import { delay } from "../helpers/index.js";
 
 export const typeDefs = gql`
   extend type Query {
@@ -36,6 +35,10 @@ export const typeDefs = gql`
       tags: [String]
     ): Project
     deleteProject(_id: ID!): Project
+    changeProjectStatus(
+      _id: ID!, 
+      status: String!
+    ): Project
   }
 
   type Project {
@@ -105,8 +108,17 @@ export const resolvers = {
       
       await Task.deleteMany({projectId: _id})
       await Event.deleteMany({projectId: _id})
-
+      
       return deletedProject;
+    },
+    changeProjectStatus: async (_, {_id, status}) => {
+      const updatedProject = await Project.findByIdAndUpdate(
+        _id,
+        { $set: { status } },
+        { new: true }
+      );
+      if (!updatedProject) throw new Error("Project not found");
+      return updatedProject;
     },
   },
   Project: {

@@ -33,6 +33,7 @@ import { GET_PROJECTNAMES } from "../graphql/queries/projectQueries";
 import AutoComplete from "../components/form/AutoComplete";
 import CustomModal from "../components/CustomModal";
 import { formatDateTime } from "../helpers/helpers";
+import useAsyncAutocomplete from "../hooks/useAsyncAutocomplete";
 
 const schema = yup.object().shape({
   title: yup.string().required(),
@@ -66,7 +67,12 @@ const Calendar = () => {
   // Apollo Client Events
 
   const { loading, data } = useQuery(GET_EVENTS);
-  const [getProjects, { loading: loadingProjects, data: projectData = [] }] = useLazyQuery(GET_PROJECTNAMES);
+  const {
+    data: projectData,
+    loading: loadingProjects,
+    open,
+    setOpen
+  } = useAsyncAutocomplete(GET_PROJECTNAMES)
 
   const [createEvent, { postLoading, postError }] = useMutation(CREATE_EVENT, {
     refetchQueries: [
@@ -141,28 +147,6 @@ const Calendar = () => {
 
     selectedEvent.event.remove();
   }
-
-  // Async AutoComplete 
-
-  const [open, setOpen] = useState(false);
-  const loadingProjectField = open && (projectData?.length === 0);
-
-  useEffect(() => {
-    let active = true;
-    if (!loadingProjectField) {
-      return undefined;
-    };
-
-    (async () => {
-      if (active && !loadingProjects) {
-        await getProjects();
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [loadingProjectField, getProjects, loadingProjects, projectData]);
   
   return (
     <Box m="20px">
@@ -271,7 +255,7 @@ const Calendar = () => {
                   async={true}
                   open={open}
                   setOpen={setOpen}
-                  loading={loadingProjectField}
+                  loading={loadingProjects}
                 />
                 <CheckboxField
                   name='notify'

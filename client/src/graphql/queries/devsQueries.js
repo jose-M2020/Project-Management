@@ -13,8 +13,8 @@ export const GET_DEVS = gql`
   }
 `;
 
-export const GET_DEVSNAME = gql`
-  query getDevelopers {
+export const GET_DEVNAMES = gql`
+  query getDeveloperNames {
     developers {
       _id
       firstname

@@ -12,8 +12,8 @@ export const GET_CLIENTS = gql`
   }
 `;
 
-export const GET_CLIENTSNAME = gql`
-  query getClients {
+export const GET_CLIENTNAMES = gql`
+  query getClientNames {
     clients {
       _id
       firstname
