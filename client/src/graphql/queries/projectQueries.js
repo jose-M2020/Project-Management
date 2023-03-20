@@ -8,7 +8,11 @@ export const GET_PROJECTS = gql`
       description,
       status,
       tags,
-      createdAt
+      createdAt,
+      tasks{
+        _id,
+        status
+      }
     }
   }
 `;

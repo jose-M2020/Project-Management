@@ -13,7 +13,7 @@ const Clients = () => {
   const colors = tokens(theme.palette.mode);
   
   if (error) return <p>Something Went Wrong</p>;
-
+  
   const columns = [
     { field: "_id", headerName: "ID" },
     {

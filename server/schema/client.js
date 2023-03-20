@@ -13,16 +13,26 @@ export const typeDefs = gql`
       firstname: String!,
       lastname: String!,
       email: String!,
-      phone: Int!,
-      company: CompanyInput
+      phone: String!,
+      # company: CompanyInput
+      name: String!,
+      website: String,
+      country: String!,
+      state: String!,
+      city: String!,
     ): Client
     updateClient(
       _id: ID!,
       firstname: String!,
       lastname: String!,
       email: String!,
-      phone: Int!,
-      company: CompanyInput
+      phone: String!,
+      # company: CompanyInput
+      name: String!,
+      website: String,
+      country: String!,
+      state: String!,
+      city: String!,
     ): Client
     deleteClient(_id: ID!): Client
   }
@@ -32,7 +42,7 @@ export const typeDefs = gql`
     firstname: String!
     lastname: String!
     email: String!
-    phone: Int!
+    phone: String!
     company: Company
     createdAt: String
   }
@@ -57,7 +67,7 @@ export const typeDefs = gql`
 export const resolvers = {
   Query: {
     clients: async () => {
-	  return await Client.find();
+	    return await Client.find();
     },
     client: async (_, { _id }) => {
       return await Client.findById(_id);
@@ -70,26 +80,24 @@ export const resolvers = {
       lastname,
       email,
       phone,
-      company: {
       name,
-        website,
-        country,
-        state,
-        city
-      }
-      }) => {
+      website,
+      country,
+      state,
+      city
+    }) => {
       const client = new Client({
-      firstname,
+        firstname,
         lastname,
         email,
         phone,
-      company: {
-        name,
+        company: {
+          name,
           website,
           country,
           state,
           city
-      }
+        }
       });
       const savedClient = client.save();
       return savedClient;

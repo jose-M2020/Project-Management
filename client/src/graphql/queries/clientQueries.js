@@ -21,3 +21,15 @@ export const GET_CLIENTNAMES = gql`
     }
   }
 `;
+
+export const GET_CLIENT = gql`
+  query getClient($id: ID!) {
+    client(_id: $id) {
+      _id
+      firstname
+      lastname
+      email
+      phone
+    }
+  }
+`;

@@ -85,6 +85,7 @@ const ProjectForm = () => {
     };
   }
 
+  // TODO: set the values in dev and client fields before clicking
   const {
     data: devData,
     loading: loadingDevs,

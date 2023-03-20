@@ -5,7 +5,7 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import Topbar from './pages/global/Topbar';
 import Sidebar from './pages/global/Sidebar';
 import Dashboard from './pages/dashboard';
-import Projects from './pages/project/Projects';
+import Projects from './pages/project/ProjectList';
 import ProjectDetails from './pages/project/ProjectDetails';
 import ProjectForm from './pages/project/ProjectForm';
 import Tasks from './pages/Tasks';

@@ -1,11 +1,11 @@
 import { useQuery } from '@apollo/client';
-import { GET_PROJECTS } from '../../graphql/queries/projectQueries';
+import { GET_PROJECTS } from '../../../graphql/queries/projectQueries';
 import { Box, Typography } from '@mui/material';
 import Grid2 from '@mui/material/Unstable_Grid2';
-import Spinner from '../../components/Spinner';
-import Header from '../../components/Header';
-import ProjectCard from '../../components/project/ProjectCard';
-import CustomButton from '../../components/CustomButton';
+import Spinner from '../../../components/Spinner';
+import Header from '../../../components/Header';
+import CustomButton from '../../../components/CustomButton';
+import ProjectCard from './components/ProjectCard';
 
 const Projects = () => {
   const { loading, error, data } = useQuery(GET_PROJECTS);

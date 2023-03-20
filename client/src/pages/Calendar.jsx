@@ -147,7 +147,7 @@ const Calendar = () => {
 
     selectedEvent.event.remove();
   }
-  
+
   return (
     <Box m="20px">
       <Header title="CALENDAR" subtitle="Managing events" />

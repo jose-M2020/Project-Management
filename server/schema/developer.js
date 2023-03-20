@@ -1,6 +1,5 @@
 import { gql } from "graphql-tag";
 import Developer from "../models/Developer.js";
-import { delay } from "../helpers/index.js";
 
 export const typeDefs = gql`
   extend type Query {
@@ -41,7 +40,6 @@ export const typeDefs = gql`
 export const resolvers = {
   Query: {
     developers: async () => {
-      await delay(5000);
       return await Developer.find();
     },
     developer: async (_, { _id }) => {

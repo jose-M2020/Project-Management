@@ -73,7 +73,7 @@ const TeamForm = () => {
 
   return (
     <Box m="20px">
-      <Header title="NEW PROJECT" subtitle="Fill the fields to create new project" />
+      <Header title="NEW DEVELOPER" subtitle="Fill the fields to create a new developer" />
       { (!devLoading) && (
         <Formik
           initialValues={initialValues}

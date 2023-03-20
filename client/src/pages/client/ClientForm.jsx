@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import * as yup from 'yup';
 import { 
@@ -11,12 +11,13 @@ import {
   Stepper 
 } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
+import { Country, State, City }  from 'country-state-city';
 import Header from '../../components/Header';
 import CustomButton from '../../components/CustomButton';
 import Input from '../../components/form/Input';
 import AutoComplete from '../../components/form/AutoComplete';
-import { ADD_PROJECT, UPDATE_PROJECT } from '../../graphql/mutations/projectMutations';
-import { GET_PROJECT, GET_PROJECTNAMES, GET_PROJECTS } from '../../graphql/queries/projectQueries';
+import { CREATE_CLIENT, UPDATE_CLIENT } from '../../graphql/mutations/clientMutations';
+import { GET_CLIENT, GET_CLIENTS } from '../../graphql/queries/clientQueries';
 
 const schema = yup.object().shape({
   firstname: yup.string().required(),
@@ -40,44 +41,36 @@ const ClientForm = () => {
   const [activeSteps, setActiveSteps] = useState(false);
 
   // TODO: Query by condition
-  const { loading: projectLoading, data: projectData } = useQuery(GET_PROJECT, { variables: { id } });
+  const { loading: clientLoading, data: clientData } = useQuery(GET_CLIENT, { variables: { id } });
   
   let initialValues
   
   if(id){
-    // projectData?.project.team = projectData?.project.team.map(item => item._id)
-    initialValues = {
-      ...projectData?.project,
-      team: projectData?.project.team.map(item => item._id),
-    };
+    initialValues = clientData?.client;
   }else { 
     initialValues = {
       firstname: '',
       lastname: '',
       email: '',
       phone: '',
-      company: {
-        name: '',
-        website: '',
-        country: '',
-        state: '',
-        city: ''
-      }
+      name: '',
+      website: '',
+      country: '',
+      state: '',
+      city: ''
     };
   }
   
-  const [getProjects, { loading, data = [] }] = useLazyQuery(GET_PROJECTNAMES);
-  
-  const [createProject, { postLoading }] = useMutation(ADD_PROJECT, {
+  const [createClient, { postLoading }] = useMutation(CREATE_CLIENT, {
 		refetchQueries: [{
-			query: GET_PROJECTS,
+			query: GET_CLIENTS,
 		},
-			"getProjects",
+			"getClients",
 		],
 	});
-  const [updateProject] = useMutation(UPDATE_PROJECT, {
+  const [updateClient] = useMutation(UPDATE_CLIENT, {
     refetchQueries: [{ 
-      query: GET_PROJECT, variables: { id } 
+      query: GET_CLIENT, variables: { id } 
     }],
   });
 
@@ -85,12 +78,12 @@ const ClientForm = () => {
 
   const onSubmit = async (values, actions) => {
     if(id) {
-      updateProject({variables: values});
-      navigate(`/projects/${id}`);
+      // updateProject({variables: values});
+      // navigate(`/projects/${id}`);
     } else {
-      createProject({ variables: values});
+      createClient({ variables: values});
       actions.resetForm();
-      navigate('/projects');
+      navigate('/clients');
     }
   }
 
@@ -106,42 +99,12 @@ const ClientForm = () => {
 		if(id){
       setActiveSteps(true)
     }
-	}, [id, projectData])
-
-  // Async Autocomplete
-
-  const [open, setOpen] = useState(false);
-  const loadingData = open && (data?.length === 0);
-  
-  useEffect(() => {
-    let active = true;
-    if (!loadingData) {
-      return undefined;
-    };
-
-    (async () => {
-      if (active && !loading) {
-        await getProjects();
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [loadingData, getProjects, loading]);
-
-  useEffect(() => {
-    if (!open) {
-      // setOptions([]);
-    }
-  }, [open]);
-
-
+	}, [id])
 
   return (
     <Box m="20px">
-      <Header title="NEW PROJECT" subtitle="Fill the fields to create new project" />
-      { (!projectLoading) && (
+      <Header title="NEW CLIENT" subtitle="Fill the fields to create a new client" />
+      { (!clientLoading) && (
         <Formik
           initialValues={initialValues}
           validationSchema={schema}
@@ -184,20 +147,20 @@ const ClientForm = () => {
                       <AutoComplete 
                         label="Country" 
                         name="country" 
-                        options={data?.projects}
-                        setLabel={(option) => `${option?.name}`}
-                        valueField='_id'
-                        async={true}
-                        open={open}
-                        setOpen={setOpen}
-                        loading={loadingData}
+                        options={Country.getAllCountries()}
+                        setLabel={(option) => option?.name}
+                        valueField='isoCode'
+                        // async={true}
+                        // open={open}
+                        // setOpen={setOpen}
+                        // loading={loadingData}
                       />
                       <AutoComplete 
                         label="State" 
                         name="state" 
-                        options={[]}
-                        // setLabel={(option) => `${option?.name}`}
-                        valueField='_id'
+                        options={State.getStatesOfCountry(values.country)}
+                        setLabel={(option) => option?.name}
+                        valueField='isoCode'
                         // async={true}
                         // open={open}
                         // setOpen={setOpen}
@@ -206,9 +169,9 @@ const ClientForm = () => {
                       <AutoComplete 
                         label="City" 
                         name="city" 
-                        options={[]}
-                        // setLabel={(option) => `${option?.name}`}
-                        valueField='_id'
+                        options={City.getCitiesOfState(values.country, values.state)}
+                        setLabel={(option) => option?.name}
+                        valueField='name'
                         // async={true}
                         // open={open}
                         // setOpen={setOpen}
