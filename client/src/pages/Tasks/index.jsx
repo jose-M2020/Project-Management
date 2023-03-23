@@ -1,39 +1,134 @@
-import { Box } from '@mui/material'
-import { useState } from 'react'
+import { Box, Stack } from '@mui/material'
+import { useEffect, useState } from 'react'
 import { DragDropContext, Droppable } from 'react-beautiful-dnd'
+import { Form, Formik } from 'formik';
+import * as yup from 'yup';
+import CustomModal from '../../components/CustomModal'
 import Header from '../../components/Header'
 import Column from './components/Column'
+import Input from '../../components/form/Input';
+import AutoComplete from '../../components/form/AutoComplete';
+import CustomButton from '../../components/CustomButton';
+import useAsyncAutocomplete from '../../hooks/useAsyncAutocomplete';
+import { GET_PROJECTNAMES } from '../../graphql/queries/projectQueries';
+import { GET_TASKS } from '../../graphql/queries/taskQueries';
+import { useQuery } from '@apollo/client';
 
-const initialData = {
-  tasks: {
-    'task-1': { id: 'task-1', content: 'Take out the garbage' },
-    'task-2': { id: 'task-2', content: 'Watch my favorite show' },
-    'task-3': { id: 'task-3', content: 'Charge my phone' },
-    'task-4': { id: 'task-4', content: 'Cook dinner' },
+const schema = yup.object().shape({
+  title: yup.string().required(),
+  description: yup.string(),
+  status: yup.string().required(),
+  projectId: yup.string().required(),
+  date: yup.date()
+});
+
+const columnData = {
+  'column-1': {
+    id: 'column-1',
+    title: 'To do',
+    status: 'Not Started',
+    items: []
   },
-  columns: {
-    'column-1': {
-      id: 'column-1',
-      title: 'To do',
-      taskIds: ['task-1', 'task-2', 'task-3', 'task-4'],
-    },
-    'column-2': {
-      id: 'column-2',
-      title: 'In progress',
-      taskIds: [],
-    },
-    'column-3': {
-      id: 'column-3',
-      title: 'Completed',
-      taskIds: [],
-    },
+  'column-2': {
+    id: 'column-2',
+    title: 'In progress',
+    status: 'In Progress',
+    items: [],
   },
-  // Facilitate reordering of the columns
-  columnOrder: ['column-1', 'column-2', 'column-3'],
-};
+  'column-3': {
+    id: 'column-3',
+    title: 'Completed',
+    status: 'Completed',
+    items: [],
+  }
+}
+
+const taskData = [
+  { 
+    id: 'task-1',
+    title: 'Take out the garbage',
+    description: 'This is a description of the task. Lorem ipsum dolor sit amet, consectetur. lorem ipsum dolor sit am',
+    status: 'Not Started',
+  },
+  { 
+    id: 'task-2',
+    title: 'Watch my favorite show',
+    description: 'This is a description of the task. Lorem ipsum dolor sit amet, consectetur',
+    status: 'Not Started',
+  },
+  { 
+    id: 'task-3',
+    title: 'Charge my phone',
+    description: 'This is a description of the task. Lorem ipsum dolor sit amet, consectetur',
+    status: 'Not Started',
+  },
+  { 
+    id: 'task-4',
+    title: 'Cook dinner',
+    description: 'This is a description of the task. Lorem ipsum dolor sit amet, consectetur',
+    status: 'In Progress',
+  },
+  {
+    id: 'task-5',
+    title: 'Cook dinner',
+    description: 'This is a description of the task. Lorem ipsum dolor sit amet, consectetur',
+    status: 'In Progress',
+  },
+  { 
+    id: 'task-6',
+    title: 'Cook dinner',
+    description: 'This is a description of the task. Lorem ipsum dolor sit amet, consectetur',
+    status: 'Completed',
+  },
+  { 
+    id: 'task-7',
+    title: 'Cook dinner',
+    description: 'This is a description of the task. Lorem ipsum dolor sit amet, consectetur',
+    status: 'Completed',
+  }
+]
 
 const Tasks = () => {
-  const [columns, setColumns] = useState(initialData);
+  const [addTaskModal, setAddTaskModal] = useState({
+    isOpen: false,
+    taskStatus: ''
+  });
+  const [columns, setColumns] = useState(columnData);
+  const { loading: loadingTasks, data: tasks } = useQuery(GET_TASKS);
+  const {
+    data: projectData,
+    loading: loadingProjects,
+    open,
+    setOpen
+  } = useAsyncAutocomplete(GET_PROJECTNAMES)
+
+  useEffect(() => {
+    const orderedTasks = taskData.reduce((acc, item) => {
+      acc[item.status]?.push(item);
+      return acc;
+    }, {
+      'Not Started': [],
+      'In Progress': [],
+      'Completed': [],
+    })
+    
+    const columData = {
+      'column-1': {
+        ...columns['column-1'],
+        items: orderedTasks['Not Started']
+      },
+      'column-2': {
+        ...columns['column-2'],
+        items: orderedTasks['In Progress']
+      },
+      'column-3': {
+        ...columns['column-3'],
+        items: orderedTasks['Completed']
+      },
+    }
+
+    setColumns(columData)
+  }, [])
   
   const onDragStart = (start, provided) => {
     provided.announce(
@@ -50,7 +145,8 @@ const Tasks = () => {
   };
 
   const handleDragEnd = (result, provided) => {
-    console.log('dragEnd')
+    const { destination, source } = result;
+
     const message = result.destination
       ? `You have moved the task from position
         ${result.source.index + 1} to ${result.destination.index + 1}`
@@ -59,11 +155,7 @@ const Tasks = () => {
 
     provided.announce(message);
 
-    const { destination, source, draggableId, type } = result;
-
-    if (!destination) {
-      return;
-    }
+    if (!destination) return;
 
     if (
       destination.droppableId === source.droppableId &&
@@ -72,69 +164,56 @@ const Tasks = () => {
       return;
     }
 
-    if (type === 'column') {
-      const newColumnOrder = Array.from(columns.columnOrder);
-      newColumnOrder.splice(source.index, 1);
-      newColumnOrder.splice(destination.index, 0, draggableId);
-
-      const newState = {
-        ...columns,
-        columnOrder: newColumnOrder,
-      };
-      setColumns(newState);
-      return;
-    }
-
-    const home = columns.columns[source.droppableId];
-    const foreign = columns.columns[destination.droppableId];
-
-    if (home === foreign) {
-      const newTaskIds = Array.from(home.taskIds);
-      newTaskIds.splice(source.index, 1);
-      newTaskIds.splice(destination.index, 0, draggableId);
+    const sourceColumn = columns[source.droppableId];
+    const destColumn = columns[destination.droppableId];
+    
+    if (sourceColumn === destColumn) {
+      const newItems = [...sourceColumn.items];
+      const [removed] = newItems.splice(source.index, 1);
+      newItems.splice(destination.index, 0, removed);
 
       const newHome = {
-        ...home,
-        taskIds: newTaskIds,
+        ...sourceColumn,
+        items: newItems,
       };
 
       const newState = {
         ...columns,
-        columns: {
-          ...columns.columns,
-          [newHome.id]: newHome,
-        },
+        [newHome.id]: newHome,
       };
-
       setColumns(newState);
       return;
     }
 
     // moving from one list to another
-    const homeTaskIds = Array.from(home.taskIds);
-    homeTaskIds.splice(source.index, 1);
+    const sourceColumnItems = [...sourceColumn.items];
+    const [removed] = sourceColumnItems.splice(source.index, 1);
     const newHome = {
-      ...home,
-      taskIds: homeTaskIds,
+      ...sourceColumn,
+      items: sourceColumnItems,
     };
 
-    const foreignTaskIds = Array.from(foreign.taskIds);
-    foreignTaskIds.splice(destination.index, 0, draggableId);
+    const destColumnItems = [...destColumn.items];
+    destColumnItems.splice(destination.index, 0, removed);
     const newForeign = {
-      ...foreign,
-      taskIds: foreignTaskIds,
+      ...destColumn,
+      items: destColumnItems,
     };
 
     const newState = {
       ...columns,
-      columns: {
-        ...columns,
-        [newHome.id]: newHome,
-        [newForeign.id]: newForeign,
-      },
+      [newHome.id]: newHome,
+      [newForeign.id]: newForeign,
     };
     setColumns(newState);
   };
+
+  const handleSubmit = (values, actions) => {
+    console.log(values);
+    // createClient({ variables: values});
+    // actions.resetForm();
+    // navigate('/clients');
+  }
 
   return (
     <Box m="20px">
@@ -154,25 +233,71 @@ const Tasks = () => {
               {...provided.droppableProps}
               ref={provided.innerRef}
               display='flex'
+              gap={2}
             >
-              {columns.columnOrder.map((columnId, index) => {
-                const column = columns.columns[columnId];
-                console.log(column)
-                const tasks = column.taskIds.map(taskId => columns.tasks[taskId]);
-                return (
-                  <Column
-                    key={column.id}
-                    column={column}
-                    tasks={tasks}
-                    index={index}
-                  />
-                );
-              })}
+              {Object.entries(columns).map(([columnId, column], index) => (
+                <Column
+                  key={columnId}
+                  column={column}
+                  index={index}
+                  setAddTaskModal={setAddTaskModal}
+                />
+              ))}
               {provided.placeholder}
             </Box>
           )}
         </Droppable>
       </DragDropContext>
+      <CustomModal
+        title='Add new task'
+        open={addTaskModal.isOpen}
+        handleClose={
+          () => setAddTaskModal(options => ({
+            ...options,
+            isOpen: false
+          }))
+        }
+      >
+        <Formik
+          initialValues={{
+            title: '',
+            description: '',
+            status: addTaskModal.taskStatus,
+            projectId: '',
+            date: '',
+          }}
+          validationSchema={schema}
+          onSubmit={handleSubmit}
+        >
+          {() => (
+            <Form>
+              <Stack spacing={2}
+              >
+                <Input label="Title*" name="title" />
+                <Input label="Description" name="description" multiline rows={4} />
+                <Input label="Date" name="date" type='date' />
+                <AutoComplete
+                  label="Project" 
+                  name="projectId" 
+                  options={projectData?.projects}
+                  valueField='_id'
+                  setLabel={option => option?.name}
+                  async={true}
+                  open={open}
+                  setOpen={setOpen}
+                  loading={loadingProjects}
+                />
+                <CustomButton 
+                  text='Create task' 
+                  type="submit"
+                  btnstyle="primary"
+                  // loading={postLoading}
+                />
+              </Stack>
+            </Form>
+          )}
+        </Formik>
+      </CustomModal>
     </Box>
   )
 }
