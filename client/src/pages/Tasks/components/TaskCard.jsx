@@ -7,7 +7,7 @@ const TaskCard = ({ task, index }) => {
   const colors = tokens(theme.palette.mode);
 
   return (
-    <Draggable draggableId={task.id} index={index}>
+    <Draggable draggableId={task._id} projectId={task.projectId} index={index}>
       {(provided, snapshot) => (
         <Box
           {...provided.draggableProps}

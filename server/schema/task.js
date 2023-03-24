@@ -14,15 +14,15 @@ export const typeDefs = gql`
       description: String,
       projectId: ID!,
       status: String!,
-      date: String!
+      date: String
     ): Task
     updateTask(
       _id: ID!, 
-      title: String!,
+      title: String,
       description: String,
-      projectId: ID!,
-      status: String!,
-      date: String!
+      projectId: ID,
+      status: String,
+      date: String
     ): Task
     deleteTask(_id: ID!): Task
   }
@@ -32,8 +32,9 @@ export const typeDefs = gql`
     title: String!
     description: String!
     project: Project!
+    projectId: String!
     status: String!
-    date: String!
+    date: String
     createdAt: String
   }
 `;
@@ -72,9 +73,12 @@ export const resolvers = {
       return savedTask;
     },
     updateTask: async (_, args) => {
-      const updatedTask = await Task.findByIdAndUpdate(args._id, args, {
-      new: true,
-      });
+      const updatedTask = await Task.findByIdAndUpdate(
+        args._id,
+        { $set: args },
+        { new: true, }
+      );
+
       if (!updatedTask) throw new Error("Task not found");
         return updatedTask;
     },

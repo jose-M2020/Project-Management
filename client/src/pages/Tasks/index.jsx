@@ -10,9 +10,10 @@ import Input from '../../components/form/Input';
 import AutoComplete from '../../components/form/AutoComplete';
 import CustomButton from '../../components/CustomButton';
 import useAsyncAutocomplete from '../../hooks/useAsyncAutocomplete';
-import { GET_PROJECTNAMES } from '../../graphql/queries/projectQueries';
+import { GET_PROJECT, GET_PROJECTNAMES, GET_PROJECTS } from '../../graphql/queries/projectQueries';
 import { GET_TASKS } from '../../graphql/queries/taskQueries';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
+import { CREATE_TASK, UPDATE_TASK } from '../../graphql/mutations/taskMutations';
 
 const schema = yup.object().shape({
   title: yup.string().required(),
@@ -101,34 +102,172 @@ const Tasks = () => {
     open,
     setOpen
   } = useAsyncAutocomplete(GET_PROJECTNAMES)
+  
+  const [createTask, { postLoading, postError }] = useMutation(CREATE_TASK, {
+    update: (cache, { data }) => {
+      const { _id } = data.createTask.project;
+      const { tasks } = cache.readQuery({
+        query: GET_TASKS
+      })
+      const { projects } = cache.readQuery({
+        query: GET_PROJECTS
+      }) || {}
+
+      cache.writeQuery({
+        query: GET_TASKS,
+        data: {
+          tasks: [
+            data.createTask,
+            ...tasks
+          ]
+        }
+      })
+
+      if(projects){
+        const project = projects.find(item => item._id === _id);
+        console.log(project)
+
+        // const tasks = [...project.tasks];
+        // const taskIndex = tasks.findIndex(item => item._id === data.createTask._id)
+
+        // tasks.splice(taskIndex, 0, {
+        //   _id: data.createTask._id,
+        //   status: data.createTask.status
+        // });
+
+        // console.log('new tasks:', tasks)
+        
+        const updatedProjects = projects.reduce((acc, project) => {
+          if(project._id === _id){
+            const tasks = [
+              ...project.tasks,
+              {
+                _id: data.createTask._id,
+                status: data.createTask.status
+              }
+            ];
+            // const taskIndex = project.tasks.findIndex(item => item._id === data.createTask._id)
+            // tasks.splice(taskIndex, 0, {
+            //   _id: data.createTask._id,
+            //   status: data.createTask.status
+            // });
+
+            return [
+              ...acc,
+              {
+                ...project,
+                tasks
+              }
+            ]
+          }
+
+          return [...acc, project]
+        }, [])
+
+        console.log('updatedProjects: ', updatedProjects)
+        // const newProjects = [...projects];
+        // newProjects.splice(taskIndex, 0, {
+        //   _id: data.createTask._id,
+        //   status: data.createTask.status
+        // });
+
+
+
+        // const updatedProject = {
+        //   ...project,
+        //   tasks : [
+        //     ...tasks,
+        //     {
+        //       _id: data.createTask._id,
+        //       status: data.createTask.status
+        //     }
+        //   ]
+        // }
+
+        cache.writeQuery({
+          query: GET_PROJECTS,
+          data: {
+            projects: updatedProjects
+          }
+        })
+      }
+    }
+	});
+  
+  const [updateTask, { updateLoading, updateError }] = useMutation(UPDATE_TASK, {
+    refetchQueries: [
+      {
+				// query: GET_PROJECT,
+			},
+			// "getTasks",
+		],
+    update: (cache, { data }) => {
+      const projectId = data.updateTask.project._id;
+      cache.modify({
+        fields: {
+          getProjects: (existingProjects, { readField }) => {
+            console.log(existingProjects);
+            if (data) {
+              return existingProjects.filter(
+                (projectRef) => projectId !== readField('_id', projectRef)
+              );
+            }
+          },
+          getTasks: (existingTasks, { readField }) => {
+            if (data) {
+              // return existingTasks.filter(
+              //   (projectRef) => projectId !== readField('_id', projectRef)
+              // );
+
+              return existingTasks.reduce((acc, task) => {
+                if(data.updateTask._id === readField('_id', task)){
+                  return [
+                    ...acc,
+                    {
+                      ...task,
+                      status: data.updateTask.status
+                    }
+                  ]
+                }
+
+                return [...acc, task]
+              })
+            }
+          },
+        },
+      });
+    },
+	});
 
   useEffect(() => {
-    const orderedTasks = taskData.reduce((acc, item) => {
-      acc[item.status]?.push(item);
-      return acc;
-    }, {
-      'Not Started': [],
-      'In Progress': [],
-      'Completed': [],
-    })
+    if(!loadingTasks){
+      const orderedTasks = tasks.tasks.reduce((acc, item) => {
+        acc[item.status]?.push(item);
+        return acc;
+      }, {
+        'Not Started': [],
+        'In Progress': [],
+        'Completed': [],
+      })
+        
+      const columData = {
+        'column-1': {
+          ...columns['column-1'],
+          items: orderedTasks['Not Started']
+        },
+        'column-2': {
+          ...columns['column-2'],
+          items: orderedTasks['In Progress']
+        },
+        'column-3': {
+          ...columns['column-3'],
+          items: orderedTasks['Completed']
+        },
+      }
     
-    const columData = {
-      'column-1': {
-        ...columns['column-1'],
-        items: orderedTasks['Not Started']
-      },
-      'column-2': {
-        ...columns['column-2'],
-        items: orderedTasks['In Progress']
-      },
-      'column-3': {
-        ...columns['column-3'],
-        items: orderedTasks['Completed']
-      },
+      setColumns(columData)
     }
-
-    setColumns(columData)
-  }, [])
+  }, [tasks])
   
   const onDragStart = (start, provided) => {
     provided.announce(
@@ -145,7 +284,11 @@ const Tasks = () => {
   };
 
   const handleDragEnd = (result, provided) => {
-    const { destination, source } = result;
+    const {
+      destination,
+      source,
+      draggableId,
+    } = result;
 
     const message = result.destination
       ? `You have moved the task from position
@@ -206,48 +349,55 @@ const Tasks = () => {
       [newForeign.id]: newForeign,
     };
     setColumns(newState);
+
+    updateTask({variables: {
+      _id: draggableId,
+      status: columnData[destination.droppableId].status
+    }});
   };
 
   const handleSubmit = (values, actions) => {
-    console.log(values);
-    // createClient({ variables: values});
-    // actions.resetForm();
-    // navigate('/clients');
+    createTask({ variables: values});
+    actions.resetForm();
   }
 
   return (
     <Box m="20px">
       <Header title="TASKS" subtitle="All project tasks" />
-      <DragDropContext
-        onDragStart={onDragStart}
-        onDragUpdate={onDragUpdate}
-        onDragEnd={handleDragEnd}
-      >
-        <Droppable
-          droppableId="all-columns"
-          direction="horizontal"
-          type="column"
+      {loadingTasks ? (
+        <h5>Loading Tasks...</h5>
+      ) : (
+        <DragDropContext
+          onDragStart={onDragStart}
+          onDragUpdate={onDragUpdate}
+          onDragEnd={handleDragEnd}
         >
-          {provided => (
-            <Box
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              display='flex'
-              gap={2}
-            >
-              {Object.entries(columns).map(([columnId, column], index) => (
-                <Column
-                  key={columnId}
-                  column={column}
-                  index={index}
-                  setAddTaskModal={setAddTaskModal}
-                />
-              ))}
-              {provided.placeholder}
-            </Box>
-          )}
-        </Droppable>
-      </DragDropContext>
+          <Droppable
+            droppableId="all-columns"
+            direction="horizontal"
+            type="column"
+          >
+            {provided => (
+              <Box
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                display='flex'
+                gap={2}
+              >
+                {Object.entries(columns).map(([columnId, column], index) => (
+                  <Column
+                    key={columnId}
+                    column={column}
+                    index={index}
+                    setAddTaskModal={setAddTaskModal}
+                  />
+                ))}
+                {provided.placeholder}
+              </Box>
+            )}
+          </Droppable>
+        </DragDropContext>
+      )}
       <CustomModal
         title='Add new task'
         open={addTaskModal.isOpen}
@@ -291,7 +441,7 @@ const Tasks = () => {
                   text='Create task' 
                   type="submit"
                   btnstyle="primary"
-                  // loading={postLoading}
+                  loading={postLoading}
                 />
               </Stack>
             </Form>

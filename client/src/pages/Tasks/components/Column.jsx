@@ -86,7 +86,7 @@ const Column = ({column, index, setAddTaskModal}) => {
               }}
             >
               {column.items.map((task, index) => (
-                <TaskCard key={task.id} task={task} index={index} />
+                <TaskCard key={task._id} task={task} index={index} />
               ))}
               {provided.placeholder}
             </Box>
