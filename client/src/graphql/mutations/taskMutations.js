@@ -47,6 +47,7 @@ export const UPDATE_TASK = gql`
     ) {
       _id
       title
+      status
       project{
         _id
       }

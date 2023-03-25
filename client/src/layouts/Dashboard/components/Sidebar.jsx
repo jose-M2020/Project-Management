@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Sidebar as ProSidebar, Menu, MenuItem, useProSidebar } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 // import "react-pro-sidebar/dist/css/styles.css";
-import { tokens } from "../../theme";
+import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
@@ -20,18 +20,18 @@ import FolderCopyIcon from '@mui/icons-material/FolderCopy';
 import CloseIcon from '@mui/icons-material/Close';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-const Item = ({ title, to, icon, selected, setSelected }) => {
+const Item = ({ title, path, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
     <MenuItem
-      active={selected === title}
+      active={selected === path}
       style={{
         color: colors.grey[100],
       }}
-      onClick={() => setSelected(title)}
+      onClick={() => setSelected(path)}
       icon={icon}
-      component={<Link to={to} />}
+      component={<Link to={path} />}
     >
       <Typography>{title}</Typography>
     </MenuItem>
@@ -39,9 +39,10 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 };
 
 const Sidebar = () => {
+  const { pathname } = useLocation();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [selected, setSelected] = useState("Dashboard");
+  const [selected, setSelected] = useState(pathname);
   const { collapseSidebar, collapsed } = useProSidebar();
 
   return (
@@ -130,7 +131,7 @@ const Sidebar = () => {
           <Box paddingLeft={collapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
-              to="/"
+              path="/"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -145,28 +146,28 @@ const Sidebar = () => {
             </Typography>
             <Item
               title="Projects"
-              to="/projects"
+              path="/projects"
               icon={<FolderCopyIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Tasks"
-              to="/tasks"
+              path="/tasks"
               icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Calendar"
-              to="/calendar"
+              path="/calendar"
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             {/* <Item
               title="Bugs"
-              to="/bugs"
+              path="/bugs"
               icon={<BugReportIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -180,21 +181,21 @@ const Sidebar = () => {
             </Typography>
             <Item
               title="Clients"
-              to="/clients"
+              path="/clients"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Manage Team"
-              to="/team"
+              path="/team"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             {/* <Item
               title="FAQ Page"
-              to="/faq"
+              path="/faq"
               icon={<HelpOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -209,28 +210,28 @@ const Sidebar = () => {
             </Typography>
             <Item
               title="Bar Chart"
-              to="/bar"
+              path="/bar"
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Pie Chart"
-              to="/pie"
+              path="/pie"
               icon={<PieChartOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Line Chart"
-              to="/line"
+              path="/line"
               icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Geography Chart"
-              to="/geography"
+              path="/geography"
               icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -238,7 +239,7 @@ const Sidebar = () => {
             {/* <Box sx={{marginTop: 2}}>
                 <Item
                 title="Profile"
-                to="/profile"
+                path="/profile"
                 icon={<AccountCircleIcon />}
                 selected={selected}
                 setSelected={setSelected}

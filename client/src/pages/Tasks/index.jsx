@@ -1,5 +1,9 @@
-import { Box, Stack } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { Box, Stack, Typography } from '@mui/material'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd'
 import { Form, Formik } from 'formik';
 import * as yup from 'yup';
@@ -9,8 +13,11 @@ import Column from './components/Column'
 import Input from '../../components/form/Input';
 import AutoComplete from '../../components/form/AutoComplete';
 import CustomButton from '../../components/CustomButton';
+import SubtitlesIcon from '@mui/icons-material/Subtitles';
+import TocIcon from '@mui/icons-material/Toc';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import useAsyncAutocomplete from '../../hooks/useAsyncAutocomplete';
-import { GET_PROJECT, GET_PROJECTNAMES, GET_PROJECTS } from '../../graphql/queries/projectQueries';
+import { GET_PROJECTNAMES, GET_PROJECTS } from '../../graphql/queries/projectQueries';
 import { GET_TASKS } from '../../graphql/queries/taskQueries';
 import { useMutation, useQuery } from '@apollo/client';
 import { CREATE_TASK, UPDATE_TASK } from '../../graphql/mutations/taskMutations';
@@ -20,7 +27,6 @@ const schema = yup.object().shape({
   description: yup.string(),
   status: yup.string().required(),
   projectId: yup.string().required(),
-  date: yup.date()
 });
 
 const columnData = {
@@ -44,57 +50,28 @@ const columnData = {
   }
 }
 
-const taskData = [
-  { 
-    id: 'task-1',
-    title: 'Take out the garbage',
-    description: 'This is a description of the task. Lorem ipsum dolor sit amet, consectetur. lorem ipsum dolor sit am',
-    status: 'Not Started',
-  },
-  { 
-    id: 'task-2',
-    title: 'Watch my favorite show',
-    description: 'This is a description of the task. Lorem ipsum dolor sit amet, consectetur',
-    status: 'Not Started',
-  },
-  { 
-    id: 'task-3',
-    title: 'Charge my phone',
-    description: 'This is a description of the task. Lorem ipsum dolor sit amet, consectetur',
-    status: 'Not Started',
-  },
-  { 
-    id: 'task-4',
-    title: 'Cook dinner',
-    description: 'This is a description of the task. Lorem ipsum dolor sit amet, consectetur',
-    status: 'In Progress',
-  },
-  {
-    id: 'task-5',
-    title: 'Cook dinner',
-    description: 'This is a description of the task. Lorem ipsum dolor sit amet, consectetur',
-    status: 'In Progress',
-  },
-  { 
-    id: 'task-6',
-    title: 'Cook dinner',
-    description: 'This is a description of the task. Lorem ipsum dolor sit amet, consectetur',
-    status: 'Completed',
-  },
-  { 
-    id: 'task-7',
-    title: 'Cook dinner',
-    description: 'This is a description of the task. Lorem ipsum dolor sit amet, consectetur',
-    status: 'Completed',
-  }
-]
+const FormItem = ({icon, input}) => (
+  <Box display='flex' >
+    <Typography variant='span' mr='8px'>
+      {icon}
+    </Typography>
+    <Box flexGrow={1} >
+      {input}
+    </Box>
+  </Box>
+);
 
 const Tasks = () => {
   const [addTaskModal, setAddTaskModal] = useState({
     isOpen: false,
     taskStatus: ''
   });
+  const [taskDetailsModal, setTaskDetailsModal] = useState({
+    isOpen: false,
+    data: {}
+  });
   const [columns, setColumns] = useState(columnData);
+  const [date, setDate] = useState();
   const { loading: loadingTasks, data: tasks } = useQuery(GET_TASKS);
   const {
     data: projectData,
@@ -124,19 +101,7 @@ const Tasks = () => {
       })
 
       if(projects){
-        const project = projects.find(item => item._id === _id);
-        console.log(project)
-
-        // const tasks = [...project.tasks];
-        // const taskIndex = tasks.findIndex(item => item._id === data.createTask._id)
-
-        // tasks.splice(taskIndex, 0, {
-        //   _id: data.createTask._id,
-        //   status: data.createTask.status
-        // });
-
-        // console.log('new tasks:', tasks)
-        
+        // const project = projects.find(item => item._id === _id);
         const updatedProjects = projects.reduce((acc, project) => {
           if(project._id === _id){
             const tasks = [
@@ -146,43 +111,15 @@ const Tasks = () => {
                 status: data.createTask.status
               }
             ];
-            // const taskIndex = project.tasks.findIndex(item => item._id === data.createTask._id)
-            // tasks.splice(taskIndex, 0, {
-            //   _id: data.createTask._id,
-            //   status: data.createTask.status
-            // });
 
             return [
               ...acc,
-              {
-                ...project,
-                tasks
-              }
+              { ...project, tasks }
             ]
           }
 
           return [...acc, project]
         }, [])
-
-        console.log('updatedProjects: ', updatedProjects)
-        // const newProjects = [...projects];
-        // newProjects.splice(taskIndex, 0, {
-        //   _id: data.createTask._id,
-        //   status: data.createTask.status
-        // });
-
-
-
-        // const updatedProject = {
-        //   ...project,
-        //   tasks : [
-        //     ...tasks,
-        //     {
-        //       _id: data.createTask._id,
-        //       status: data.createTask.status
-        //     }
-        //   ]
-        // }
 
         cache.writeQuery({
           query: GET_PROJECTS,
@@ -195,47 +132,45 @@ const Tasks = () => {
 	});
   
   const [updateTask, { updateLoading, updateError }] = useMutation(UPDATE_TASK, {
-    refetchQueries: [
-      {
-				// query: GET_PROJECT,
-			},
-			// "getTasks",
-		],
     update: (cache, { data }) => {
-      const projectId = data.updateTask.project._id;
-      cache.modify({
-        fields: {
-          getProjects: (existingProjects, { readField }) => {
-            console.log(existingProjects);
-            if (data) {
-              return existingProjects.filter(
-                (projectRef) => projectId !== readField('_id', projectRef)
-              );
-            }
-          },
-          getTasks: (existingTasks, { readField }) => {
-            if (data) {
-              // return existingTasks.filter(
-              //   (projectRef) => projectId !== readField('_id', projectRef)
-              // );
+      // const projectId = data.updateTask.project._id;
+      const { tasks } = cache.readQuery({
+        query: GET_TASKS
+      })
 
-              return existingTasks.reduce((acc, task) => {
-                if(data.updateTask._id === readField('_id', task)){
-                  return [
-                    ...acc,
-                    {
-                      ...task,
-                      status: data.updateTask.status
-                    }
-                  ]
-                }
-
-                return [...acc, task]
-              })
+      const updatedTasks = tasks.reduce((acc, task) => {
+        if(data.updateTask._id === task._id){
+          return [
+            ...acc,
+            {
+              ...task,
+              status: data.updateTask.status
             }
-          },
-        },
-      });
+          ]
+        }
+
+        return [...acc, task]
+      }, [])
+
+      cache.writeQuery({
+        query: GET_TASKS,
+        data: {
+          tasks: updatedTasks,
+        }
+      })
+
+      // cache.modify({
+      //   fields: {
+      //     getProjects: (existingProjects, { readField }) => {
+      //       console.log(existingProjects);
+      //       if (data) {
+      //         return existingProjects.filter(
+      //           (projectRef) => projectId !== readField('_id', projectRef)
+      //         );
+      //       }
+      //     }
+      //   },
+      // });
     },
 	});
 
@@ -357,46 +292,61 @@ const Tasks = () => {
   };
 
   const handleSubmit = (values, actions) => {
-    createTask({ variables: values});
+    createTask({ variables: {
+      ...values,
+      date
+    }});
     actions.resetForm();
+
+    setAddTaskModal(options => ({
+      ...options,
+      isOpen: false
+    }))
   }
 
   return (
-    <Box m="20px">
+    <Box mx="20px" mt="20px">
       <Header title="TASKS" subtitle="All project tasks" />
       {loadingTasks ? (
         <h5>Loading Tasks...</h5>
       ) : (
-        <DragDropContext
-          onDragStart={onDragStart}
-          onDragUpdate={onDragUpdate}
-          onDragEnd={handleDragEnd}
-        >
-          <Droppable
-            droppableId="all-columns"
-            direction="horizontal"
-            type="column"
+        <Box sx={{ overflow: 'hidden' }}>
+          <DragDropContext
+            onDragStart={onDragStart}
+            onDragUpdate={onDragUpdate}
+            onDragEnd={handleDragEnd}
           >
-            {provided => (
-              <Box
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                display='flex'
-                gap={2}
-              >
-                {Object.entries(columns).map(([columnId, column], index) => (
-                  <Column
-                    key={columnId}
-                    column={column}
-                    index={index}
-                    setAddTaskModal={setAddTaskModal}
-                  />
-                ))}
-                {provided.placeholder}
-              </Box>
-            )}
-          </Droppable>
-        </DragDropContext>
+            <Droppable
+              droppableId="all-columns"
+              direction="horizontal"
+              type="column"
+            >
+              {provided => (
+                <Box
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  display='flex'
+                  gap={2}
+                  sx={{
+                    overflowX: 'auto',
+                    paddingBottom: '15px'
+                  }}
+                >
+                  {Object.entries(columns).map(([columnId, column], index) => (
+                    <Column
+                      key={columnId}
+                      column={column}
+                      index={index}
+                      setAddTaskModal={setAddTaskModal}
+                      setTaskDetailsModal={setTaskDetailsModal}
+                    />
+                  ))}
+                  {provided.placeholder}
+                </Box>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </Box>
       )}
       <CustomModal
         title='Add new task'
@@ -425,7 +375,15 @@ const Tasks = () => {
               >
                 <Input label="Title*" name="title" />
                 <Input label="Description" name="description" multiline rows={4} />
-                <Input label="Date" name="date" type='date' />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer components={['DatePicker']}>
+                    <DatePicker
+                      sx={{ width: '100%'}}
+                      label="Due date"
+                      onChange={(newDate) => setDate(newDate)}
+                    />
+                  </DemoContainer>
+                </LocalizationProvider>
                 <AutoComplete
                   label="Project" 
                   name="projectId" 
@@ -443,6 +401,73 @@ const Tasks = () => {
                   btnstyle="primary"
                   loading={postLoading}
                 />
+              </Stack>
+            </Form>
+          )}
+        </Formik>
+      </CustomModal>
+      <CustomModal
+        title='Task details'
+        open={taskDetailsModal.isOpen}
+        handleClose={
+          () => setTaskDetailsModal({
+            isOpen: false,
+            data: {}
+          })
+        }
+      >
+        <Formik
+          initialValues={{
+            title: '',
+            description: '',
+            status: addTaskModal.taskStatus,
+            projectId: '',
+            date: '',
+          }}
+          validationSchema={schema}
+          onSubmit={handleSubmit}
+        >
+          {() => (
+            <Form>
+              <Stack component="div" spacing={3}
+              >
+                <FormItem
+                  icon={<SubtitlesIcon />}
+                  input={
+                    <Input
+                      label='Title'
+                      name="title"
+                      variant="standard"
+                      value={taskDetailsModal.data.title} />
+                  }
+                />
+                <FormItem
+                  icon={<TocIcon />}
+                  input={
+                    <Input
+                      label='Description'
+                      name="description"
+                      variant="standard"
+                      value={taskDetailsModal.data.description} />
+                  }
+                />
+                <FormItem
+                  icon={<PeopleAltIcon />}
+                  input={
+                    <Input
+                      label='Description'
+                      name="description"
+                      variant="standard"
+                      value={taskDetailsModal.data.description} />
+                  }
+                />
+
+                {/* <CustomButton 
+                  text='Create task' 
+                  type="submit"
+                  btnstyle="primary"
+                  loading={postLoading}
+                /> */}
               </Stack>
             </Form>
           )}

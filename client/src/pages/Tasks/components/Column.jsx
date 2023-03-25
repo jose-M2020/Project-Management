@@ -5,7 +5,12 @@ import AddIcon from '@mui/icons-material/Add';
 import TaskCard from "./TaskCard";
 import { tokens } from "../../../theme";
 
-const Column = ({column, index, setAddTaskModal}) => {
+const Column = ({
+  column,
+  index,
+  setAddTaskModal,
+  setTaskDetailsModal
+}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -18,7 +23,9 @@ const Column = ({column, index, setAddTaskModal}) => {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        width: '300px',     
+        flexShrink: 0,
+        maxWidth: '290px',
+        flexBasis: '96%'   
       }}
     >
       <Stack 
@@ -27,6 +34,8 @@ const Column = ({column, index, setAddTaskModal}) => {
         justifyContent='space-between'
         alignItems='center'
         padding='10px'
+        boxShadow={`0 1px 4px ${colors.blueAccent[400]}`}
+        mb='8px'
       >
         <Box>
           <Typography
@@ -63,11 +72,11 @@ const Column = ({column, index, setAddTaskModal}) => {
         </Fab>
       </Stack>
       <Box
-        sx={{
-          height: 'auto',
-          maxHeight: '65vh',
-          overflowY: 'auto',
-        }}
+        // sx={{
+        //   height: 'auto',
+        //   maxHeight: '63vh',
+        //   overflowY: 'auto',
+        // }}
       >
         <Droppable droppableId={column.id} type="task" key={column.id}>
           {(provided, snapshot) => (
@@ -86,7 +95,12 @@ const Column = ({column, index, setAddTaskModal}) => {
               }}
             >
               {column.items.map((task, index) => (
-                <TaskCard key={task._id} task={task} index={index} />
+                <TaskCard 
+                  key={task._id}
+                  task={task}
+                  index={index}
+                  setTaskDetailsModal={setTaskDetailsModal}
+                />
               ))}
               {provided.placeholder}
             </Box>

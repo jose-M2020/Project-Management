@@ -9,14 +9,17 @@ body,
   font-family: "Source Sans Pro", sans-serif;
 }
 
+body {
+  overflow-x: hidden;
+}
+
+main {
+  width: 100%;
+}
+
 .content {
   max-width: 1500px;
   margin: 0 auto;
-}
-
-.app {
-  display: flex;
-  position: relative;
 }
 
 ::-webkit-scrollbar {

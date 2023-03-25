@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
 import { CssBaseline, ThemeProvider } from '@mui/material';
-import Topbar from './pages/global/Topbar';
-import Sidebar from './pages/global/Sidebar';
+import Topbar from './layouts/Dashboard/components/Topbar';
+import Sidebar from './layouts/Dashboard/components/Sidebar';
 import Dashboard from './pages/dashboard';
 import Projects from './pages/project/ProjectList';
 import ProjectDetails from './pages/project/ProjectDetails';
@@ -23,6 +23,7 @@ import Geography from './pages/chart/Geography';
 import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
 import { ColorModeContext, useMode } from './theme';
+import DashboardLayout from './layouts/Dashboard';
 
 const cache = new InMemoryCache({
   typePolicies: {
@@ -65,7 +66,7 @@ const client = new ApolloClient({
 
 function App() {
   const [theme, colorMode] = useMode();
-  const [isSidebar, setIsSidebar] = useState(true);
+  // const [isSidebar, setIsSidebar] = useState(true);
 
   return (
     <>
@@ -74,10 +75,11 @@ function App() {
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <div className='app'>
-              <Sidebar isSidebar={isSidebar} />
-              <main className='content'>
-                <Topbar setIsSidebar={setIsSidebar} />
-                <Routes>
+              <Routes>
+                <Route
+                  path='/'
+                  element={<DashboardLayout />}
+                >
                   <Route path='/' element={<Dashboard />} />
                   <Route path='/projects' element={<Projects />} />
                   <Route path='/projects/:id' element={<ProjectDetails />} />
@@ -97,8 +99,8 @@ function App() {
                   <Route path='/geography' element={<Geography />} />
                   <Route path='/profile' element={<Profile />} />
                   <Route path='*' element={<NotFound />} />
-                </Routes>
-              </main>
+                </Route>
+              </Routes>
             </div>
           </ThemeProvider>
         </ColorModeContext.Provider>
