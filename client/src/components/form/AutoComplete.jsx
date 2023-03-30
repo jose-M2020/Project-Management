@@ -1,13 +1,7 @@
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment } from 'react';
 import { Chip, CircularProgress, TextField } from '@mui/material'
 import Autocomplete from '@mui/material/Autocomplete';
 import { useFormikContext } from 'formik';
-
-function sleep(delay = 0) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, delay);
-  });
-}
 
 const AutoComplete = ({
   options = [], 
@@ -66,7 +60,8 @@ const AutoComplete = ({
       {...(props.multiple && {
         renderTags: (value, getTagProps) => (
           value.map((option, index) => (
-            <Chip 
+            <Chip
+              sx={{ display: 'block' }}
               variant="outlined"
               label={
                 (typeof option === 'string') ? (

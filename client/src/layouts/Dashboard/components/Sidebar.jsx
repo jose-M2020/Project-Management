@@ -4,21 +4,16 @@ import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 // import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../../theme";
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
-import BugReportIcon from '@mui/icons-material/BugReport';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import FolderCopyIcon from '@mui/icons-material/FolderCopy';
-import CloseIcon from '@mui/icons-material/Close';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const Item = ({ title, path, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -76,57 +71,62 @@ const Sidebar = () => {
             }
           }}
         >
-          {/* LOGO AND MENU ICON */}
-          <MenuItem
-            icon={collapsed && <MenuOutlinedIcon onClick={() => collapseSidebar(!collapsed)} />}
-            style={{
-              margin: "10px 0 20px 0",
-              color: colors.grey[100],
-            }}
-          >
+          {/*  CARD AND MENU ICON */}
+          <Box position='relative'>
             {!collapsed && (
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                ml="15px"
-              >
-                <Typography variant="h3" color={colors.grey[100]}>
-                  IT Projects
-                </Typography>
-                <IconButton onClick={() => collapseSidebar(!collapsed)}>
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-            )}
-          </MenuItem>
-
-          {!collapsed && (
-            <Box mb="25px">
-              <Box display="flex" justifyContent="center" alignItems="center">
-                <img
-                  alt="profile-user"
-                  width="100px"
-                  height="100px"
-                  src={`../../assets/user.png`}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
-              </Box>
-              <Box textAlign="center">
-                <Typography
-                  variant="h2"
-                  color={colors.grey[100]}
-                  fontWeight="bold"
-                  sx={{ m: "10px 0 0 0" }}
+              <>
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    right: 0,
+                    top: '50%',
+                    transform: 'translate(0,-50%)'
+                  }}
                 >
-                  Jhon Klein
-                </Typography>
-                <Typography variant="h5" color={colors.greenAccent[500]}>
-                  Front-end Developer
-                </Typography>
-              </Box>
-            </Box>
-          )}
+                  <IconButton 
+                    onClick={() => collapseSidebar(!collapsed)}
+                    sx={{ backgroundColor: colors.primary[600] }}
+                  >
+                      <ArrowBackIosIcon />
+                    </IconButton>
+                </Box>
+                <Box 
+                  my="15px"              
+                  paddingLeft={"10%"}
+                >
+                  <Box paddingX='20px' >
+                    <Box
+                      backgroundColor={colors.blueAccent[700]}
+                      padding={1}
+                      borderRadius={2}
+                    >
+                      <Typography
+                        variant="h2"
+                        fontSize='1.2rem'
+                        color={colors.grey[100]}
+                        fontWeight="bold"
+                        noWrap={true}
+                      >
+                        Ecommerce Project
+                      </Typography>
+                      <Typography variant="h5" color={colors.greenAccent[500]}>
+                        Front-end
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              </>
+            )}
+            {collapsed && (
+              <MenuItem
+                icon={ <MenuOutlinedIcon onClick={() => collapseSidebar(!collapsed)} /> }
+                style={{
+                  margin: "10px 0 10px 0",
+                  color: colors.grey[100],
+                }}
+              />
+            )}
+          </Box>
 
           <Box paddingLeft={collapsed ? undefined : "10%"}>
             <Item
@@ -144,13 +144,6 @@ const Sidebar = () => {
             >
               Activity
             </Typography>
-            <Item
-              title="Projects"
-              path="/projects"
-              icon={<FolderCopyIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
             <Item
               title="Tasks"
               path="/tasks"
@@ -172,35 +165,13 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             /> */}
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Users
-            </Typography>
             <Item
-              title="Clients"
-              path="/clients"
-              icon={<ContactsOutlinedIcon />}
+              title="Settings"
+              path="/settings"
+              icon={<SettingsIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
-              title="Manage Team"
-              path="/team"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            {/* <Item
-              title="FAQ Page"
-              path="/faq"
-              icon={<HelpOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
-
             <Typography
               variant="h6"
               color={colors.grey[300]}

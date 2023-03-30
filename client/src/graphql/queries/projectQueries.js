@@ -56,3 +56,20 @@ export const GET_PROJECT = gql`
     }
   }
 `;
+
+export const GET_COMPANYLOCATIONS = gql`
+  query getCompanyLocations {
+    projects {
+      client{
+        company{
+          name
+          website
+          country
+          state
+          city
+        }
+      }
+      createdAt
+    }
+  }
+`;

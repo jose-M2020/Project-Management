@@ -1,23 +1,97 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
-import { Box, Fab, IconButton, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Fab, IconButton, Stack, TextField, Typography, useTheme } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
+import ClearIcon from '@mui/icons-material/Clear';
 import TaskCard from "./TaskCard";
 import { tokens } from "../../../theme";
+import CustomButton from "../../../components/CustomButton";
+import AutoComplete from "../../../components/form/AutoComplete";
+import { hexToRgba } from "../../../helpers/helpers";
+import useAsyncAutocomplete from "../../../hooks/useAsyncAutocomplete";
+import { GET_PROJECTNAMES, GET_PROJECTS } from "../../../graphql/queries/projectQueries";
+import { Form, Formik } from "formik";
+import { schema } from "../TaskValidation";
+import Input from "../../../components/form/Input";
+import { useMutation } from "@apollo/client";
+import { CREATE_TASK } from "../../../graphql/mutations/taskMutations";
+import { GET_TASKS } from "../../../graphql/queries/taskQueries";
 
 const Column = ({
   column,
   index,
-  setAddTaskModal,
   setTaskDetailsModal
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [addTaskActivated, setAddTaskActivated] = useState(false);  
+  const {
+    data: projectData,
+    loading: loadingProjects,
+    open,
+    setOpen
+  } = useAsyncAutocomplete(GET_PROJECTNAMES)
+
+  const [createTask, { postLoading, postError }] = useMutation(CREATE_TASK, {
+    update: (cache, { data }) => {
+      const { _id } = data.createTask?.project || {};
+      const { tasks } = cache.readQuery({
+        query: GET_TASKS
+      })
+      const { projects } = cache.readQuery({
+        query: GET_PROJECTS
+      }) || {}
+
+      cache.writeQuery({
+        query: GET_TASKS,
+        data: {
+          tasks: [
+            data.createTask,
+            ...tasks
+          ]
+        }
+      })
+
+      if(projects && _id){
+        // const project = projects.find(item => item._id === _id);
+        const updatedProjects = projects.reduce((acc, project) => {
+          if(project._id === _id){
+            const tasks = [
+              ...project.tasks,
+              {
+                _id: data.createTask._id,
+                status: data.createTask.status
+              }
+            ];
+
+            return [
+              ...acc,
+              { ...project, tasks }
+            ]
+          }
+
+          return [...acc, project]
+        }, [])
+
+        cache.writeQuery({
+          query: GET_PROJECTS,
+          data: {
+            projects: updatedProjects
+          }
+        })
+      }
+    }
+	});
+
+  const handleSubmit = (values, actions) => {
+    createTask({ variables: values});
+    actions.resetForm();
+  }
 
   return (
     <Box
       sx={{
-        backgroundColor: colors.blueAccent[800],
+        backgroundColor: hexToRgba(colors.blueAccent[800], .5),
         borderRadius: '5px',
         boxShadow: `0 0 4px ${colors.blueAccent[400]}`,
         display: 'flex',
@@ -28,13 +102,13 @@ const Column = ({
         flexBasis: '96%'   
       }}
     >
-      <Stack 
+      <Stack
         direction="row"
         spacing={1}
         justifyContent='space-between'
         alignItems='center'
         padding='10px'
-        boxShadow={`0 1px 4px ${colors.blueAccent[400]}`}
+        borderBottom={`.5px solid ${colors.blueAccent[400]}`}
         mb='8px'
       >
         <Box>
@@ -54,22 +128,6 @@ const Column = ({
             {column.items.length}
           </Typography> */}
         </Box>
-        <Fab 
-          onClick={
-            () => setAddTaskModal(options => ({
-              taskStatus: column.status,
-              isOpen: true
-            }))
-          }
-          aria-label="add" 
-          sx={{
-            minHeight: 0,
-            width: '25px',
-            height: '25px'
-          }}
-        >
-          <AddIcon />
-        </Fab>
       </Stack>
       <Box
         // sx={{
@@ -106,6 +164,77 @@ const Column = ({
             </Box>
           )}
         </Droppable>
+      </Box>
+
+      <Box padding='10px'>
+        { addTaskActivated ? (
+          <Formik
+            initialValues={{
+              title: '',
+              status: column.status,
+              projectId: '',
+              priority: 'Low'
+            }}
+            validationSchema={schema}
+            onSubmit={handleSubmit}
+          >
+            {() => (
+              <Form>
+                <Stack
+                  spacing={2}
+                  sx={{
+                    backgroundColor: colors.blueAccent[800],
+                    borderRadius: '5px',
+                    padding: '10px',
+                  }}
+                >
+                  <Input 
+                    label='Title'
+                    name='title'
+                  />
+                  {/* <TextField 
+                    label='Title'
+                    name='title'
+                    inputRef={taskTitleRef}
+                    sx={{ marginBottom: '8px' }}
+                    fullWidth
+                  /> */}
+                  <AutoComplete
+                    label="Project" 
+                    name="projectId" 
+                    options={projectData?.projects}
+                    valueField='_id'
+                    setLabel={option => option?.name}
+                    async={true}
+                    open={open}
+                    setOpen={setOpen}
+                    loading={loadingProjects}
+                  />
+                  <Box>
+                    <CustomButton 
+                      text='Add task'
+                      type='submit'
+                      loading={postLoading}  
+                    />
+                    <IconButton
+                      sx={{ marginLeft: '6px' }}
+                      onClick={() => setAddTaskActivated(false)}
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                  </Box>
+                </Stack>
+              </Form>
+            )}
+          </Formik>
+        ) : (
+          <CustomButton 
+            text='Add task'
+            variant='outlined'
+            onClick={() => setAddTaskActivated(true)}
+            fullWidth
+          />
+        )}
       </Box>
     </Box>
   );

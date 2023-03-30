@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import Topbar from './layouts/Dashboard/components/Topbar';
-import Sidebar from './layouts/Dashboard/components/Sidebar';
 import Dashboard from './pages/dashboard';
 import Projects from './pages/project/ProjectList';
 import ProjectDetails from './pages/project/ProjectDetails';
@@ -75,23 +73,25 @@ function App() {
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <div className='app'>
+              <Topbar />
               <Routes>
+                <Route path='/projects' element={<Projects />} />
+                <Route path='/projects/add' element={<ProjectForm />} />
+                <Route path='/clients' element={<Clients />} />
+                <Route path='/clients/add' element={<ClientForm />} />
+                <Route path='/team' element={<Team />} />
+                <Route path='/team/add' element={<TeamForm />} />
                 <Route
                   path='/'
                   element={<DashboardLayout />}
                 >
                   <Route path='/' element={<Dashboard />} />
-                  <Route path='/projects' element={<Projects />} />
+                  
                   <Route path='/projects/:id' element={<ProjectDetails />} />
-                  <Route path='/projects/add' element={<ProjectForm />} />
                   <Route path='/projects/:id/edit' element={<ProjectForm />} />
                   <Route path='/tasks' element={<Tasks />} />
                   <Route path='/calendar' element={<Calendar />} />
                   <Route path='/bugs' element={<Bugs />} />
-                  <Route path='/clients' element={<Clients />} />
-                  <Route path='/clients/add' element={<ClientForm />} />
-                  <Route path='/team' element={<Team />} />
-                  <Route path='/team/add' element={<TeamForm />} />
                   <Route path='/faq' element={<Faq />} />
                   <Route path='/bar' element={<Bar />} />
                   <Route path='/pie' element={<Pie />} />

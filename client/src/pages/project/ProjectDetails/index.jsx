@@ -68,16 +68,14 @@ const ProjectDetails = () => {
 
   return (
     <Box m="20px">
-      <Header title="DETAILS PROJECT" subtitle="Details project" />
+      <Header title="PROJECT SETTINGS" subtitle="Details project" />
       {loading ? (
         <Spinner />
       ) : (
         <Box>
-          <Link to='/projects' className='btn btn-light btn-sm w-25 d-inline ms-auto'>
-            Back
-          </Link>
+          <CustomButton text='BACK' link='/projects' />
           <Grid container spacing={2}>
-            <Grid item xs={4}>
+            {/* <Grid item xs={4}>
               <CircularProgressWithLabel
                 label="Task completed"
                 progress={44}
@@ -103,7 +101,7 @@ const ProjectDetails = () => {
                   )}                
                 </List>
               </Box>
-            </Grid>
+            </Grid> */}
             <Grid item xs={8}>
               <Box>
                 <Box mb={5}>

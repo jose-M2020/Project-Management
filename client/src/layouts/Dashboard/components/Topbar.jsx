@@ -1,4 +1,4 @@
-import { Box, IconButton, useTheme } from "@mui/material";
+import { Box, IconButton, MenuItem, Typography, useTheme } from "@mui/material";
 import { useContext } from "react";
 import { ColorModeContext, tokens } from "../../../theme";
 import InputBase from "@mui/material/InputBase";
@@ -9,20 +9,99 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from '@mui/icons-material/Menu';
+import MoreIcon from '@mui/icons-material/MoreVert';
+import { useNavigate } from "react-router-dom";
+import Dropdown from "../../../components/Dropdown";
 
-const Topbar = ({ toggleDrawer, isMobil }) => {
+const sectionMenu = [
+  { title: 'Projects', path: '/projects' },
+  {
+    title: 'Users',
+    submenu: [
+      { title: 'Developers', path: '/team' },
+      { title: 'Clients', path: '/clients' }
+    ]
+  }
+]
+
+const toolMenu = (theme, colorMode) => {
+  return [
+    {icon: (
+        <IconButton onClick={colorMode.toggleColorMode}>
+          {theme.palette.mode === "dark" ? (
+            <DarkModeOutlinedIcon />
+          ) : (
+            <LightModeOutlinedIcon />
+          )}
+        </IconButton>
+      )
+    },
+    {icon: (
+        <IconButton>
+          <NotificationsOutlinedIcon />
+        </IconButton>
+      )
+    },
+    {icon: (
+        <IconButton>
+          <SettingsOutlinedIcon />
+        </IconButton>
+      )
+    }
+  ]
+} 
+
+const Topbar = () => {
+  const navigate = useNavigate();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
-      <Box display="flex" alignItems='center' >
-        { isMobil && (
+      {/* LEFT SIDE */}
+      <Box display="flex" alignItems='center' gap={1} >
+        {/* { isMobil && (
           <IconButton onClick={toggleDrawer(true)}>
             <MenuIcon />
           </IconButton>
-        ) }
+        ) } */}
+        <Box sx={{ display: { xs: 'block', md: 'none' }}}>
+          <Dropdown
+            button={
+              <IconButton>
+                <MenuIcon />
+              </IconButton>
+            }
+            options={sectionMenu}          
+          />
+        </Box>
+        <Typography>IT PROJECTS</Typography>
+        <Box sx={{ display: { xs: 'none', md: 'flex' }}}>
+          {sectionMenu.map((item, index) => (
+            <>
+              {item?.submenu ? (
+                <MenuItem>
+                  <Dropdown
+                    button={<Typography>Users</Typography>}
+                    options={item.submenu}
+                  />
+                </MenuItem>
+              ) : (
+                <MenuItem
+                  onClick={() => navigate(item.path)}
+                  // component={<Link to="/projects" />}
+                >
+                  {item.title}
+                </MenuItem>
+              )}
+            </>
+          ))}
+        </Box>
+      </Box>
+
+      {/* RIGTH SIDE */}
+      <Box display="flex">
         {/* SEARCH BAR */}
         <Box
           display="flex"
@@ -34,26 +113,56 @@ const Topbar = ({ toggleDrawer, isMobil }) => {
             <SearchIcon />
           </IconButton>
         </Box>
-      </Box>
-
-      {/* ICONS */}
-      <Box display="flex">
-        <IconButton onClick={colorMode.toggleColorMode}>
-          {theme.palette.mode === "dark" ? (
-            <DarkModeOutlinedIcon />
-          ) : (
-            <LightModeOutlinedIcon />
-          )}
-        </IconButton>
-        <IconButton>
-          <NotificationsOutlinedIcon />
-        </IconButton>
-        <IconButton>
-          <SettingsOutlinedIcon />
-        </IconButton>
-        <IconButton>
-          <PersonOutlinedIcon />
-        </IconButton>
+        <Box sx={{ display: { xs: 'none', md: 'flex' } }} >
+          {toolMenu(theme, colorMode).map((item, index) => (
+            item.icon
+          ))}
+        </Box>
+        <Dropdown
+          button={
+            <IconButton>
+              <PersonOutlinedIcon />
+            </IconButton>
+          }
+        >
+          <Box p={2} >
+            <Box display="flex" justifyContent="center" alignItems="center">
+              <img
+                alt="profile-user"
+                width="100px"
+                height="100px"
+                src={`../../assets/user.png`}
+                style={{ cursor: "pointer", borderRadius: "50%" }}
+              />
+            </Box>
+            <Box textAlign="center">
+              <Typography
+                variant="h2"
+                color={colors.grey[100]}
+                fontWeight="bold"
+                sx={{ m: "10px 0 0 0" }}
+              >
+                Jhon Klein
+              </Typography>
+              <Typography variant="h5" color={colors.greenAccent[500]}>
+                Front-end Developer
+              </Typography>
+            </Box>
+          </Box>
+        </Dropdown>
+        <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+          <Dropdown
+            button={
+              <IconButton>
+                <MoreIcon />
+              </IconButton>
+            }
+          >
+            {toolMenu(theme, colorMode).map((item, index) => (
+              <Box key={index}>{item.icon}</Box>
+            ))}
+          </Dropdown>
+        </Box>
       </Box>
     </Box>
   );

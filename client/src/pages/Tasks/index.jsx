@@ -1,44 +1,24 @@
 import { useEffect, useState } from 'react'
-import { Box, Stack, Typography } from '@mui/material'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { Box } from '@mui/material'
 import { DragDropContext, Droppable } from 'react-beautiful-dnd'
-import { Form, Formik } from 'formik';
-import * as yup from 'yup';
-import CustomModal from '../../components/CustomModal'
 import Header from '../../components/Header'
 import Column from './components/Column'
-import Input from '../../components/form/Input';
-import AutoComplete from '../../components/form/AutoComplete';
-import CustomButton from '../../components/CustomButton';
-import SubtitlesIcon from '@mui/icons-material/Subtitles';
-import TocIcon from '@mui/icons-material/Toc';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import useAsyncAutocomplete from '../../hooks/useAsyncAutocomplete';
-import { GET_PROJECTNAMES, GET_PROJECTS } from '../../graphql/queries/projectQueries';
+import { GET_PROJECTS } from '../../graphql/queries/projectQueries';
 import { GET_TASKS } from '../../graphql/queries/taskQueries';
 import { useMutation, useQuery } from '@apollo/client';
 import { CREATE_TASK, UPDATE_TASK } from '../../graphql/mutations/taskMutations';
-
-const schema = yup.object().shape({
-  title: yup.string().required(),
-  description: yup.string(),
-  status: yup.string().required(),
-  projectId: yup.string().required(),
-});
+import TaskModal from './components/TaskModal';
 
 const columnData = {
   'column-1': {
     id: 'column-1',
-    title: 'To do',
+    title: 'To Do',
     status: 'Not Started',
     items: []
   },
   'column-2': {
     id: 'column-2',
-    title: 'In progress',
+    title: 'In Progress',
     status: 'In Progress',
     items: [],
   },
@@ -50,22 +30,7 @@ const columnData = {
   }
 }
 
-const FormItem = ({icon, input}) => (
-  <Box display='flex' >
-    <Typography variant='span' mr='8px'>
-      {icon}
-    </Typography>
-    <Box flexGrow={1} >
-      {input}
-    </Box>
-  </Box>
-);
-
 const Tasks = () => {
-  const [addTaskModal, setAddTaskModal] = useState({
-    isOpen: false,
-    taskStatus: ''
-  });
   const [taskDetailsModal, setTaskDetailsModal] = useState({
     isOpen: false,
     data: {}
@@ -73,63 +38,6 @@ const Tasks = () => {
   const [columns, setColumns] = useState(columnData);
   const [date, setDate] = useState();
   const { loading: loadingTasks, data: tasks } = useQuery(GET_TASKS);
-  const {
-    data: projectData,
-    loading: loadingProjects,
-    open,
-    setOpen
-  } = useAsyncAutocomplete(GET_PROJECTNAMES)
-  
-  const [createTask, { postLoading, postError }] = useMutation(CREATE_TASK, {
-    update: (cache, { data }) => {
-      const { _id } = data.createTask.project;
-      const { tasks } = cache.readQuery({
-        query: GET_TASKS
-      })
-      const { projects } = cache.readQuery({
-        query: GET_PROJECTS
-      }) || {}
-
-      cache.writeQuery({
-        query: GET_TASKS,
-        data: {
-          tasks: [
-            data.createTask,
-            ...tasks
-          ]
-        }
-      })
-
-      if(projects){
-        // const project = projects.find(item => item._id === _id);
-        const updatedProjects = projects.reduce((acc, project) => {
-          if(project._id === _id){
-            const tasks = [
-              ...project.tasks,
-              {
-                _id: data.createTask._id,
-                status: data.createTask.status
-              }
-            ];
-
-            return [
-              ...acc,
-              { ...project, tasks }
-            ]
-          }
-
-          return [...acc, project]
-        }, [])
-
-        cache.writeQuery({
-          query: GET_PROJECTS,
-          data: {
-            projects: updatedProjects
-          }
-        })
-      }
-    }
-	});
   
   const [updateTask, { updateLoading, updateError }] = useMutation(UPDATE_TASK, {
     update: (cache, { data }) => {
@@ -291,19 +199,6 @@ const Tasks = () => {
     }});
   };
 
-  const handleSubmit = (values, actions) => {
-    createTask({ variables: {
-      ...values,
-      date
-    }});
-    actions.resetForm();
-
-    setAddTaskModal(options => ({
-      ...options,
-      isOpen: false
-    }))
-  }
-
   return (
     <Box mx="20px" mt="20px">
       <Header title="TASKS" subtitle="All project tasks" />
@@ -337,7 +232,6 @@ const Tasks = () => {
                       key={columnId}
                       column={column}
                       index={index}
-                      setAddTaskModal={setAddTaskModal}
                       setTaskDetailsModal={setTaskDetailsModal}
                     />
                   ))}
@@ -348,131 +242,7 @@ const Tasks = () => {
           </DragDropContext>
         </Box>
       )}
-      <CustomModal
-        title='Add new task'
-        open={addTaskModal.isOpen}
-        handleClose={
-          () => setAddTaskModal(options => ({
-            ...options,
-            isOpen: false
-          }))
-        }
-      >
-        <Formik
-          initialValues={{
-            title: '',
-            description: '',
-            status: addTaskModal.taskStatus,
-            projectId: '',
-            date: '',
-          }}
-          validationSchema={schema}
-          onSubmit={handleSubmit}
-        >
-          {() => (
-            <Form>
-              <Stack spacing={2}
-              >
-                <Input label="Title*" name="title" />
-                <Input label="Description" name="description" multiline rows={4} />
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DemoContainer components={['DatePicker']}>
-                    <DatePicker
-                      sx={{ width: '100%'}}
-                      label="Due date"
-                      onChange={(newDate) => setDate(newDate)}
-                    />
-                  </DemoContainer>
-                </LocalizationProvider>
-                <AutoComplete
-                  label="Project" 
-                  name="projectId" 
-                  options={projectData?.projects}
-                  valueField='_id'
-                  setLabel={option => option?.name}
-                  async={true}
-                  open={open}
-                  setOpen={setOpen}
-                  loading={loadingProjects}
-                />
-                <CustomButton 
-                  text='Create task' 
-                  type="submit"
-                  btnstyle="primary"
-                  loading={postLoading}
-                />
-              </Stack>
-            </Form>
-          )}
-        </Formik>
-      </CustomModal>
-      <CustomModal
-        title='Task details'
-        open={taskDetailsModal.isOpen}
-        handleClose={
-          () => setTaskDetailsModal({
-            isOpen: false,
-            data: {}
-          })
-        }
-      >
-        <Formik
-          initialValues={{
-            title: '',
-            description: '',
-            status: addTaskModal.taskStatus,
-            projectId: '',
-            date: '',
-          }}
-          validationSchema={schema}
-          onSubmit={handleSubmit}
-        >
-          {() => (
-            <Form>
-              <Stack component="div" spacing={3}
-              >
-                <FormItem
-                  icon={<SubtitlesIcon />}
-                  input={
-                    <Input
-                      label='Title'
-                      name="title"
-                      variant="standard"
-                      value={taskDetailsModal.data.title} />
-                  }
-                />
-                <FormItem
-                  icon={<TocIcon />}
-                  input={
-                    <Input
-                      label='Description'
-                      name="description"
-                      variant="standard"
-                      value={taskDetailsModal.data.description} />
-                  }
-                />
-                <FormItem
-                  icon={<PeopleAltIcon />}
-                  input={
-                    <Input
-                      label='Description'
-                      name="description"
-                      variant="standard"
-                      value={taskDetailsModal.data.description} />
-                  }
-                />
-
-                {/* <CustomButton 
-                  text='Create task' 
-                  type="submit"
-                  btnstyle="primary"
-                  loading={postLoading}
-                /> */}
-              </Stack>
-            </Form>
-          )}
-        </Formik>
-      </CustomModal>
+      <TaskModal taskDetailsModal={taskDetailsModal} setTaskDetailsModal={setTaskDetailsModal}/>
     </Box>
   )
 }

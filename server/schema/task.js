@@ -12,8 +12,9 @@ export const typeDefs = gql`
     createTask(
       title: String!,
       description: String,
-      projectId: ID!,
+      projectId: ID,
       status: String!,
+      priority: String,
       date: String
     ): Task
     updateTask(
@@ -30,10 +31,11 @@ export const typeDefs = gql`
   type Task {
     _id: ID!
     title: String!
-    description: String!
-    project: Project!
-    projectId: String!
+    description: String
+    project: Project
+    projectId: String
     status: String!
+    priority: String!
     date: String
     createdAt: String
   }
@@ -55,19 +57,21 @@ export const resolvers = {
       description,
       projectId,
       status,
+      priority,
       date
     }) => {
 	    const projectFound = await Project.findById(projectId);
-      if (!projectFound) {
-      throw new Error("Project not found");
+      if (projectId && !projectFound) {
+        throw new Error("Project not found");
       }
 
       const task = new Task({
-      title,
-          description,
-          projectId,
-          status,
-          date
+        title,
+        description,
+        projectId,
+        status,
+        priority,
+        date
       });
       const savedTask = task.save();
       return savedTask;

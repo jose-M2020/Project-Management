@@ -1,19 +1,21 @@
 import { Box, Fade, Modal, Typography, useTheme } from '@mui/material'
 import { tokens } from '../theme';
 
-const CustomModal = ({title, subtitle, open = false, handleClose, children}) => {
+const CustomModal = ({title, subtitle, width = '450px', open = false, handleClose, children}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const style = {
     borderRadius: '8px',
+    bgcolor: colors.primary[500],
+    p: 4,
     position: 'absolute',
+    boxShadow: 24,
     top: '50%',
     left: '50%',
+    width,
+    maxHeight: '97%',
+    overflowY: 'auto',
     transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: colors.primary[500],
-    boxShadow: 24,
-    p: 4,
   };
 
   return (

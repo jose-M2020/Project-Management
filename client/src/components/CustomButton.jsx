@@ -3,7 +3,7 @@ import { Button, CircularProgress } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { tokens } from '../theme';
 
-const CustomButton = ({text, link, loading = false , ...props}) => {
+const CustomButton = ({text, link, loading = false, btnstyle = 'primary', ...props}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -45,7 +45,7 @@ const CustomButton = ({text, link, loading = false , ...props}) => {
   
   return (
     <Button
-      sx={styles[props.btnstyle]}
+      sx={styles[btnstyle]}
       {...props}
       {...(loading) && {
         disabled: true,

@@ -1,8 +1,7 @@
 import { useState } from 'react'
-import { Box, Button, Drawer, useMediaQuery } from '@mui/material';
+import { Box, Drawer, useMediaQuery } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './components/Sidebar'
-import Topbar from './components/Topbar';
 
 const DashboardLayout = () => {
     const isMobil = useMediaQuery('(max-width:600px)');
@@ -32,7 +31,6 @@ const DashboardLayout = () => {
             <Sidebar />
           )}
           <main>
-            <Topbar toggleDrawer={toggleDrawer} isMobil={isMobil} />
             <Box>
               <Outlet />
             </Box>

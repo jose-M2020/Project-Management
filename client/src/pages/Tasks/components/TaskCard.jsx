@@ -19,7 +19,7 @@ const TaskCard = ({ task, index, setTaskDetailsModal }) => {
           sx={{
             boxShadow: `0 0 2px ${colors.blueAccent[100]}`,
             borderRadius: '5px',
-            padding: '8px',
+            padding: '10px',
             backgroundColor: snapshot.isDragging ? colors.blueAccent[600] : colors.blueAccent[700],
           }}
           onClick={() => setTaskDetailsModal({
@@ -28,17 +28,11 @@ const TaskCard = ({ task, index, setTaskDetailsModal }) => {
           })}
         >
           <Box>
-            <Typography
-              variant='span'
-              sx={{
-                backgroundColor: colors.blueAccent[800],
-                display: 'inline-block',
-                padding: '4px',
-                borderRadius: '5px'
-              }}
-            >
-              {"Medium priority"}
-            </Typography>
+            <Chip
+              label={`${task.priority} priority`}
+              size="small"
+              sx={{ backgroundColor: colors.blueAccent[800] }}
+            />
           </Box>
           <Box>
             <Typography
