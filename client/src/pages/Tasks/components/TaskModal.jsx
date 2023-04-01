@@ -23,6 +23,7 @@ import useAsyncAutocomplete from '../../../hooks/useAsyncAutocomplete';
 import { GET_PROJECTNAMES } from '../../../graphql/queries/projectQueries';
 import { GET_DEVNAMES } from '../../../graphql/queries/devsQueries';
 import { schema } from '../TaskValidation';
+import ProfileRow from '../../../components/ProfileRow';
 
 const FormItem = ({icon, title, children}) => (
   <Stack gap={1} direction='row' >
@@ -191,20 +192,14 @@ const TaskModal = ({taskDetailsModal, setTaskDetailsModal}) => {
                             loading={loadingDevs}
                           />
                         </Dropdown>
-                        <Box
-                          display='flex'
-                          gap={1}
-                          alignItems='center'
-                        >
-                          <Avatar
-                            sx={{
-                              bgcolor: colors.blueAccent[500],
-                              width: 24, height: 24
-                            }}
-                          >
-                            N
-                          </Avatar>
-                          <Typography>Front-end Developer</Typography>
+                        <Box display='flex' alignItems='center' justifyContent='space-between'>
+                          <ProfileRow user={{firstname: 'Jhon', lastname: 'Ruiz Hernandez', position: 'Front-end'}} />
+                          <IconButton>
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+                        <Box display='flex' alignItems='center' justifyContent='space-between'>
+                          <ProfileRow user={{firstname: 'Jhon Luis', lastname: 'Ruiz Hernandez', position: 'Front-end'}} />
                           <IconButton>
                             <DeleteIcon />
                           </IconButton>

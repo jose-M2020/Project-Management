@@ -41,12 +41,13 @@ export const DELETE_PROJECT = gql`
 
 export const UPDATE_PROJECT = gql`
   mutation UpdateProject(
-    $_id: ID!
-    $name: String!
-    $description: String!
+    $_id: ID!,
+    $name: String,
+    $description: String,
+    $status: String,
     $repository: String,
     $url: String,
-    $type: String!,
+    $type: String,
     $team: [ID],
     $clientId: ID,
     $tags: [String]
@@ -56,6 +57,7 @@ export const UPDATE_PROJECT = gql`
       name: $name
       description: $description
       repository: $repository
+      status: $status
       url: $url
       type: $type
       team: $team
@@ -73,22 +75,6 @@ export const UPDATE_PROJECT = gql`
         email
         phone
       }
-    }
-  }
-`;
-
-export const CHANGE_STATUS = gql`
-  mutation changeProjectStatus(
-    $_id: ID!
-    $status: String!
-  ) {
-    changeProjectStatus(
-      _id: $_id
-      status: $status
-    ) {
-      _id
-      name
-      status
     }
   }
 `;

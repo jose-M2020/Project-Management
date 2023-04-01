@@ -40,6 +40,7 @@ export const GET_PROJECT = gql`
         _id
         firstname
         lastname
+        position
       }
       client{
         _id

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { 
   Box,
@@ -6,40 +6,116 @@ import {
   Chip,
   Divider,
   Grid,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   MenuItem,
   TextField,
-  Typography 
+  Typography, 
+  IconButton,
+  Fab,
+  useTheme
 } from '@mui/material';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import AddIcon from '@mui/icons-material/Add';
+import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
+import GroupIcon from '@mui/icons-material/Group';
+import ReportIcon from '@mui/icons-material/Report';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../../../components/Header';
 import Spinner from '../../../components/Spinner';
 import CustomButton from '../../../components/CustomButton';
 import CustomModal from '../../../components/CustomModal';
-import CircularProgressWithLabel from './components/CircularProgressWithLabel';
-import { status, statusIcon } from '../../../helpers/helpers';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { hexToRgba, status } from '../../../helpers/helpers';
 import { GET_PROJECT } from '../../../graphql/queries/projectQueries';
-import { CHANGE_STATUS, DELETE_PROJECT } from '../../../graphql/mutations/projectMutations';
+import { DELETE_PROJECT, UPDATE_PROJECT } from '../../../graphql/mutations/projectMutations';
+import ProfileRow from '../../../components/ProfileRow';
+import useAsyncAutocomplete from '../../../hooks/useAsyncAutocomplete';
+import { GET_DEVNAMES } from '../../../graphql/queries/devsQueries';
+import { GET_CLIENTNAMES } from '../../../graphql/queries/clientQueries';
+import Dropdown from '../../../components/Dropdown';
+import AutoComplete from '../../../components/form/AutoComplete';
+import { tokens } from '../../../theme';
+import EditInput from '../../../components/form/EditInput';
+
+const SettingSection = ({title, icon, children}) => (
+  <Box>
+    <Divider />              
+    <Grid container mt={1}>
+      <Grid 
+        item 
+        xs={12} 
+        md={3}
+      >
+        <Box
+          sx={{ 
+            mb: {xs: 3, md: 0},
+            position: 'sticky',
+            top: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1
+          }}
+        >
+          {icon}
+          <Typography
+            variant="h4" 
+          >
+            { title }
+          </Typography>
+        </Box>
+      </Grid>
+      <Grid item xs={12} md={9}>
+        { children }
+      </Grid>
+    </Grid>
+  </Box>
+)
 
 const ProjectDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const { loading, error, data } = useQuery(GET_PROJECT, { variables: { id } });
   const [open, setOpen] = useState(false);
-  const [deleteProject, { loading: deleting, error: deleteError }] =
-      useMutation(DELETE_PROJECT, {
-        refetchQueries: ["getProjects"],
-      });
-      
-  const [updateProject] = useMutation(CHANGE_STATUS, {
+  const [projectData, setProjectData] = useState(null);
+  const [users, setUsers] = useState({
+    client: null,
+    team: []
+  });
+  
+  useEffect(() => {
+    if(!loading && data) {
+      setProjectData(data?.project)
+    }
+  }, [loading])
+  
+
+  const [
+    deleteProject,
+    {loading: deleting }
+  ] = useMutation(DELETE_PROJECT, {
+    refetchQueries: ["getProjects"],
+  });
+        
+  const [updateProject] = useMutation(UPDATE_PROJECT, {
     refetchQueries: [{ 
       query: GET_PROJECT, variables: { id: data?.project?._id } 
     }],
   });
+
+  const {
+    data: devData,
+    loading: loadingDevs,
+    open: devFieldOpen,
+    setOpen: setOpenDev
+  } = useAsyncAutocomplete(GET_DEVNAMES);
+  
+  const {
+    data: clientData,
+    loading: loadingClients,
+    open: clientFieldOpen,
+    setOpen: setOpenClient
+  } = useAsyncAutocomplete(GET_CLIENTNAMES);
 
   if (error) return <p>Something Went Wrong</p>;
   
@@ -66,15 +142,26 @@ const ProjectDetails = () => {
     }});
   }
 
+  const handelEdit = (value, name) => {
+    console.log('handle edit', name)
+
+    updateProject({variables: {
+      _id: projectData._id,
+      [name]: value
+    }});
+
+    return true;
+  }
+
   return (
     <Box m="20px">
       <Header title="PROJECT SETTINGS" subtitle="Details project" />
-      {loading ? (
+      {!projectData ? (
         <Spinner />
       ) : (
         <Box>
           <CustomButton text='BACK' link='/projects' />
-          <Grid container spacing={2}>
+          <Stack spacing={3} mt={4} >
             {/* <Grid item xs={4}>
               <CircularProgressWithLabel
                 label="Task completed"
@@ -102,130 +189,246 @@ const ProjectDetails = () => {
                 </List>
               </Box>
             </Grid> */}
-            <Grid item xs={8}>
-              <Box>
-                <Box mb={5}>
-                  <Box display='flex' alignItems='center'>
-                    <Typography variant='h1' mb={2}>{data.project.name}</Typography>
-                  </Box>
-                  <Box display="flex" gap={1} mb={2}>
-                    {data.project?.tags?.map( (item, i) => (
-                      <Chip key={i} label={item} variant="outlined" color="secondary" />
-                    ))}
-                  </Box>
-                  <Typography mb={2}>{data.project.description}</Typography>
-                  <Typography mb={2}>Type: {data.project.type}</Typography>
-                  {data.project.client && (
-                    <Typography mb={2}>
-                      Client: {data.project.client.firstname} {data.project.client.lastname}
-                    </Typography>
+            <SettingSection title='General' icon={<DocumentScannerIcon />}>
+              <Stack spacing={3} mb={5}>
+                <EditInput
+                  name='name'
+                  label='Name'
+                  value={projectData?.name}
+                  onAccept={handelEdit}
+                />
+                <EditInput
+                  name='description'
+                  label='Description'
+                  value={projectData?.description}
+                  onAccept={handelEdit}
+                  multiline
+                  rows={4}
+                />
+                <EditInput
+                  name='type'
+                  label='Type'
+                  value={projectData?.type}
+                  onAccept={handelEdit}
+                />
+                
+                <Box display="flex" gap={1} mb={2}>
+                  {projectData?.tags?.map( (item, i) => (
+                    <Chip key={i} label={item} variant="outlined" color="secondary" />
+                  ))}
+                </Box>
+              </Stack>
+              {/* <ClientInfo client={projectData.client} /> */}
+
+              {/* <EditProjectForm project={projectData} />
+
+              <DeleteProjectButton projectId={projectData.id} /> */}
+            </SettingSection>
+            <SettingSection title='Links' icon={<AttachFileIcon />}>
+              <Stack spacing={3} mb={5}>
+                <EditInput
+                  name='repository'
+                  label='Repository'
+                  value={projectData?.repository}
+                  onAccept={handelEdit}
+                />
+                <EditInput
+                  name='url'
+                  label='URL'
+                  value={projectData?.url}
+                  onAccept={handelEdit}
+                />
+              </Stack>
+            </SettingSection>
+            <SettingSection title='Members' icon={<GroupIcon />}>
+              <Box 
+                bgcolor={hexToRgba(colors.blueAccent[700], .1)}
+                mb={2}
+                padding={2}
+                borderRadius={2}
+              >
+                <Typography mb={2}>Client</Typography>
+                <Box display='flex' justifyContent='space-between' >
+                  {data?.project?.client && (
+                    <ProfileRow user={data?.project.client} />
                   )}
-                  
-                  <Typography mb={2}>Repository: {data.project?.repository}</Typography>
-                  <Typography mb={2}>URL: {data.project?.url}</Typography>
-                </Box>
-                <Box mb={5}>
-                  <Typography variant="h3">Collaborators</Typography>
-                  <Divider />
-                  <Box mt={2}>
-                    {data?.project?.team.length ? (
-                      (data?.project?.team).map( (item, i) => (
-                        <Box key={i}>
-                          <Typography>{item?.firstname} {item?.lastname}</Typography>
-                        </Box>
-                      ))
-                    ) : (
-                      <Typography>No collaborator</Typography>
-                    )}
-                  </Box>
-                </Box>
-                <Box>
-                  <Typography variant="h3">Actions</Typography>
-                  <Divider />
-                  <Stack spacing={2}>
-                    <Box display='flex' justifyContent='space-between' alignItems='center'>
-                      <Box>
-                        <Typography variant='h5' fontWeight='bold'>Change Status</Typography>
-                        <Typography>Change the project status</Typography>
-                      </Box>
-                      <TextField
-                        select
-                        defaultValue={data.project.status}
-                        onChange={handleStatusChange}
-                      >
-                        {status.map((option) => (
-                          <MenuItem key={option.name} value={option.name} >
-                            <Box display='flex'>
-                              {option.icon()}
-                              <Typography variant='span' ml='3px'>{option.name}</Typography>
-                            </Box>
-                          </MenuItem>
-                        ))}
-                      </TextField>
-
-                      {/* <Select
-                        defaultValue={data.project.status}
-                        labelId="demo-simple-select-error-label"
-                        id="demo-simple-select-error"
-                        label="Age"
-                        renderValue={(value) => `${statusIcon[value].icon} ${value}`}
-                      >
-                        {status.map((option) => (
-                          <MenuItem key={option.name} value={option.name} >
-                            {option.icon({mr: '22px'})} {option.name}
-                          </MenuItem>
-                        ))}
-                      </Select> */}
-                    </Box>
-                    <Box display='flex' justifyContent='space-between' alignItems='center'>
-                      <Box>
-                        <Typography variant='h5' fontWeight='bold'>Edit</Typography>
-                        <Typography>Change the project status</Typography>
-                      </Box>
-                      <CustomButton
-                        text='Edit Project'
-                        component={Link} to={`/projects/${data.project._id}/edit`}
-                        btnstyle="primary"
+                  <Dropdown
+                    button={<CustomButton text='Change client' />}
+                    width='250px'
+                  >
+                    <AutoComplete 
+                      label="Client" 
+                      name="clientId"
+                      value={users.client}
+                      options={clientData?.clients}
+                      setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
+                      valueField='_id'
+                      async={true}
+                      open={clientFieldOpen}
+                      setOpen={setOpenClient}
+                      loading={loadingClients}
+                      onChange={ (_, value) => (
+                        setUsers({...users, client: value || null})
+                      )}
+                    />
+                    <Box mt={1}>
+                      <CustomButton 
+                        text='OK'
+                        size='small'
+                        onClick={
+                          () => handelEdit(users.client._id, 'clientId')
+                        }
                       />
                     </Box>
-                    <Box display='flex' justifyContent='space-between' alignItems='center'>
-                      <Box>
-                        <Typography variant='h5' fontWeight='bold'>Delete</Typography>
-                        <Typography>Change the project status</Typography>
-                      </Box>
-                      <CustomButton
-                        text='Delete Project'
-                        btnstyle='danger'
-                        onClick={handleModal}
-                      />
-                      <CustomModal
-                        title='Are you sure you want to delete this project?'
-                        subtitle='This repository will permanently delete with related tasks and events.'
-                        open={open}
-                        handleClose={handleModal}
-                      >
-                        <form onSubmit={handleDelete}>
-                          <Box display='flex' justifyContent='end'>
-                            <CustomButton
-                              text='Accept'
-                              btnstyle='danger'
-                              type='submit'
-                              loading={deleting}
-                            />
-                          </Box>
-                        </form>
-                      </CustomModal>
-                    </Box>
-                  </Stack>
+                  </Dropdown>
                 </Box>
-                {/* <ClientInfo client={data.project.client} /> */}
-
-                {/* <EditProjectForm project={data.project} />
-
-                <DeleteProjectButton projectId={data.project.id} /> */}
               </Box>
-            </Grid>
-          </Grid>
+              <Stack 
+                spacing={2} 
+                bgcolor={hexToRgba(colors.blueAccent[700], .1)}
+                mt={2}
+                padding={2}
+                borderRadius={2}
+              >
+                <Box display='flex' justifyContent='space-between' alignItems='center' >
+                  <Typography mb={1}>Developers</Typography>
+                  <Dropdown 
+                    button={
+                      <Fab size="small" color="secondary" aria-label="add">
+                        <AddIcon />
+                      </Fab>
+                    }
+                    width='250px'
+                  >
+                    <AutoComplete 
+                      label="Team" 
+                      name="team"
+                      value={users.team}
+                      options={devData?.developers}
+                      setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
+                      valueField='_id'
+                      multiple
+                      async={true}
+                      open={devFieldOpen}
+                      setOpen={setOpenDev}
+                      loading={loadingDevs}
+                      onChange={ (_, value) => (
+                        setUsers({...users, team: value || null})
+                      )}
+                    />
+                    <Box mt={1}>
+                      <CustomButton 
+                        text='Add members'
+                        size='small'
+                        onClick={() => {
+                          handelEdit(
+                            [
+                              ...data?.project?.team,
+                              ...(users.team.reduce((acc, user) => [...acc, user._id], []))
+                            ],
+                            'team'
+                          )
+                        }}
+                      />
+                    </Box>
+                  </Dropdown>
+                </Box>
+                {data?.project?.team.length ? (
+                  (data?.project?.team).map( (item, i) => (
+                    <Box key={i} display='flex' alignItems='center' justifyContent='space-between'>
+                      <ProfileRow user={item} />  
+                      <IconButton
+                        onClick={() => {
+                          const filteredDevs = (data.project.team).filter(dev => dev._id === item._id)
+                          console.log('delete', {item, filteredDevs})
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  ))
+                ) : (
+                  <Typography>No collaborator</Typography>
+                )}
+              </Stack>
+            </SettingSection>
+            <SettingSection title='Danger zone' icon={<ReportIcon />}>
+              <Stack spacing={2}>
+                <Box display='flex' justifyContent='space-between' alignItems='center'>
+                  <Box>
+                    <Typography variant='h5' fontWeight='bold'>Change Status</Typography>
+                    <Typography>Change the project status</Typography>
+                  </Box>
+                  <TextField
+                    select
+                    defaultValue={projectData?.status}
+                    onChange={handleStatusChange}
+                  >
+                    {status.map((option) => (
+                      <MenuItem key={option.name} value={option.name} >
+                        <Box display='flex'>
+                          {option.icon()}
+                          <Typography variant='span' ml='3px'>{option.name}</Typography>
+                        </Box>
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                  {/* <Select
+                    defaultValue={data.project.status}
+                    labelId="demo-simple-select-error-label"
+                    id="demo-simple-select-error"
+                    label="Age"
+                    renderValue={(value) => `${statusIcon[value].icon} ${value}`}
+                  >
+                    {status.map((option) => (
+                      <MenuItem key={option.name} value={option.name} >
+                        {option.icon({mr: '22px'})} {option.name}
+                      </MenuItem>
+                    ))}
+                  </Select> */}
+                </Box>
+                {/* <Box display='flex' justifyContent='space-between' alignItems='center'>
+                  <Box>
+                    <Typography variant='h5' fontWeight='bold'>Edit</Typography>
+                    <Typography>Change the project status</Typography>
+                  </Box>
+                  <CustomButton
+                    text='Edit Project'
+                    component={Link} to={`/projects/${data.project._id}/edit`}
+                    btnstyle="primary"
+                  />
+                </Box> */}
+                <Box display='flex' justifyContent='space-between' alignItems='center'>
+                  <Box>
+                    <Typography variant='h5' fontWeight='bold'>Delete</Typography>
+                    <Typography>Change the project status</Typography>
+                  </Box>
+                  <CustomButton
+                    text='Delete Project'
+                    btnstyle='danger'
+                    onClick={handleModal}
+                  />
+                  <CustomModal
+                    title='Are you sure you want to delete this project?'
+                    subtitle='This repository will permanently delete with related tasks and events.'
+                    open={open}
+                    handleClose={handleModal}
+                  >
+                    <form onSubmit={handleDelete}>
+                      <Box display='flex' justifyContent='end'>
+                        <CustomButton
+                          text='Accept'
+                          btnstyle='danger'
+                          type='submit'
+                          loading={deleting}
+                        />
+                      </Box>
+                    </form>
+                  </CustomModal>
+                </Box>
+              </Stack>
+            </SettingSection>
+          </Stack>
         </Box>
       )}
     </Box>

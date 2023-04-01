@@ -53,7 +53,7 @@ export default function ProjectCard({ project }) {
         <Card 
           sx={{ 
             backgroundColor: colors.primary[500],
-            boxShadow: `1px 1px 4px ${colors.blueAccent[300]}`,
+            boxShadow: `1px 1px 6px ${colors.blueAccent[800]}`,
             height: '100%',
             marginX: 'auto',
             padding: '15px'

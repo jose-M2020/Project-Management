@@ -25,20 +25,17 @@ export const typeDefs = gql`
     ): Project
     updateProject(
       _id: ID!, 
-      name: String!,
-      description: String!,
+      name: String,
+      description: String,
+      status: String,
       repository: String,
       url: String,
-      type: String!,
+      type: String,
       team: [ID],
       clientId: ID,
       tags: [String]
     ): Project
     deleteProject(_id: ID!): Project
-    changeProjectStatus(
-      _id: ID!, 
-      status: String!
-    ): Project
   }
 
   type Project {
@@ -96,7 +93,7 @@ export const resolvers = {
     updateProject: async (_, args) => {
       const updatedProject = await Project.findByIdAndUpdate(
         args._id,
-        args,
+        { $set: args },
         { new: true }
       );
       if (!updatedProject) throw new Error("Project not found");
@@ -110,15 +107,6 @@ export const resolvers = {
       await Event.deleteMany({projectId: _id})
       
       return deletedProject;
-    },
-    changeProjectStatus: async (_, {_id, status}) => {
-      const updatedProject = await Project.findByIdAndUpdate(
-        _id,
-        { $set: { status } },
-        { new: true }
-      );
-      if (!updatedProject) throw new Error("Project not found");
-      return updatedProject;
     },
   },
   Project: {

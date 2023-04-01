@@ -1,5 +1,5 @@
 import { Box, IconButton, MenuItem, Typography, useTheme } from "@mui/material";
-import { useContext } from "react";
+import { Fragment, useContext } from "react";
 import { ColorModeContext, tokens } from "../../../theme";
 import InputBase from "@mui/material/InputBase";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
@@ -79,7 +79,7 @@ const Topbar = () => {
         <Typography>IT PROJECTS</Typography>
         <Box sx={{ display: { xs: 'none', md: 'flex' }}}>
           {sectionMenu.map((item, index) => (
-            <>
+            <Box key={index}>
               {item?.submenu ? (
                 <MenuItem>
                   <Dropdown
@@ -95,7 +95,7 @@ const Topbar = () => {
                   {item.title}
                 </MenuItem>
               )}
-            </>
+            </Box>
           ))}
         </Box>
       </Box>
@@ -115,7 +115,9 @@ const Topbar = () => {
         </Box>
         <Box sx={{ display: { xs: 'none', md: 'flex' } }} >
           {toolMenu(theme, colorMode).map((item, index) => (
-            item.icon
+            <Fragment key={index}>
+              {item.icon}
+            </Fragment>
           ))}
         </Box>
         <Dropdown
