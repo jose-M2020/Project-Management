@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Sidebar as ProSidebar, Menu, MenuItem, useProSidebar } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 // import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../../theme";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
@@ -14,6 +14,8 @@ import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { GET_PROJECTOVERVIEW } from "../../../graphql/queries/projectQueries";
+import { useQuery } from "@apollo/client";
 
 const Item = ({ title, path, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -35,10 +37,16 @@ const Item = ({ title, path, icon, selected, setSelected }) => {
 
 const Sidebar = () => {
   const { pathname } = useLocation();
+  const { id } = useParams();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [selected, setSelected] = useState(pathname);
   const { collapseSidebar, collapsed } = useProSidebar();
+  
+  const { loading, error, data } = useQuery(
+    GET_PROJECTOVERVIEW,
+    { variables: { id } }
+  );
 
   return (
     <Box
@@ -105,12 +113,12 @@ const Sidebar = () => {
                         fontSize='1.2rem'
                         color={colors.grey[100]}
                         fontWeight="bold"
-                        noWrap={true}
+                        // noWrap={true}
                       >
-                        Ecommerce Project
+                        {data?.project?.name}
                       </Typography>
                       <Typography variant="h5" color={colors.greenAccent[500]}>
-                        Front-end
+                        {data?.project?.type}
                       </Typography>
                     </Box>
                   </Box>
@@ -130,8 +138,8 @@ const Sidebar = () => {
 
           <Box paddingLeft={collapsed ? undefined : "10%"}>
             <Item
-              title="Dashboard"
-              path="/"
+              title="Overview"
+              path={`projects/${id}/overview`}
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -146,14 +154,14 @@ const Sidebar = () => {
             </Typography>
             <Item
               title="Tasks"
-              path="/tasks"
+              path={`projects/${id}/tasks`}
               icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Calendar"
-              path="/calendar"
+              path={`projects/${id}/calendar`}
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -167,7 +175,7 @@ const Sidebar = () => {
             /> */}
             <Item
               title="Settings"
-              path="/settings"
+              path={`projects/${id}/settings`}
               icon={<SettingsIcon />}
               selected={selected}
               setSelected={setSelected}

@@ -4,7 +4,6 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import Topbar from './layouts/Dashboard/components/Topbar';
 import Dashboard from './pages/dashboard';
 import Projects from './pages/project/ProjectList';
-import ProjectDetails from './pages/project/ProjectDetails';
 import ProjectForm from './pages/project/ProjectForm';
 import Tasks from './pages/Tasks';
 import Calendar from './pages/Calendar';
@@ -22,6 +21,8 @@ import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
 import { ColorModeContext, useMode } from './theme';
 import DashboardLayout from './layouts/Dashboard';
+import Settings from './pages/project/Settings';
+import Overview from './pages/project/Overview';
 
 const cache = new InMemoryCache({
   typePolicies: {
@@ -85,14 +86,13 @@ function App() {
                   path='/'
                   element={<DashboardLayout />}
                 >
-                  <Route path='/' element={<Dashboard />} />
+                  <Route path='/projects/:id/overview' element={<Overview />} />
                   
-                  <Route path='/projects/:id' element={<ProjectDetails />} />
-                  <Route path='/projects/:id/edit' element={<ProjectForm />} />
-                  <Route path='/tasks' element={<Tasks />} />
-                  <Route path='/calendar' element={<Calendar />} />
-                  <Route path='/bugs' element={<Bugs />} />
-                  <Route path='/faq' element={<Faq />} />
+                  <Route path='/projects/:id/settings' element={<Settings />} />
+                  {/* <Route path='/projects/:id/edit' element={<ProjectForm />} /> */}
+                  <Route path='/projects/:id/tasks' element={<Tasks />} />
+                  <Route path='/projects/:id/calendar' element={<Calendar />} />
+                  <Route path='/projects/:id/bugs' element={<Bugs />} />
                   <Route path='/bar' element={<Bar />} />
                   <Route path='/pie' element={<Pie />} />
                   <Route path='/line' element={<Line />} />

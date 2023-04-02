@@ -9,6 +9,7 @@ export const GET_PROJECTS = gql`
       status,
       tags,
       createdAt,
+      type,
       tasks{
         _id,
         status
@@ -18,7 +19,7 @@ export const GET_PROJECTS = gql`
 `;
 
 export const GET_PROJECTNAMES = gql`
-  query getProjects {
+  query getProjectNames {
     projects {
       _id,
       name
@@ -53,6 +54,18 @@ export const GET_PROJECT = gql`
         _id
         title
       }
+      createdAt
+    }
+  }
+`;
+
+export const GET_PROJECTOVERVIEW = gql`
+  query getProjectOverview($id: ID!) {
+    project(_id: $id) {
+      _id
+      name
+      type
+      status
       createdAt
     }
   }

@@ -48,7 +48,7 @@ export default function ProjectCard({ project }) {
       <CardActionArea 
         sx={{ height: '100%', maxWidth: 500 }}
         component={Link}
-        to={`/projects/${project._id}`}
+        to={`/projects/${project._id}/overview`}
       >
         <Card 
           sx={{ 

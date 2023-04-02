@@ -13,9 +13,8 @@ const Dropdown = ({button, options, children, width = 'auto', ...props}) => {
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleItemClick = (path) => {
+  const handleItemClick = () => {
     setAnchorEl(null);
-    path && navigate(path);
   };
 
   return (
@@ -102,7 +101,10 @@ const Dropdown = ({button, options, children, width = 'auto', ...props}) => {
           options.map((item, index) => (
             <MenuItem 
               key={index}
-              onClick={() => handleItemClick(item?.path)}
+              onClick={() => {
+                handleItemClick();
+                item?.path && navigate(item.path)
+              }}
               disableRipple
             >
               {item?.icon}

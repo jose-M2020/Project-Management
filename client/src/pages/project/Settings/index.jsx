@@ -70,17 +70,20 @@ const SettingSection = ({title, icon, children}) => (
   </Box>
 )
 
-const ProjectDetails = () => {
+const Settings = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { loading, error, data } = useQuery(GET_PROJECT, { variables: { id } });
+  const { loading, error, data } = useQuery(
+    GET_PROJECT,
+    { variables: { id } }
+  );
   const [open, setOpen] = useState(false);
   const [projectData, setProjectData] = useState(null);
-  const [users, setUsers] = useState({
+  const [usersInput, setUsersInput] = useState({
     client: null,
-    team: []
+    team: [],
   });
   
   useEffect(() => {
@@ -162,33 +165,6 @@ const ProjectDetails = () => {
         <Box>
           <CustomButton text='BACK' link='/projects' />
           <Stack spacing={3} mt={4} >
-            {/* <Grid item xs={4}>
-              <CircularProgressWithLabel
-                label="Task completed"
-                progress={44}
-                marginBottom={3}
-              />
-              <Typography variant="h3">Tasks</Typography>
-              <Divider />
-              <Box>
-                <List>
-                  {data.project.tasks.lenght ? (
-                    (data.project.tasks).map( (item, i) => (
-                      <ListItem disablePadding>
-                        <ListItemButton>
-                          <ListItemIcon>
-                            {statusIcon[item.title].icon}
-                          </ListItemIcon>
-                          <ListItemText primary={item.title} />
-                        </ListItemButton>
-                      </ListItem>
-                    ))
-                  ) : (
-                    <Typography>No Tasks</Typography>
-                  )}                
-                </List>
-              </Box>
-            </Grid> */}
             <SettingSection title='General' icon={<DocumentScannerIcon />}>
               <Stack spacing={3} mb={5}>
                 <EditInput
@@ -259,8 +235,10 @@ const ProjectDetails = () => {
                     <AutoComplete 
                       label="Client" 
                       name="clientId"
-                      value={users.client}
-                      options={clientData?.clients}
+                      value={usersInput.client}
+                      options={clientData?.clients?.filter(item => (
+                        item._id !== data?.project?.client._id
+                      ))}
                       setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
                       valueField='_id'
                       async={true}
@@ -268,7 +246,7 @@ const ProjectDetails = () => {
                       setOpen={setOpenClient}
                       loading={loadingClients}
                       onChange={ (_, value) => (
-                        setUsers({...users, client: value || null})
+                        setUsersInput({...usersInput, client: value || null})
                       )}
                     />
                     <Box mt={1}>
@@ -276,7 +254,7 @@ const ProjectDetails = () => {
                         text='OK'
                         size='small'
                         onClick={
-                          () => handelEdit(users.client._id, 'clientId')
+                          () => handelEdit(usersInput.client._id, 'clientId')
                         }
                       />
                     </Box>
@@ -303,7 +281,7 @@ const ProjectDetails = () => {
                     <AutoComplete 
                       label="Team" 
                       name="team"
-                      value={users.team}
+                      // value={users.team}
                       options={devData?.developers}
                       setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
                       valueField='_id'
@@ -313,7 +291,7 @@ const ProjectDetails = () => {
                       setOpen={setOpenDev}
                       loading={loadingDevs}
                       onChange={ (_, value) => (
-                        setUsers({...users, team: value || null})
+                        setUsersInput({...usersInput, team: value || null})
                       )}
                     />
                     <Box mt={1}>
@@ -323,8 +301,8 @@ const ProjectDetails = () => {
                         onClick={() => {
                           handelEdit(
                             [
-                              ...data?.project?.team,
-                              ...(users.team.reduce((acc, user) => [...acc, user._id], []))
+                              ...(data?.project?.team.reduce((acc, user) => [...acc, user._id], [])),
+                              ...(usersInput.team.reduce((acc, user) => [...acc, user._id], []))
                             ],
                             'team'
                           )
@@ -339,8 +317,10 @@ const ProjectDetails = () => {
                       <ProfileRow user={item} />  
                       <IconButton
                         onClick={() => {
-                          const filteredDevs = (data.project.team).filter(dev => dev._id === item._id)
-                          console.log('delete', {item, filteredDevs})
+                          const filteredDevs = (data.project.team)
+                                                .filter(dev => dev._id !== item._id)
+                                                .map(item => item._id)
+                          handelEdit(filteredDevs, 'team');
                         }}
                       >
                         <DeleteIcon />
@@ -435,4 +415,4 @@ const ProjectDetails = () => {
   )
 };
 
-export default ProjectDetails;
+export default Settings;
