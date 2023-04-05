@@ -12,10 +12,10 @@ const TaskSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
   },
-  status: {
-    type: String,
-    enum: ['Not Started', 'In Progress', 'Completed'],
-  },
+  // status: {
+  //   type: String,
+  //   enum: ['Not Started', 'In Progress', 'Completed'],
+  // },
   priority: {
     type: String,
     enum: ['Low', 'Medium', 'High'],
@@ -24,6 +24,22 @@ const TaskSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Developer',
   }],
+  column: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'KanbanColumn',
+    required: true
+  },
+  assignee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Developer'
+  },
+  order: {
+    type: Number,
+    required: true
+  },
+  dueDate: {
+    type: Date
+  },
   date: {type:Date}
 }, { timestamps: true });
 
