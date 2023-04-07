@@ -14,14 +14,14 @@ const KanbanBoardSchema = new mongoose.Schema({
     ref: 'Project',
     required: true
   },
-  owner: {
+  ownerId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Developer',
     required: true
   },
   members: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'Developer'
   }]
 },{ timestamps: true });
 

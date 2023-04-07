@@ -20,16 +20,12 @@ const TaskSchema = new mongoose.Schema({
     type: String,
     enum: ['Low', 'Medium', 'High'],
   },
-  users: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Developer',
-  }],
-  column: {
+  columnId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'KanbanColumn',
     required: true
   },
-  assignee: {
+  members: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Developer'
   },
@@ -40,7 +36,6 @@ const TaskSchema = new mongoose.Schema({
   dueDate: {
     type: Date
   },
-  date: {type:Date}
 }, { timestamps: true });
 
 export default mongoose.model('Task', TaskSchema);

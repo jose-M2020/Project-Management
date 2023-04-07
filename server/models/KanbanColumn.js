@@ -5,7 +5,7 @@ const KanbanColumnSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  board: {
+  boardId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'KanbanBoard',
     required: true

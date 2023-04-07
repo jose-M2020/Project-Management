@@ -14,6 +14,7 @@ import { GET_PROJECT, GET_PROJECTS } from '../../graphql/queries/projectQueries'
 import { GET_DEVNAMES } from '../../graphql/queries/devsQueries';
 import useAsyncAutocomplete from '../../hooks/useAsyncAutocomplete';
 import { GET_CLIENTNAMES } from '../../graphql/queries/clientQueries';
+import { tagsOptions } from '../../data';
 
 const schema = yup.object().shape({
   name: yup.string().required(),
@@ -37,14 +38,7 @@ const schema = yup.object().shape({
 //   }
 // }
 
-const tagsOptions = [
-  { label: 'JavaScript', value: 'JavaScript' },
-  { label: 'ReactJS', value: 'ReactJS' },
-  { label: 'Angular', value: 'Angular' },
-  { label: 'HTML', value: 'HTML' },
-  { label: 'VUE', value: 'VUE' },
-  { label: 'PHP', value: 'PHP' },
-]
+
 
 // const flatData = (data, field) => {
 //   if(data){

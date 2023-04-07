@@ -38,11 +38,11 @@ export default function ProjectCard({ project }) {
   const colors = tokens(theme.palette.mode);
   const { color } = GetStatusProps(project.status)
   
-  const totalTask = project.tasks.length;
-  const totalCompletedTask = project.tasks.reduce((acc, item) => (
-    item.status === 'Completed' ? acc+=1 : acc
-  ), 0);
-  const percentageCompletedTask = Math.round(100*(totalCompletedTask/totalTask)) || 0;
+  // const totalTask = project.tasks.length;
+  // const totalCompletedTask = project.tasks.reduce((acc, item) => (
+  //   item.status === 'Completed' ? acc+=1 : acc
+  // ), 0);
+  // const percentageCompletedTask = Math.round(100*(totalCompletedTask/totalTask)) || 0;
 
   return (
       <CardActionArea 
@@ -97,47 +97,8 @@ export default function ProjectCard({ project }) {
                 ></Typography>  
                 <strong>{project.status}</strong>
               </Typography>
-              {/* Dropdown */}
-              {/* <div>
-                <IconButton
-                  aria-label="more"
-                  id="long-button"
-                  aria-controls={open ? 'long-menu' : undefined}
-                  aria-expanded={open ? 'true' : undefined}
-                  aria-haspopup="true"
-                  onClick={handleClick}
-                >
-                  <MoreVertIcon />
-                </IconButton>
-                <Menu
-                  id="long-menu"
-                  MenuListProps={{
-                    'aria-labelledby': 'long-button',
-                  }}
-                  anchorEl={anchorEl}
-                  open={open}
-                  onClose={handleClose}
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                >
-                  {dropdownOptions.map((option) => (
-                    <MenuItem 
-                      key={option.name} 
-                      onClick={handleClose} 
-                      {...(option?.redirect && {
-                        component: Link,
-                        to: option.redirect
-                      })}
-                    >
-                      {option.name}
-                    </MenuItem>
-                  ))}
-                </Menu>
-              </div> */}
             </Box>
-            <CardContent 
+            <CardContent
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -176,7 +137,7 @@ export default function ProjectCard({ project }) {
               </Box>
             </CardContent>
             {/* Footer */}
-            <Box
+            {/* <Box
               sx={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -196,7 +157,7 @@ export default function ProjectCard({ project }) {
               <Typography variant="span" >
                 {percentageCompletedTask}%
               </Typography>
-            </Box>
+            </Box> */}
           </Box>
         </Card>
       </CardActionArea>

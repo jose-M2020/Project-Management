@@ -35,6 +35,7 @@ import Dropdown from '../../../components/Dropdown';
 import AutoComplete from '../../../components/form/AutoComplete';
 import { tokens } from '../../../theme';
 import EditInput from '../../../components/form/EditInput';
+import { tagsOptions } from '../../../data';
 
 const SettingSection = ({title, icon, children}) => (
   <Box>
@@ -80,19 +81,11 @@ const Settings = () => {
     { variables: { id } }
   );
   const [open, setOpen] = useState(false);
-  const [projectData, setProjectData] = useState(null);
   const [usersInput, setUsersInput] = useState({
     client: null,
     team: [],
   });
   
-  useEffect(() => {
-    if(!loading && data) {
-      setProjectData(data?.project)
-    }
-  }, [loading])
-  
-
   const [
     deleteProject,
     {loading: deleting }
@@ -120,6 +113,25 @@ const Settings = () => {
     setOpen: setOpenClient
   } = useAsyncAutocomplete(GET_CLIENTNAMES);
 
+
+  const [filteredDevs, setFilteredDevs] = useState([])
+  useEffect(() => {
+    console.log('filtering devs')
+    if(devData?.developers?.length){
+      const devId = (data?.project?.team).map(item => (
+        item._id
+      ))
+      
+      const newDevs = devData.developers.filter(item => (
+        !devId.includes(item._id)
+      ));
+
+      setFilteredDevs(newDevs);
+      console.log(newDevs);
+    }
+  }, [data, loadingDevs])
+
+
   if (error) return <p>Something Went Wrong</p>;
   
   const handleModal = () => setOpen(!open);
@@ -146,10 +158,12 @@ const Settings = () => {
   }
 
   const handelEdit = (value, name) => {
-    console.log('handle edit', name)
+    if(name === 'tags'){
+      value = value.map(tag => tag.value);
+    }
 
     updateProject({variables: {
-      _id: projectData._id,
+      _id: data?.project?._id,
       [name]: value
     }});
 
@@ -159,7 +173,7 @@ const Settings = () => {
   return (
     <Box m="20px">
       <Header title="PROJECT SETTINGS" subtitle="Details project" />
-      {!projectData ? (
+      {loading ? (
         <Spinner />
       ) : (
         <Box>
@@ -170,13 +184,13 @@ const Settings = () => {
                 <EditInput
                   name='name'
                   label='Name'
-                  value={projectData?.name}
+                  value={data?.project?.name}
                   onAccept={handelEdit}
                 />
                 <EditInput
                   name='description'
                   label='Description'
-                  value={projectData?.description}
+                  value={data?.project?.description}
                   onAccept={handelEdit}
                   multiline
                   rows={4}
@@ -184,15 +198,30 @@ const Settings = () => {
                 <EditInput
                   name='type'
                   label='Type'
-                  value={projectData?.type}
+                  value={data?.project?.type}
                   onAccept={handelEdit}
                 />
-                
-                <Box display="flex" gap={1} mb={2}>
+                <EditInput
+                  name='tags'
+                  label='Tags'
+                  options={tagsOptions}
+                  value={data?.project?.tags}
+                  onAccept={handelEdit}
+                  multiple
+                  freeSolo
+                />
+                {/* <AutoComplete 
+                  label="Tags" 
+                  name="tags"
+                  options={['JS', 'Angular', 'React']}
+                  multiple
+                  freeSolo
+                /> */}
+                {/* <Box display="flex" gap={1} mb={2}>
                   {projectData?.tags?.map( (item, i) => (
                     <Chip key={i} label={item} variant="outlined" color="secondary" />
                   ))}
-                </Box>
+                </Box> */}
               </Stack>
               {/* <ClientInfo client={projectData.client} /> */}
 
@@ -205,13 +234,13 @@ const Settings = () => {
                 <EditInput
                   name='repository'
                   label='Repository'
-                  value={projectData?.repository}
+                  value={data?.project?.repository}
                   onAccept={handelEdit}
                 />
                 <EditInput
                   name='url'
                   label='URL'
-                  value={projectData?.url}
+                  value={data?.project?.url}
                   onAccept={handelEdit}
                 />
               </Stack>
@@ -237,7 +266,7 @@ const Settings = () => {
                       name="clientId"
                       value={usersInput.client}
                       options={clientData?.clients?.filter(item => (
-                        item._id !== data?.project?.client._id
+                        item._id !== data?.project?.client?._id
                       ))}
                       setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
                       valueField='_id'
@@ -253,9 +282,11 @@ const Settings = () => {
                       <CustomButton 
                         text='OK'
                         size='small'
-                        onClick={
-                          () => handelEdit(usersInput.client._id, 'clientId')
-                        }
+                        onClick={() => {
+                          if(!usersInput.client) return;
+                          handelEdit(usersInput.client._id, 'clientId')
+                          setUsersInput({...usersInput, client: null})
+                        }}
                       />
                     </Box>
                   </Dropdown>
@@ -281,8 +312,8 @@ const Settings = () => {
                     <AutoComplete 
                       label="Team" 
                       name="team"
-                      // value={users.team}
-                      options={devData?.developers}
+                      value={usersInput.team}
+                      options={filteredDevs}
                       setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
                       valueField='_id'
                       multiple
@@ -291,7 +322,7 @@ const Settings = () => {
                       setOpen={setOpenDev}
                       loading={loadingDevs}
                       onChange={ (_, value) => (
-                        setUsersInput({...usersInput, team: value || null})
+                        setUsersInput({...usersInput, team: value || []})
                       )}
                     />
                     <Box mt={1}>
@@ -299,6 +330,8 @@ const Settings = () => {
                         text='Add members'
                         size='small'
                         onClick={() => {
+                          if(!usersInput?.team?.length) return;
+
                           handelEdit(
                             [
                               ...(data?.project?.team.reduce((acc, user) => [...acc, user._id], [])),
@@ -306,6 +339,7 @@ const Settings = () => {
                             ],
                             'team'
                           )
+                          setUsersInput({...usersInput, team: []})
                         }}
                       />
                     </Box>
@@ -317,7 +351,7 @@ const Settings = () => {
                       <ProfileRow user={item} />  
                       <IconButton
                         onClick={() => {
-                          const filteredDevs = (data.project.team)
+                          const filteredDevs = (data?.project.team)
                                                 .filter(dev => dev._id !== item._id)
                                                 .map(item => item._id)
                           handelEdit(filteredDevs, 'team');
@@ -341,7 +375,7 @@ const Settings = () => {
                   </Box>
                   <TextField
                     select
-                    defaultValue={projectData?.status}
+                    defaultValue={data?.project?.status}
                     onChange={handleStatusChange}
                   >
                     {status.map((option) => (
@@ -354,7 +388,7 @@ const Settings = () => {
                     ))}
                   </TextField>
                   {/* <Select
-                    defaultValue={data.project.status}
+                    defaultValue={data?.project.status}
                     labelId="demo-simple-select-error-label"
                     id="demo-simple-select-error"
                     label="Age"
@@ -374,7 +408,7 @@ const Settings = () => {
                   </Box>
                   <CustomButton
                     text='Edit Project'
-                    component={Link} to={`/projects/${data.project._id}/edit`}
+                    component={Link} to={`/projects/${data?.project._id}/edit`}
                     btnstyle="primary"
                   />
                 </Box> */}

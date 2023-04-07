@@ -25,7 +25,7 @@ export const GET_DEVNAMES = gql`
 
 export const GET_DEV = gql`
   query getDeveloper($id: ID!) {
-    developers(_id: $id) {
+    developer(_id: $id) {
       _id
       name
       description

@@ -3,6 +3,8 @@ import { Box, Fab, TextField, useTheme } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import { tokens } from "../../theme";
+import AutoComplete from "./AutoComplete";
+import { arraysEqual } from "../../helpers/helpers";
 
 const EditInput = ({onAccept, value = '', children, ...props}) => {
   const theme = useTheme();
@@ -10,11 +12,16 @@ const EditInput = ({onAccept, value = '', children, ...props}) => {
   const [activeEdit, setActiveEdit] = useState(false);
   const [inputValue, setInputValue] = useState(value)
 
-  const handleChange = (e) => {
-    const {target: {value: newValue}} = e;
-    const isChanged = newValue !== value;
-    setInputValue(newValue)
+  const handleChange = (e, autoCompleteValue) => {
+    const newValue = !autoCompleteValue ? e.target.value : autoCompleteValue;
     
+    const isChanged = Array.isArray(newValue) ? (
+      !arraysEqual(newValue, value)
+    ) : (
+      newValue !== value
+    )
+
+    setInputValue(newValue)
     isChanged ? setActiveEdit(true) : setActiveEdit(false);
   }
 
@@ -40,15 +47,27 @@ const EditInput = ({onAccept, value = '', children, ...props}) => {
 
   return (
     <Box position='relative' onBlur={handleBlur} >
-      <TextField
-        value={inputValue}
-        // name='name'
-        onChange={handleChange}
-        fullWidth
-        {...props}
-      >
-        {children}
-      </TextField>             
+      <>
+        {props.options ? (
+          <AutoComplete
+            value={inputValue}
+            onChange={(_, value) => {
+              handleChange(null, value)
+            }}
+            {...props}
+          />
+        ) : (
+          <TextField
+            value={inputValue}
+            // name='name'
+            onChange={e => handleChange(e)}
+            fullWidth
+            {...props}
+          >
+            {children}
+          </TextField>             
+        )}
+      </>
       <Box
         gap={1}
         sx={{

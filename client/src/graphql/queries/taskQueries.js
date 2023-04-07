@@ -10,9 +10,18 @@ export const GET_TASKS = gql`
         _id
         name
       }
-      status
       priority
-      date
+      column {
+        _id
+        title
+      }
+      members {
+        _id
+        firstname
+        lastname
+      }
+      order
+      dueDate
     }
   }
 `;

@@ -90,7 +90,7 @@ function App() {
                   
                   <Route path='/projects/:id/settings' element={<Settings />} />
                   {/* <Route path='/projects/:id/edit' element={<ProjectForm />} /> */}
-                  <Route path='/projects/:id/tasks' element={<Tasks />} />
+                  <Route path='/projects/:id/board' element={<Tasks />} />
                   <Route path='/projects/:id/calendar' element={<Calendar />} />
                   <Route path='/projects/:id/bugs' element={<Bugs />} />
                   <Route path='/bar' element={<Bar />} />

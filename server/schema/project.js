@@ -4,6 +4,8 @@ import Task from "../models/Task.js";
 import Event from "../models/Event.js";
 import Developer from "../models/Developer.js";
 import Client from "../models/Client.js";
+import KanbanBoard from "../models/KanbanBoard.js";
+import KanbanColumn from "../models/KanbanColumn.js";
 
 export const typeDefs = gql`
   extend type Query {
@@ -88,6 +90,39 @@ export const resolvers = {
         tags
       });
       const savedProject = await project.save();
+
+      // Create a board
+      const board = new KanbanBoard({
+        title: 'Task board',
+        ownerId: 'test',
+        projectId: savedProject._id
+      });
+      const savedBoard = await board.save();
+
+      // Create Columns
+      await KanbanColumn.insertMany([
+        {
+          title: 'Not Started',
+          boardId: savedBoard._id,
+          order: 0
+        },
+        {
+          title: 'In Progress',
+          boardId: savedBoard._id,
+          order: 1
+        },
+        {
+          title: 'Testing',
+          boardId: savedBoard._id,
+          order: 2
+        },
+        {
+          title: 'Completed',
+          boardId: savedBoard._id,
+          order: 3
+        },
+      ])
+
       return savedProject;
     },
     updateProject: async (_, args) => {

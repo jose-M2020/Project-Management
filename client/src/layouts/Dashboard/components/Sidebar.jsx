@@ -153,8 +153,8 @@ const Sidebar = () => {
               Activity
             </Typography>
             <Item
-              title="Tasks"
-              path={`projects/${id}/tasks`}
+              title="Board"
+              path={`projects/${id}/board`}
               icon={<FormatListBulletedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -180,7 +180,7 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Typography
+            {/* <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
@@ -214,7 +214,7 @@ const Sidebar = () => {
               icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
             {/* <Box sx={{marginTop: 2}}>
                 <Item
                 title="Profile"

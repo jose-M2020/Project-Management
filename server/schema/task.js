@@ -34,9 +34,11 @@ export const typeDefs = gql`
     description: String
     project: Project
     projectId: String
-    status: String!
     priority: String!
-    date: String
+    column: Column
+    members: [Developer]
+    order: Int
+    dueDate: String
     createdAt: String
   }
 `;

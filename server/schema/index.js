@@ -19,6 +19,14 @@ import {
     typeDefs as Event, 
     resolvers as EventResolvers
 } from './event.js'
+import {
+    typeDefs as kanbanBoard, 
+    resolvers as kanbanBoardtResolvers
+} from './kanbanBoard.js'
+import {
+    typeDefs as kanbanColumn, 
+    resolvers as kanbanColumnResolvers
+} from './kanbanColumn.js'
 
 const rootTypeDefs = gql`
   type Query {
@@ -35,7 +43,9 @@ export const resolvers = [
   TaskResolvers,
   ClientResolvers,
   DeveloperResolvers,
-  EventResolvers
+  EventResolvers,
+  kanbanBoardtResolvers,
+  kanbanColumnResolvers
 ]
 
 export const typeDefs = [
@@ -44,5 +54,7 @@ export const typeDefs = [
   Task,
   Client,
   Developer,
-  Event
+  Event,
+  kanbanBoard,
+  kanbanColumn
 ]

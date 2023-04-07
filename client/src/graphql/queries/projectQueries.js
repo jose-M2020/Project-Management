@@ -10,10 +10,10 @@ export const GET_PROJECTS = gql`
       tags,
       createdAt,
       type,
-      tasks{
-        _id,
-        status
-      }
+      # tasks{
+      #   _id,
+      #   status
+      # }
     }
   }
 `;

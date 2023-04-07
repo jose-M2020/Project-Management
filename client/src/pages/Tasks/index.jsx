@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Box } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { DragDropContext, Droppable } from 'react-beautiful-dnd'
 import Header from '../../components/Header'
 import Column from './components/Column'
@@ -8,6 +8,8 @@ import { GET_TASKS } from '../../graphql/queries/taskQueries';
 import { useMutation, useQuery } from '@apollo/client';
 import { CREATE_TASK, UPDATE_TASK } from '../../graphql/mutations/taskMutations';
 import TaskModal from './components/TaskModal';
+import { useParams } from 'react-router-dom'
+import { GET_BOARDBYPROJECT } from '../../graphql/queries/boardQueries'
 
 const columnData = {
   'column-1': {
@@ -31,6 +33,7 @@ const columnData = {
 }
 
 const Tasks = () => {
+  const { id: projectId } = useParams();
   const [taskDetailsModal, setTaskDetailsModal] = useState({
     isOpen: false,
     data: {}
@@ -38,7 +41,10 @@ const Tasks = () => {
   const [columns, setColumns] = useState(columnData);
   const [date, setDate] = useState();
   const { loading: loadingTasks, data: tasks } = useQuery(GET_TASKS);
-  
+  const { loading: loadingBoard, data: board } = useQuery(
+    GET_BOARDBYPROJECT,
+    { variables: { projectId } }
+  );
   const [updateTask, { updateLoading, updateError }] = useMutation(UPDATE_TASK, {
     update: (cache, { data }) => {
       // const projectId = data.updateTask.project._id;
@@ -82,35 +88,35 @@ const Tasks = () => {
     },
 	});
 
-  useEffect(() => {
-    if(!loadingTasks){
-      const orderedTasks = tasks.tasks.reduce((acc, item) => {
-        acc[item.status]?.push(item);
-        return acc;
-      }, {
-        'Not Started': [],
-        'In Progress': [],
-        'Completed': [],
-      })
+  // useEffect(() => {
+  //   if(!loadingTasks){
+  //     const orderedTasks = tasks.tasks.reduce((acc, item) => {
+  //       acc[item.status]?.push(item);
+  //       return acc;
+  //     }, {
+  //       'Not Started': [],
+  //       'In Progress': [],
+  //       'Completed': [],
+  //     })
         
-      const columData = {
-        'column-1': {
-          ...columns['column-1'],
-          items: orderedTasks['Not Started']
-        },
-        'column-2': {
-          ...columns['column-2'],
-          items: orderedTasks['In Progress']
-        },
-        'column-3': {
-          ...columns['column-3'],
-          items: orderedTasks['Completed']
-        },
-      }
+  //     const columData = {
+  //       'column-1': {
+  //         ...columns['column-1'],
+  //         items: orderedTasks['Not Started']
+  //       },
+  //       'column-2': {
+  //         ...columns['column-2'],
+  //         items: orderedTasks['In Progress']
+  //       },
+  //       'column-3': {
+  //         ...columns['column-3'],
+  //         items: orderedTasks['Completed']
+  //       },
+  //     }
     
-      setColumns(columData)
-    }
-  }, [tasks])
+  //     setColumns(columData)
+  //   }
+  // }, [tasks])
   
   const onDragStart = (start, provided) => {
     provided.announce(
@@ -201,46 +207,52 @@ const Tasks = () => {
 
   return (
     <Box mx="20px" mt="20px">
-      <Header title="TASKS" subtitle="All project tasks" />
-      {loadingTasks ? (
-        <h5>Loading Tasks...</h5>
+      <Header title="BOARD" subtitle="All project tasks" />
+      {loadingBoard ? (
+        <h5>Loading Board...</h5>
       ) : (
-        <Box sx={{ overflow: 'hidden' }}>
-          <DragDropContext
-            onDragStart={onDragStart}
-            onDragUpdate={onDragUpdate}
-            onDragEnd={handleDragEnd}
-          >
-            <Droppable
-              droppableId="all-columns"
-              direction="horizontal"
-              type="column"
+        !board.boardByProject ? (
+          <Box>
+            <Typography>No board</Typography>
+          </Box>
+        ) : (
+          <Box sx={{ overflow: 'hidden' }}>
+            <DragDropContext
+              onDragStart={onDragStart}
+              onDragUpdate={onDragUpdate}
+              onDragEnd={handleDragEnd}
             >
-              {provided => (
-                <Box
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  display='flex'
-                  gap={2}
-                  sx={{
-                    overflowX: 'auto',
-                    paddingBottom: '15px'
-                  }}
-                >
-                  {Object.entries(columns).map(([columnId, column], index) => (
-                    <Column
-                      key={columnId}
-                      column={column}
-                      index={index}
-                      setTaskDetailsModal={setTaskDetailsModal}
-                    />
-                  ))}
-                  {provided.placeholder}
-                </Box>
-              )}
-            </Droppable>
-          </DragDropContext>
-        </Box>
+              <Droppable
+                droppableId="all-columns"
+                direction="horizontal"
+                type="column"
+              >
+                {provided => (
+                  <Box
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    display='flex'
+                    gap={2}
+                    sx={{
+                      overflowX: 'auto',
+                      paddingBottom: '15px'
+                    }}
+                  >
+                    {Object.entries(columns).map(([columnId, column], index) => (
+                      <Column
+                        key={columnId}
+                        column={column}
+                        index={index}
+                        setTaskDetailsModal={setTaskDetailsModal}
+                      />
+                    ))}
+                    {provided.placeholder}
+                  </Box>
+                )}
+              </Droppable>
+            </DragDropContext>
+          </Box>
+        )
       )}
       <TaskModal taskDetailsModal={taskDetailsModal} setTaskDetailsModal={setTaskDetailsModal}/>
     </Box>
