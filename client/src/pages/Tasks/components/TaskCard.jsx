@@ -7,7 +7,11 @@ const TaskCard = ({ task, index, setTaskDetailsModal }) => {
   const colors = tokens(theme.palette.mode);
 
   return (
-    <Draggable draggableId={task._id} projectId={task.projectId} index={index}>
+    <Draggable
+      draggableId={task._id}
+      projectId={task.projectId}
+      index={index}
+    >
       {(provided, snapshot) => (
         <Stack
           {...provided.draggableProps}

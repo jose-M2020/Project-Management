@@ -94,7 +94,7 @@ export const resolvers = {
       // Create a board
       const board = new KanbanBoard({
         title: 'Task board',
-        ownerId: 'test',
+        ownerId: '63e6df76bd1e4dbb4d3d086b',
         projectId: savedProject._id
       });
       const savedBoard = await board.save();

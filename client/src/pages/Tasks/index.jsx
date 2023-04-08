@@ -32,6 +32,11 @@ const columnData = {
   }
 }
 
+const reOrder = (items) => {
+  let sortedItems = items.sort((a, b) => a.order - b.order);
+  return sortedItems;
+};
+
 const Tasks = () => {
   const { id: projectId } = useParams();
   const [taskDetailsModal, setTaskDetailsModal] = useState({
@@ -118,12 +123,6 @@ const Tasks = () => {
   //   }
   // }, [tasks])
   
-  const onDragStart = (start, provided) => {
-    provided.announce(
-      `You have lifted the task in position ${start.source.index + 1}`,
-    );
-  };
-
   const onDragUpdate = (update, provided) => {
     const message = update.destination
       ? `You have moved the task to position ${update.destination.index + 1}`
@@ -137,6 +136,7 @@ const Tasks = () => {
       destination,
       source,
       draggableId,
+      type
     } = result;
 
     const message = result.destination
@@ -153,6 +153,19 @@ const Tasks = () => {
       destination.droppableId === source.droppableId &&
       destination.index === source.index
     ) {
+      return;
+    }
+
+    if (type === 'column') {
+      const newColumnOrder = Array.from(this.state.columnOrder);
+      newColumnOrder.splice(source.index, 1);
+      newColumnOrder.splice(destination.index, 0, draggableId);
+
+      const newState = {
+        ...this.state,
+        columnOrder: newColumnOrder,
+      };
+      this.setState(newState);
       return;
     }
 
@@ -218,7 +231,6 @@ const Tasks = () => {
         ) : (
           <Box sx={{ overflow: 'hidden' }}>
             <DragDropContext
-              onDragStart={onDragStart}
               onDragUpdate={onDragUpdate}
               onDragEnd={handleDragEnd}
             >
@@ -238,9 +250,9 @@ const Tasks = () => {
                       paddingBottom: '15px'
                     }}
                   >
-                    {Object.entries(columns).map(([columnId, column], index) => (
+                    {(board.boardByProject.columns).map((column, index) => (
                       <Column
-                        key={columnId}
+                        key={column._id}
                         column={column}
                         index={index}
                         setTaskDetailsModal={setTaskDetailsModal}

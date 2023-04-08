@@ -33,7 +33,7 @@ export const typeDefs = gql`
   type Board {
     _id: ID!
     title: String!
-    description: String!
+    description: String
     owner: Developer!
     project: Project
     members: [Developer]

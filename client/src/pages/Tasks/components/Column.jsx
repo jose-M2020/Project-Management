@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Droppable } from "react-beautiful-dnd";
+import { Draggable, Droppable } from "react-beautiful-dnd";
 import { Box, Fab, IconButton, Stack, TextField, Typography, useTheme } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -89,154 +89,156 @@ const Column = ({
   }
 
   return (
-    <Box
-      sx={{
-        backgroundColor: hexToRgba(colors.blueAccent[800], .5),
-        borderRadius: '5px',
-        boxShadow: `0 0 4px ${colors.blueAccent[400]}`,
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        flexShrink: 0,
-        maxWidth: '290px',
-        flexBasis: '96%'   
-      }}
+    <Draggable
+      draggableId={column._id}
+      index={index}
     >
-      <Stack
-        direction="row"
-        spacing={1}
-        justifyContent='space-between'
-        alignItems='center'
-        padding='10px'
-        borderBottom={`.5px solid ${colors.blueAccent[400]}`}
-        mb='8px'
-      >
-        <Box>
-          <Typography
-            variant='h4'
+      {(provided, snapshot) => (
+        <Box
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          sx={{
+            backgroundColor: hexToRgba(colors.blueAccent[800], .5),
+            borderRadius: '5px',
+            boxShadow: `0 0 4px ${colors.blueAccent[400]}`,
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            flexShrink: 0,
+            maxWidth: '290px',
+            flexBasis: '96%'   
+          }}
+        >
+          <Stack
+            direction="row"
+            spacing={1}
+            justifyContent='space-between'
+            alignItems='center'
+            padding='10px'
+            borderBottom={`.5px solid ${colors.blueAccent[400]}`}
+            mb='8px'
           >
-            {column.title} 
-          </Typography>
-          {/* <Typography 
-            variant="span"
-            ml={1}
-            sx={{
-              padding: '5px',
-              backgroundColor: colors.blueAccent[500],
-            }}
-          >
-            {column.items.length}
-          </Typography> */}
-        </Box>
-      </Stack>
-      <Box
-        // sx={{
-        //   height: 'auto',
-        //   maxHeight: '63vh',
-        //   overflowY: 'auto',
-        // }}
-      >
-        <Droppable droppableId={column.id} type="task" key={column.id}>
-          {(provided, snapshot) => (
-            <Box
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              sx={{
-                padding: '10px',
-                display: 'flex',
-                flexDirection: 'column',
-                transition: 'background-color 0.2s ease',
-                backgroundColor: snapshot.isDraggingOver ? colors.blueAccent[700] : 'inherit',
-                flexGrow: 1,
-                minHeight: '100px',
-                gap: '15px'
-              }}
-            >
-              {column.items.map((task, index) => (
-                <TaskCard 
-                  key={task._id}
-                  task={task}
-                  index={index}
-                  setTaskDetailsModal={setTaskDetailsModal}
-                />
-              ))}
-              {provided.placeholder}
+            <Box {...provided.dragHandleProps} width='100%'>
+              <Typography
+                variant='h4'
+              >
+                {column.title} 
+              </Typography>
+              {/* <Typography 
+                variant="span"
+                ml={1}
+                sx={{
+                  padding: '5px',
+                  backgroundColor: colors.blueAccent[500],
+                }}
+              >
+                {column.items.length}
+              </Typography> */}
             </Box>
-          )}
-        </Droppable>
-      </Box>
-
-      <Box padding='10px'>
-        { addTaskActivated ? (
-          <Formik
-            initialValues={{
-              title: '',
-              status: column.status,
-              projectId: '',
-              priority: 'Low'
-            }}
-            validationSchema={schema}
-            onSubmit={handleSubmit}
+          </Stack>
+          <Box
+            // sx={{
+            //   height: 'auto',
+            //   maxHeight: '63vh',
+            //   overflowY: 'auto',
+            // }}
           >
-            {() => (
-              <Form>
-                <Stack
-                  spacing={2}
+            <Droppable
+              droppableId={column._id}
+              type="task"
+              key={column._id}
+            >
+              {(provided, snapshot) => (
+                <Box
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
                   sx={{
-                    backgroundColor: colors.blueAccent[800],
-                    borderRadius: '5px',
                     padding: '10px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'background-color 0.2s ease',
+                    backgroundColor: snapshot.isDraggingOver ? colors.blueAccent[700] : 'inherit',
+                    flexGrow: 1,
+                    minHeight: '100px',
+                    gap: '15px'
                   }}
                 >
-                  <Input 
-                    label='Title'
-                    name='title'
-                  />
-                  {/* <TextField 
-                    label='Title'
-                    name='title'
-                    inputRef={taskTitleRef}
-                    sx={{ marginBottom: '8px' }}
-                    fullWidth
-                  /> */}
-                  <AutoComplete
-                    label="Project" 
-                    name="projectId" 
-                    options={projectData?.projects}
-                    valueField='_id'
-                    setLabel={option => option?.name}
-                    async={true}
-                    open={open}
-                    setOpen={setOpen}
-                    loading={loadingProjects}
-                  />
-                  <Box>
-                    <CustomButton 
-                      text='Add task'
-                      type='submit'
-                      loading={postLoading}  
+                  {column.tasks.map((task, index) => (
+                    <TaskCard 
+                      key={task._id}
+                      task={task}
+                      index={index}
+                      setTaskDetailsModal={setTaskDetailsModal}
                     />
-                    <IconButton
-                      sx={{ marginLeft: '6px' }}
-                      onClick={() => setAddTaskActivated(false)}
+                  ))}
+                  {provided.placeholder}
+                </Box>
+              )}
+            </Droppable>
+          </Box>
+
+          <Box padding='10px'>
+            { addTaskActivated ? (
+              <Formik
+                initialValues={{
+                  title: '',
+                  projectId: '',
+                  priority: 'Low'
+                }}
+                validationSchema={schema}
+                onSubmit={handleSubmit}
+              >
+                {() => (
+                  <Form>
+                    <Stack
+                      spacing={2}
+                      sx={{
+                        backgroundColor: colors.blueAccent[800],
+                        borderRadius: '5px',
+                        padding: '10px',
+                      }}
                     >
-                      <ClearIcon />
-                    </IconButton>
-                  </Box>
-                </Stack>
-              </Form>
+                      <Input 
+                        label='Title'
+                        name='title'
+                      />
+                      {/* <TextField 
+                        label='Title'
+                        name='title'
+                        inputRef={taskTitleRef}
+                        sx={{ marginBottom: '8px' }}
+                        fullWidth
+                      /> */}
+                      <Box>
+                        <CustomButton 
+                          text='Add task'
+                          type='submit'
+                          loading={postLoading}  
+                        />
+                        <IconButton
+                          sx={{ marginLeft: '6px' }}
+                          onClick={() => setAddTaskActivated(false)}
+                        >
+                          <ClearIcon />
+                        </IconButton>
+                      </Box>
+                    </Stack>
+                  </Form>
+                )}
+              </Formik>
+            ) : (
+              <CustomButton 
+                text='Add task'
+                variant='outlined'
+                onClick={() => setAddTaskActivated(true)}
+                fullWidth
+              />
             )}
-          </Formik>
-        ) : (
-          <CustomButton 
-            text='Add task'
-            variant='outlined'
-            onClick={() => setAddTaskActivated(true)}
-            fullWidth
-          />
-        )}
-      </Box>
-    </Box>
+          </Box>
+        </Box>
+      )}
+    </Draggable>
+      
   );
 };
 
