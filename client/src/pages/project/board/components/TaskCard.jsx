@@ -1,6 +1,6 @@
 import { Avatar, AvatarGroup, Box, Chip, Stack, Typography, useTheme } from '@mui/material'
 import { Draggable } from 'react-beautiful-dnd'
-import { tokens } from '../../../theme';
+import { tokens } from '../../../../theme';
 
 const TaskCard = ({ task, index, setTaskDetailsModal }) => {
   const theme = useTheme();
@@ -9,7 +9,6 @@ const TaskCard = ({ task, index, setTaskDetailsModal }) => {
   return (
     <Draggable
       draggableId={task._id}
-      projectId={task.projectId}
       index={index}
     >
       {(provided, snapshot) => (

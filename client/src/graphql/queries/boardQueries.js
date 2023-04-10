@@ -34,6 +34,7 @@ export const GET_BOARDBYPROJECT = gql`
         _id
         title
         order
+        category
         tasks {
           _id
           title

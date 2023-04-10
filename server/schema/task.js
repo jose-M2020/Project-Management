@@ -1,6 +1,7 @@
 import { gql } from "graphql-tag";
 import Project from "../models/Project.js";
 import Task from "../models/Task.js";
+import KanbanColumn from "../models/KanbanColumn.js";
 
 export const typeDefs = gql`
   extend type Query {
@@ -12,18 +13,29 @@ export const typeDefs = gql`
     createTask(
       title: String!,
       description: String,
-      projectId: ID,
-      status: String!,
+      projectId: ID!,
+      done: Boolean!,
       priority: String,
-      date: String
+      columnId: ID!,
+      order: Int!,
+      dueDate: String
     ): Task
     updateTask(
       _id: ID!, 
       title: String,
       description: String,
       projectId: ID,
-      status: String,
-      date: String
+      done: Boolean,
+      priority: String,
+      columnId: ID,
+      order: Int,
+      dueDate: String
+    ): Task
+    updateTaskPosition(
+      _id: ID!,
+      newPosition: Int!,
+      sourceColumnId: ID!,
+      destinationColumnId: ID!,
     ): Task
     deleteTask(_id: ID!): Task
   }
@@ -34,10 +46,11 @@ export const typeDefs = gql`
     description: String
     project: Project
     projectId: String
+    done: Boolean
     priority: String!
     column: Column
     members: [Developer]
-    order: Int
+    order: Int!
     dueDate: String
     createdAt: String
   }
@@ -58,9 +71,11 @@ export const resolvers = {
       title,
       description,
       projectId,
-      status,
+      done,
       priority,
-      date
+      columnId, 
+      order,
+      dueDate,
     }) => {
 	    const projectFound = await Project.findById(projectId);
       if (projectId && !projectFound) {
@@ -71,9 +86,11 @@ export const resolvers = {
         title,
         description,
         projectId,
-        status,
-        priority,
-        date
+        done,
+        priority: 'Low',
+        columnId, 
+        order,
+        dueDate,
       });
       const savedTask = task.save();
       return savedTask;
@@ -88,6 +105,47 @@ export const resolvers = {
       if (!updatedTask) throw new Error("Task not found");
         return updatedTask;
     },
+    updateTaskPosition: async (_, args) => {
+      const {
+        _id,
+        newPosition,
+        sourceColumnId,
+        destinationColumnId
+      } = args;
+      // console.log(args)
+      try {
+        const tasks = await Task.find({columnId: destinationColumnId, order: { $gt: newPosition }})
+        console.log(tasks)
+        // if (sourceColumnId !== destinationColumnId) {
+        //   for (const key in sourceList) {
+        //     await Task.findByIdAndUpdate(
+        //       sourceList[key]._id,
+        //       {
+        //         $set: {
+        //           columnId: sourceColumnId,
+        //           order: key
+        //         }
+        //       }
+        //     )
+        //   }
+        // }
+
+        // for (const key in destinationList) {
+        //   await Task.findByIdAndUpdate(
+        //     destinationList[key]._id,
+        //     {
+        //       $set: {
+        //         columnId: destinationColumnId,
+        //         order: key
+        //       }
+        //     }
+        //   )
+        // }
+        // return('updated');
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
     deleteTask: async (_, { _id }) => {
       const deletedTask = await Task.findByIdAndDelete(_id);
       if (!deletedTask) throw new Error("Task not found");
@@ -97,6 +155,9 @@ export const resolvers = {
   Task: {
     project: async (parent) => {
       return await Project.findById(parent.projectId);
+    },
+    column: async (parent) => {
+      return await KanbanColumn.findById(parent.columnId);
     }
   }
 }

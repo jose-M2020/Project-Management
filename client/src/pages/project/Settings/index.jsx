@@ -157,12 +157,12 @@ const Settings = () => {
     }});
   }
 
-  const handelEdit = (value, name) => {
+  const handelEdit = async (value, name) => {
     if(name === 'tags'){
       value = value.map(tag => tag.value);
     }
 
-    updateProject({variables: {
+    await updateProject({variables: {
       _id: data?.project?._id,
       [name]: value
     }});
@@ -204,7 +204,9 @@ const Settings = () => {
                 <EditInput
                   name='tags'
                   label='Tags'
-                  options={tagsOptions}
+                  options={tagsOptions.filter(
+                    tag => !(data?.project?.tags).includes(tag?.value)
+                  )}
                   value={data?.project?.tags}
                   onAccept={handelEdit}
                   multiple
@@ -415,7 +417,7 @@ const Settings = () => {
                 <Box display='flex' justifyContent='space-between' alignItems='center'>
                   <Box>
                     <Typography variant='h5' fontWeight='bold'>Delete</Typography>
-                    <Typography>Change the project status</Typography>
+                    <Typography>This action will permanently delete the current project and all associated data</Typography>
                   </Box>
                   <CustomButton
                     text='Delete Project'
@@ -423,11 +425,17 @@ const Settings = () => {
                     onClick={handleModal}
                   />
                   <CustomModal
-                    title='Are you sure you want to delete this project?'
-                    subtitle='This repository will permanently delete with related tasks and events.'
                     open={open}
                     handleClose={handleModal}
                   >
+                    <Box mb={2}>
+                      <Typography variant="h4" component="h2" mb={1}>
+                        Are you sure you want to delete<b> {data?.project?.name}</b>?
+                      </Typography>
+                      <Typography variant="span">
+                        This action cannot be undone. Please confirm your decision before proceeding.
+                      </Typography>
+                    </Box>
                     <form onSubmit={handleDelete}>
                       <Box display='flex' justifyContent='end'>
                         <CustomButton

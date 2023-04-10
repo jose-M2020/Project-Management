@@ -9,21 +9,21 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { Form, Formik } from 'formik';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import CustomModal from '../../../components/CustomModal';
-import { tokens } from '../../../theme';
-import Input from '../../../components/form/Input';
+import CustomModal from '../../../../components/CustomModal';
+import { tokens } from '../../../../theme';
+import Input from '../../../../components/form/Input';
 import StyledEditor from '../styles/StyledEditor';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import Dropdown from '../../../components/Dropdown';
-import CustomButton from '../../../components/CustomButton';
-import AutoComplete from '../../../components/form/AutoComplete';
-import useAsyncAutocomplete from '../../../hooks/useAsyncAutocomplete';
-import { GET_PROJECTNAMES } from '../../../graphql/queries/projectQueries';
-import { GET_DEVNAMES } from '../../../graphql/queries/devsQueries';
+import Dropdown from '../../../../components/Dropdown';
+import CustomButton from '../../../../components/CustomButton';
+import AutoComplete from '../../../../components/form/AutoComplete';
+import ProfileRow from '../../../../components/ProfileRow';
+import useAsyncAutocomplete from '../../../../hooks/useAsyncAutocomplete';
+import { GET_PROJECTNAMES } from '../../../../graphql/queries/projectQueries';
+import { GET_DEVNAMES } from '../../../../graphql/queries/devsQueries';
 import { schema } from '../TaskValidation';
-import ProfileRow from '../../../components/ProfileRow';
 
 const FormItem = ({icon, title, children}) => (
   <Stack gap={1} direction='row' >
@@ -120,30 +120,6 @@ const TaskModal = ({taskDetailsModal, setTaskDetailsModal}) => {
                           </RadioGroup>
                         </FormControl>
                       </Stack>
-                    </FormItem>
-                    <FormItem
-                      title='Linked project'
-                      icon={<AttachFileIcon />}
-                    >
-                      <Dropdown 
-                        button={
-                          <CustomButton text='Change' />
-                        }
-                        width='250px'
-                      >
-                        <AutoComplete
-                          label="Project" 
-                          name="projectId" 
-                          options={projectData?.projects}
-                          valueField='_id'
-                          setLabel={option => option?.name}
-                          async={true}
-                          open={open}
-                          setOpen={setOpen}
-                          loading={loadingProjects}
-                         
-                        />
-                      </Dropdown>
                     </FormItem>
                     <FormItem
                       icon={<TocIcon />}

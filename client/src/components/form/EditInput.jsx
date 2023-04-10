@@ -9,9 +9,10 @@ import { arraysEqual } from "../../helpers/helpers";
 const EditInput = ({onAccept, value = '', children, ...props}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [loading, setLoading] = useState(false);
   const [activeEdit, setActiveEdit] = useState(false);
   const [inputValue, setInputValue] = useState(value)
-
+  
   const handleChange = (e, autoCompleteValue) => {
     const newValue = !autoCompleteValue ? e.target.value : autoCompleteValue;
     
@@ -38,11 +39,13 @@ const EditInput = ({onAccept, value = '', children, ...props}) => {
     setDefaultValue();
   }
   
-  const handleClickAccept = () => {
+  const handleClickAccept = async () => {
+    setLoading(true);
     setActiveEdit(false);
-    const status = onAccept(inputValue, props.name);
+    const status = await onAccept(inputValue, props.name);
     // status ? setInputValue()
     console.log(status);
+    setLoading(false);
   }
 
   return (
@@ -54,6 +57,9 @@ const EditInput = ({onAccept, value = '', children, ...props}) => {
             onChange={(_, value) => {
               handleChange(null, value)
             }}
+            {...loading && {
+              disabled: true
+            }}
             {...props}
           />
         ) : (
@@ -62,6 +68,9 @@ const EditInput = ({onAccept, value = '', children, ...props}) => {
             // name='name'
             onChange={e => handleChange(e)}
             fullWidth
+            {...loading && {
+              disabled: true
+            }}
             {...props}
           >
             {children}

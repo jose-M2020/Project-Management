@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { Box, Typography } from '@mui/material'
 import { DragDropContext, Droppable } from 'react-beautiful-dnd'
-import Header from '../../components/Header'
-import Column from './components/Column'
-import { GET_PROJECTS } from '../../graphql/queries/projectQueries';
-import { GET_TASKS } from '../../graphql/queries/taskQueries';
 import { useMutation, useQuery } from '@apollo/client';
-import { CREATE_TASK, UPDATE_TASK } from '../../graphql/mutations/taskMutations';
+import Header from '../../../components/Header'
+import { GET_PROJECTS } from '../../../graphql/queries/projectQueries';
+import { GET_BOARDBYPROJECT } from '../../../graphql/queries/boardQueries'
+import { UPDATE_COLUMN, UPDATE_COLUMNPOSITION } from '../../../graphql/mutations/columnMutations'
+import { GET_TASKS } from '../../../graphql/queries/taskQueries';
+import { CREATE_TASK, UPDATE_TASK, UPDATE_TASKPOSITION } from '../../../graphql/mutations/taskMutations';
+import Column from './components/Column'
 import TaskModal from './components/TaskModal';
-import { useParams } from 'react-router-dom'
-import { GET_BOARDBYPROJECT } from '../../graphql/queries/boardQueries'
 
 const columnData = {
   'column-1': {
@@ -32,25 +33,26 @@ const columnData = {
   }
 }
 
-const reOrder = (items) => {
+const sortData = (items) => {
   let sortedItems = items.sort((a, b) => a.order - b.order);
   return sortedItems;
 };
 
-const Tasks = () => {
+const Board = () => {
   const { id: projectId } = useParams();
   const [taskDetailsModal, setTaskDetailsModal] = useState({
     isOpen: false,
     data: {}
   });
-  const [columns, setColumns] = useState(columnData);
-  const [date, setDate] = useState();
-  const { loading: loadingTasks, data: tasks } = useQuery(GET_TASKS);
+  const [columns, setColumns] = useState([]);
   const { loading: loadingBoard, data: board } = useQuery(
     GET_BOARDBYPROJECT,
     { variables: { projectId } }
   );
-  const [updateTask, { updateLoading, updateError }] = useMutation(UPDATE_TASK, {
+  const [
+    updateTask,
+    { loadingTaskUpdate, taskUpdateError }
+  ] = useMutation(UPDATE_TASK, {
     update: (cache, { data }) => {
       // const projectId = data.updateTask.project._id;
       const { tasks } = cache.readQuery({
@@ -92,6 +94,40 @@ const Tasks = () => {
       // });
     },
 	});
+  const [
+    updateTaskPosition,
+    { loadingTaskPositionUpdate, taskUpdatePositionError }
+  ] = useMutation(UPDATE_TASKPOSITION, {
+    update: (cache, { data }) => {
+      
+    },
+	});
+  const [
+    updateColumnPosition,
+    { loadingColumnUpdate, columnUpdateError }
+  ] = useMutation(UPDATE_COLUMNPOSITION, {
+    update: (cache, { data }) => {
+      // TODO: Find out if there's a better way to update board cache
+      cache.writeQuery({
+        query: GET_BOARDBYPROJECT,
+        variables: { projectId },
+        data: {
+          boardByProject: {
+            ...board?.boardByProject,
+            columns
+          }
+        }
+      })
+    },
+	});
+
+  useEffect(() => {
+    if(!loadingBoard && !columns.length){
+      console.log('ordering: ', columns)
+      const sortedColums = sortData([...board?.boardByProject?.columns]);
+      setColumns(sortedColums)
+    }
+  }, [board])
 
   // useEffect(() => {
   //   if(!loadingTasks){
@@ -130,7 +166,7 @@ const Tasks = () => {
 
     provided.announce(message);
   };
-
+  
   const handleDragEnd = (result, provided) => {
     const {
       destination,
@@ -138,13 +174,12 @@ const Tasks = () => {
       draggableId,
       type
     } = result;
-
+    
     const message = result.destination
-      ? `You have moved the task from position
-        ${result.source.index + 1} to ${result.destination.index + 1}`
-      : `The task has been returned to its starting position of
-        ${result.source.index + 1}`;
-
+      ? `You have moved the ${type} from position
+        ${source.index} to ${destination.index}`
+      : `The ${type} has been returned to its starting position of
+        ${source.index}`;
     provided.announce(message);
 
     if (!destination) return;
@@ -155,66 +190,75 @@ const Tasks = () => {
     ) {
       return;
     }
+    
+    const newColumns = [...columns];
 
     if (type === 'column') {
-      const newColumnOrder = Array.from(this.state.columnOrder);
-      newColumnOrder.splice(source.index, 1);
-      newColumnOrder.splice(destination.index, 0, draggableId);
+      const [sourceRemoved] = newColumns.splice(source.index, 1);
+      newColumns.splice(destination.index, 0, sourceRemoved)
+      setColumns(newColumns);
 
-      const newState = {
-        ...this.state,
-        columnOrder: newColumnOrder,
-      };
-      this.setState(newState);
+      updateColumnPosition({ variables: {
+        sourceColumnPosition: destination.index,
+        destinationColumnPosition: source.index,
+        sourceColumnId: draggableId,
+        destinationColumnId: columns[destination.index]._id
+      }})
+
       return;
     }
 
-    const sourceColumn = columns[source.droppableId];
-    const destColumn = columns[destination.droppableId];
+    // Handling positioning of column cards
+
+    const sourceColumnIndex = columns.findIndex(
+      column => column._id === source.droppableId
+    )
+    const destColumnIndex = columns.findIndex(
+      column => column._id === destination.droppableId
+    )
+    const sourceColumn = columns[sourceColumnIndex]
+    const destColumn = columns[destColumnIndex]
     
-    if (sourceColumn === destColumn) {
-      const newItems = [...sourceColumn.items];
+    if (source.droppableId === destination.droppableId) {
+      const newItems = [...sourceColumn.tasks];
       const [removed] = newItems.splice(source.index, 1);
       newItems.splice(destination.index, 0, removed);
 
-      const newHome = {
+      const newColumn = {
         ...sourceColumn,
-        items: newItems,
-      };
+        tasks: newItems,
+      };      
+      newColumns.splice(sourceColumnIndex, 1, newColumn);
 
-      const newState = {
-        ...columns,
-        [newHome.id]: newHome,
-      };
-      setColumns(newState);
+      setColumns(newColumns);
       return;
     }
 
     // moving from one list to another
-    const sourceColumnItems = [...sourceColumn.items];
+    const sourceColumnItems = [...sourceColumn.tasks];
     const [removed] = sourceColumnItems.splice(source.index, 1);
-    const newHome = {
+    const newSource = {
       ...sourceColumn,
-      items: sourceColumnItems,
+      tasks: sourceColumnItems,
     };
 
-    const destColumnItems = [...destColumn.items];
+    const destColumnItems = [...destColumn.tasks];
     destColumnItems.splice(destination.index, 0, removed);
     const newForeign = {
       ...destColumn,
-      items: destColumnItems,
+      tasks: destColumnItems,
     };
 
-    const newState = {
-      ...columns,
-      [newHome.id]: newHome,
-      [newForeign.id]: newForeign,
-    };
-    setColumns(newState);
+    newColumns.splice(sourceColumnIndex, 1, newSource);
+    newColumns.splice(destColumnIndex, 1, newForeign);
 
-    updateTask({variables: {
+    setColumns(newColumns);
+
+    updateTaskPosition({variables: {
       _id: draggableId,
-      status: columnData[destination.droppableId].status
+      newPosition: destination.index,
+      sourceColumnId: source.droppableId,
+      destinationColumnId: destination.droppableId
     }});
   };
 
@@ -250,12 +294,13 @@ const Tasks = () => {
                       paddingBottom: '15px'
                     }}
                   >
-                    {(board.boardByProject.columns).map((column, index) => (
+                    {columns.map((column, index) => (
                       <Column
                         key={column._id}
                         column={column}
                         index={index}
                         setTaskDetailsModal={setTaskDetailsModal}
+                        projectId={projectId}
                       />
                     ))}
                     {provided.placeholder}
@@ -271,4 +316,4 @@ const Tasks = () => {
   )
 }
 
-export default Tasks
+export default Board

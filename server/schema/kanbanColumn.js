@@ -14,13 +14,20 @@ export const typeDefs = gql`
       title: String!,
       boardId: ID!,
       order: Int!,
+      category: String
     ): Column
     updateColumn(
       _id: ID!,
-      title: String!,
-      boardId: ID!,
-      order: Int!,
+      title: String,
+      boardId: ID,
+      order: Int,
     ): Column
+    updateColumnPosition(
+      sourceColumnPosition: Int!,
+      destinationColumnPosition: Int!,
+      sourceColumnId: ID!,
+      destinationColumnId: ID!
+    ): [Column]
     deleteColumn(_id: ID!): Column
   }
 
@@ -29,6 +36,7 @@ export const typeDefs = gql`
     title: String!
     board: Board!
     order: Int!
+    category: String
     tasks: [Task]
     createdAt: String
   }
@@ -47,12 +55,14 @@ export const resolvers = {
     createColumn: async (_, {
       title,
       boardId,
-      order
+      order,
+      category
     }) => {
       const column = new KanbanColumn({
         title,
         boardId,
-        order
+        order,
+        category
       });
       const savedColumn = column.save();
       return savedColumn;
@@ -65,6 +75,22 @@ export const resolvers = {
       );
       if (!updatedColumn) throw new Error("Column not found");
         return updatedColumn;
+    },
+    updateColumnPosition: async (_, args) => {
+      const updatedSourceColumn = await KanbanColumn.findByIdAndUpdate(
+        args.sourceColumnId,
+        { $set: {order: args.sourceColumnPosition} },
+        { new: true }
+      );
+
+      const updateddestinationColumn = await KanbanColumn.findByIdAndUpdate(
+        args.destinationColumnId,
+        { $set: {order: args.destinationColumnPosition} },
+        { new: true }
+      );
+
+      if (!updatedSourceColumn) throw new Error("Column not found");
+        return [updatedSourceColumn, updateddestinationColumn];
     },
     deleteColumn: async (_, { _id }) => {
       const deletedBoard = await KanbanColumn.findByIdAndDelete(_id);

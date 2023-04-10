@@ -2,31 +2,39 @@ import { gql } from '@apollo/client';
 
 export const CREATE_TASK = gql`
   mutation createTask(
-    $title: String!
-    $description: String
-    $projectId: ID
-    $status: String!
-    $priority: String
-    $date: String
+    $title: String!,
+    $description: String,
+    $projectId: ID!,
+    $done: Boolean!,
+    $priority: String,
+    $columnId: ID!,
+    $order: Int!,
+    $dueDate: String
   ) {
     createTask(
       title: $title,
       description: $description,
       projectId: $projectId,
-      status: $status,
+      done: $done,
       priority: $priority,
-      date: $date,
+      columnId: $columnId,
+      order: $order,
+      dueDate: $dueDate
     ) {
       _id
       title
       description
-      project{
+      project {
         _id
         name
       }
-      status
+      column {
+        _id
+      }
+      done
       priority
-      date
+      order
+      dueDate
     }
   }
 `;
@@ -57,6 +65,24 @@ export const UPDATE_TASK = gql`
       project{
         _id
       }
+    }
+  }
+`;
+
+export const UPDATE_TASKPOSITION = gql`
+  mutation updateTaskPosition(
+    $_id: ID!,
+    $newPosition: Int!,
+    $sourceColumnId: ID!,
+    $destinationColumnId: ID!,
+  ) {
+    updateTaskPosition(
+      _id: $_id,
+      newPosition: $newPosition,
+      sourceColumnId: $sourceColumnId,
+      destinationColumnId: $destinationColumnId,
+    ) {
+      title
     }
   }
 `;

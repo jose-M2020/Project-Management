@@ -13,6 +13,9 @@ const KanbanColumnSchema = new mongoose.Schema({
   order: {
     type: Number,
     required: true
+  },
+  category: {
+    type: String,
   }
 },{ timestamps: true });
 

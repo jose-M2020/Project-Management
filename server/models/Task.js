@@ -11,11 +11,16 @@ const TaskSchema = new mongoose.Schema({
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
+    require: true
   },
   // status: {
   //   type: String,
   //   enum: ['Not Started', 'In Progress', 'Completed'],
   // },
+  done: {
+    type: Boolean,
+    require: true
+  },
   priority: {
     type: String,
     enum: ['Low', 'Medium', 'High'],
