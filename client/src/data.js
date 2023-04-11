@@ -1,3 +1,25 @@
+import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
+import CachedIcon from '@mui/icons-material/Cached';
+import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
+
+export const projectStatus = {
+  'Not Started': {
+    id: 1,
+    name: 'Not Started',
+    icon: <AccessTimeOutlinedIcon />
+  },
+  'In Progress': {
+    id: 2,
+    name: 'In Progress',
+    icon: <CachedIcon />
+  },
+  'Completed': {
+    id: 3,
+    name: 'Completed',
+    icon: <CheckOutlinedIcon />
+  },
+}
+
 export const tagsOptions = [
   { label: 'HTML', value: 'HTML' },
   { label: 'CSS', value: 'HTML' },

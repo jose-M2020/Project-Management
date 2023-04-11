@@ -4,7 +4,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import { tokens } from "../../theme";
 import AutoComplete from "./AutoComplete";
-import { arraysEqual } from "../../helpers/helpers";
+import { arraysEqual } from "../../helpers/array";
 
 const EditInput = ({onAccept, value = '', children, ...props}) => {
   const theme = useTheme();

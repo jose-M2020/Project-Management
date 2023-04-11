@@ -9,17 +9,19 @@ import { useMutation } from "@apollo/client";
 import TaskCard from "./TaskCard";
 import { tokens } from "../../../../theme";
 import CustomButton from "../../../../components/CustomButton";
-import { hexToRgba } from "../../../../helpers/helpers";
+import { hexToRgba } from "../../../../helpers/colors";
 import { GET_PROJECTS } from "../../../../graphql/queries/projectQueries";
 import { schema } from "../TaskValidation";
 import Input from "../../../../components/form/Input";
 import { CREATE_TASK } from "../../../../graphql/mutations/taskMutations";
 import { GET_TASKS } from "../../../../graphql/queries/taskQueries";
 import { GET_BOARDBYPROJECT } from "../../../../graphql/queries/boardQueries";
+import { getAppendedItemPos } from "../../../../helpers/itemPosition";
 
 const Column = ({
-  column,
   index,
+  column,
+  tasks,
   setTaskDetailsModal,
   projectId
 }) => {
@@ -107,7 +109,7 @@ const Column = ({
         projectId,
         done: column.category === 'done' ? true : false,
         columnId: column._id,
-        order: column.tasks.length + 1
+        order: getAppendedItemPos(column.tasks),
       }});
     }
     // actions.resetForm();
@@ -202,7 +204,7 @@ const Column = ({
                     gap: '15px'
                   }}
                 >
-                  {column.tasks.map((task, index) => (
+                  {tasks.map((task, index) => (
                     <TaskCard 
                       key={task._id}
                       task={task}

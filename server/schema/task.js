@@ -2,6 +2,8 @@ import { gql } from "graphql-tag";
 import Project from "../models/Project.js";
 import Task from "../models/Task.js";
 import KanbanColumn from "../models/KanbanColumn.js";
+import isTooClose from "../helpers/isTooClose.js";
+import recalcItemsPos from "../helpers/recalcItemsPos.js";
 
 export const typeDefs = gql`
   extend type Query {
@@ -34,8 +36,7 @@ export const typeDefs = gql`
     updateTaskPosition(
       _id: ID!,
       newPosition: Int!,
-      sourceColumnId: ID!,
-      destinationColumnId: ID!,
+      columnId: ID!,
     ): Task
     deleteTask(_id: ID!): Task
   }
@@ -109,39 +110,23 @@ export const resolvers = {
       const {
         _id,
         newPosition,
-        sourceColumnId,
-        destinationColumnId
+        columnId
       } = args;
-      // console.log(args)
-      try {
-        const tasks = await Task.find({columnId: destinationColumnId, order: { $gt: newPosition }})
-        console.log(tasks)
-        // if (sourceColumnId !== destinationColumnId) {
-        //   for (const key in sourceList) {
-        //     await Task.findByIdAndUpdate(
-        //       sourceList[key]._id,
-        //       {
-        //         $set: {
-        //           columnId: sourceColumnId,
-        //           order: key
-        //         }
-        //       }
-        //     )
-        //   }
-        // }
 
-        // for (const key in destinationList) {
-        //   await Task.findByIdAndUpdate(
-        //     destinationList[key]._id,
-        //     {
-        //       $set: {
-        //         columnId: destinationColumnId,
-        //         order: key
-        //       }
-        //     }
-        //   )
-        // }
-        // return('updated');
+      try {
+        const updatedTask = Task.findByIdAndUpdate(_id, {
+          $set: {
+            order: newPosition,
+            columnId
+          }
+        })
+
+        if (isTooClose(newPosition)) {
+          const tasks = await recalcItemsPos({ columnId }, Task);
+          return tasks;
+        }
+
+        return updatedTask;
       } catch (err) {
         throw new Error(err);
       }

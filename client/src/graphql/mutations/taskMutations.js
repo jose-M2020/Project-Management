@@ -73,14 +73,12 @@ export const UPDATE_TASKPOSITION = gql`
   mutation updateTaskPosition(
     $_id: ID!,
     $newPosition: Int!,
-    $sourceColumnId: ID!,
-    $destinationColumnId: ID!,
+    $columnId: ID!
   ) {
     updateTaskPosition(
       _id: $_id,
       newPosition: $newPosition,
-      sourceColumnId: $sourceColumnId,
-      destinationColumnId: $destinationColumnId,
+      columnId: $columnId,
     ) {
       title
     }

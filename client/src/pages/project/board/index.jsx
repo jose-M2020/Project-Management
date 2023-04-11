@@ -4,13 +4,13 @@ import { Box, Typography } from '@mui/material'
 import { DragDropContext, Droppable } from 'react-beautiful-dnd'
 import { useMutation, useQuery } from '@apollo/client';
 import Header from '../../../components/Header'
-import { GET_PROJECTS } from '../../../graphql/queries/projectQueries';
 import { GET_BOARDBYPROJECT } from '../../../graphql/queries/boardQueries'
-import { UPDATE_COLUMN, UPDATE_COLUMNPOSITION } from '../../../graphql/mutations/columnMutations'
+import { UPDATE_COLUMNPOSITION } from '../../../graphql/mutations/columnMutations'
 import { GET_TASKS } from '../../../graphql/queries/taskQueries';
-import { CREATE_TASK, UPDATE_TASK, UPDATE_TASKPOSITION } from '../../../graphql/mutations/taskMutations';
+import { UPDATE_TASK, UPDATE_TASKPOSITION } from '../../../graphql/mutations/taskMutations';
 import Column from './components/Column'
 import TaskModal from './components/TaskModal';
+import taskReorderer from '../../../helpers/taskReorderer';
 
 const columnData = {
   'column-1': {
@@ -191,9 +191,8 @@ const Board = () => {
       return;
     }
     
-    const newColumns = [...columns];
-
     if (type === 'column') {
+      const newColumns = [...columns];
       const [sourceRemoved] = newColumns.splice(source.index, 1);
       newColumns.splice(destination.index, 0, sourceRemoved)
       setColumns(newColumns);
@@ -210,56 +209,18 @@ const Board = () => {
 
     // Handling positioning of column cards
 
-    const sourceColumnIndex = columns.findIndex(
-      column => column._id === source.droppableId
-    )
-    const destColumnIndex = columns.findIndex(
-      column => column._id === destination.droppableId
-    )
-    const sourceColumn = columns[sourceColumnIndex]
-    const destColumn = columns[destColumnIndex]
+    const {updatedTask, newColumns} = taskReorderer(
+      columns,
+      destination,
+      source
+    );
     
-    if (source.droppableId === destination.droppableId) {
-      const newItems = [...sourceColumn.tasks];
-      const [removed] = newItems.splice(source.index, 1);
-      newItems.splice(destination.index, 0, removed);
-
-      const newColumn = {
-        ...sourceColumn,
-        tasks: newItems,
-      };      
-      newColumns.splice(sourceColumnIndex, 1, newColumn);
-
-      setColumns(newColumns);
-      return;
-    }
-
-    // moving from one list to another
-    const sourceColumnItems = [...sourceColumn.tasks];
-    const [removed] = sourceColumnItems.splice(source.index, 1);
-    const newSource = {
-      ...sourceColumn,
-      tasks: sourceColumnItems,
-    };
-
-    const destColumnItems = [...destColumn.tasks];
-    destColumnItems.splice(destination.index, 0, removed);
-    const newForeign = {
-      ...destColumn,
-      tasks: destColumnItems,
-    };
-
-    newColumns.splice(sourceColumnIndex, 1, newSource);
-    newColumns.splice(destColumnIndex, 1, newForeign);
-
     setColumns(newColumns);
-
-    updateTaskPosition({variables: {
-      _id: draggableId,
-      newPosition: destination.index,
-      sourceColumnId: source.droppableId,
-      destinationColumnId: destination.droppableId
-    }});
+    // updateTaskPosition({variables: {
+    //   _id: draggableId,
+    //   columnId: updatedTask.columnId,
+    //   newPosition: updatedTask.order
+    // }});
   };
 
   return (
@@ -294,15 +255,19 @@ const Board = () => {
                       paddingBottom: '15px'
                     }}
                   >
-                    {columns.map((column, index) => (
-                      <Column
-                        key={column._id}
-                        column={column}
-                        index={index}
-                        setTaskDetailsModal={setTaskDetailsModal}
-                        projectId={projectId}
-                      />
-                    ))}
+                    {columns.map((column, index) => {
+                      const tasks = sortData([...column.tasks]);
+                      return (
+                        <Column
+                          key={column._id}
+                          column={column}
+                          tasks={tasks}
+                          index={index}
+                          setTaskDetailsModal={setTaskDetailsModal}
+                          projectId={projectId}
+                        />
+                      )
+                    })}
                     {provided.placeholder}
                   </Box>
                 )}

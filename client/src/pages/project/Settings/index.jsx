@@ -24,7 +24,6 @@ import Spinner from '../../../components/Spinner';
 import CustomButton from '../../../components/CustomButton';
 import CustomModal from '../../../components/CustomModal';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { hexToRgba, status } from '../../../helpers/helpers';
 import { GET_PROJECT } from '../../../graphql/queries/projectQueries';
 import { DELETE_PROJECT, UPDATE_PROJECT } from '../../../graphql/mutations/projectMutations';
 import ProfileRow from '../../../components/ProfileRow';
@@ -35,7 +34,8 @@ import Dropdown from '../../../components/Dropdown';
 import AutoComplete from '../../../components/form/AutoComplete';
 import { tokens } from '../../../theme';
 import EditInput from '../../../components/form/EditInput';
-import { tagsOptions } from '../../../data';
+import { projectStatus, tagsOptions } from '../../../data';
+import { hexToRgba } from '../../../helpers/colors';
 
 const SettingSection = ({title, icon, children}) => (
   <Box>
@@ -380,11 +380,11 @@ const Settings = () => {
                     defaultValue={data?.project?.status}
                     onChange={handleStatusChange}
                   >
-                    {status.map((option) => (
-                      <MenuItem key={option.name} value={option.name} >
+                    {(Object.keys(projectStatus)).map((key, index) => (
+                      <MenuItem key={index} value={key} >
                         <Box display='flex'>
-                          {option.icon()}
-                          <Typography variant='span' ml='3px'>{option.name}</Typography>
+                          {projectStatus[key].icon}
+                          <Typography variant='span' ml='3px'>{projectStatus[key].name}</Typography>
                         </Box>
                       </MenuItem>
                     ))}
