@@ -25,6 +25,11 @@ const TaskSchema = new mongoose.Schema({
     type: String,
     enum: ['Low', 'Medium', 'High'],
   },
+  boardId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'KanbanBoard',
+    required: true
+  },
   columnId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'KanbanColumn',

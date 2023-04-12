@@ -7,6 +7,7 @@ export const CREATE_TASK = gql`
     $projectId: ID!,
     $done: Boolean!,
     $priority: String,
+    $boardId: ID!,
     $columnId: ID!,
     $order: Int!,
     $dueDate: String
@@ -17,6 +18,7 @@ export const CREATE_TASK = gql`
       projectId: $projectId,
       done: $done,
       priority: $priority,
+      boardId: $boardId,
       columnId: $columnId,
       order: $order,
       dueDate: $dueDate

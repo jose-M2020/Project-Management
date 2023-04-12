@@ -23,7 +23,8 @@ const Column = ({
   column,
   tasks,
   setTaskDetailsModal,
-  projectId
+  projectId,
+  boardId
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -107,8 +108,9 @@ const Column = ({
       createTask({ variables: {
         title: value,
         projectId,
-        done: column.category === 'done' ? true : false,
+        boardId: boardId,
         columnId: column._id,
+        done: column.category === 'done' ? true : false,
         order: getAppendedItemPos(column.tasks),
       }});
     }

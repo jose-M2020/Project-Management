@@ -15,10 +15,11 @@ export const typeDefs = gql`
     createTask(
       title: String!,
       description: String,
+      boardId: ID!,
       projectId: ID!,
+      columnId: ID!,
       done: Boolean!,
       priority: String,
-      columnId: ID!,
       order: Int!,
       dueDate: String
     ): Task
@@ -37,6 +38,7 @@ export const typeDefs = gql`
       _id: ID!,
       newPosition: Int!,
       columnId: ID!,
+      boardId: ID,
     ): Task
     deleteTask(_id: ID!): Task
   }

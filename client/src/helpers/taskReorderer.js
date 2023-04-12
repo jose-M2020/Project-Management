@@ -18,28 +18,40 @@ const taskReorderer = (columns, destination, source) => {
   
   const columnItems = [...sourceColumn.tasks];
   const [removed] = columnItems.splice(source.index, 1);
-  
-  if(!isDraggingInSameColumn) {
-    const newSource = {
-      ...sourceColumn,
-      tasks: columnItems,
-    };
-    newColumns.splice(sourceColumnIndex, 1, newSource);
-  }
-  destColumnItems.splice(destination.index, 0, removed);
+  console.log({removed, columnItems})
+  const newSourceColumn = {
+    ...sourceColumn,
+    tasks: columnItems,
+  };
+  newColumns.splice(sourceColumnIndex, 1, newSourceColumn);
 
+  console.log({source, destination})
+  // if(!isDraggingInSameColumn) {
+  //   const newSource = {
+  //     ...sourceColumn,
+  //     tasks: columnItems,
+  //   };
+  //   newColumns.splice(sourceColumnIndex, 1, newSource);
+  //   console.log('newSource: ', newSource);
+  // }
+  // destColumnItems.splice(destination.index, 0, removed);
+  console.log('destColumnItems: ', destColumnItems);
+  
+  // Update the task
   const updatedTask = {
     ...removed,
     columnId: destination.droppableId,
     order: getNewItemPos(destColumnItems, destination.index)
   }
-  destColumnItems.splice(destination.index, 1, updatedTask);
+  // destColumnItems.splice(destination.index, 1, updatedTask);
   
-  const newColumn = {
-    ...destColumn,
-    tasks: destColumnItems,
-  };
-  newColumns.splice(destColumnIndex, 1, newColumn);
+  // Update columns
+  // const newColumn = {
+  //   ...destColumn,
+  //   tasks: destColumnItems,
+  // };
+  // newColumns.splice(destColumnIndex, 1, newColumn);
+  console.log('newColumns: ', newColumns)
 
   if (isDraggingInSameColumn) {
     // columnItems.splice(destination.index, 0, removed);
