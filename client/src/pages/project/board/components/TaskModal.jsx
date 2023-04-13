@@ -24,6 +24,10 @@ import useAsyncAutocomplete from '../../../../hooks/useAsyncAutocomplete';
 import { GET_PROJECTNAMES } from '../../../../graphql/queries/projectQueries';
 import { GET_DEVNAMES } from '../../../../graphql/queries/devsQueries';
 import { schema } from '../TaskValidation';
+import { useMutation } from '@apollo/client';
+import { UPDATE_TASK } from '../../../../graphql/mutations/taskMutations';
+import { GET_TASKS } from '../../../../graphql/queries/taskQueries';
+import EditInput from '../../../../components/form/EditInput';
 
 const FormItem = ({icon, title, children}) => (
   <Stack gap={1} direction='row' >
@@ -41,18 +45,57 @@ const FormItem = ({icon, title, children}) => (
   </Stack>
 );
 
-const TaskModal = ({taskDetailsModal, setTaskDetailsModal}) => {
+const TaskModal = ({task, closeTaskModal}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [editorcontent, setEditorContent] = useState(taskDetailsModal.data?.description || '')
+  const [editorcontent, setEditorContent] = useState(task?.description || '')
   const [date, setDate] = useState();
 
-  const {
-    data: projectData,
-    loading: loadingProjects,
-    open,
-    setOpen
-  } = useAsyncAutocomplete(GET_PROJECTNAMES);
+  const [
+    updateTask,
+    { loadingTaskUpdate, taskUpdateError }
+  ] = useMutation(UPDATE_TASK, {
+    update: (cache, { data }) => {
+      // const projectId = data.updateTask.project._id;
+      const { tasks } = cache.readQuery({
+        query: GET_TASKS
+      })
+
+      const updatedTasks = tasks.reduce((acc, task) => {
+        if(data.updateTask._id === task._id){
+          return [
+            ...acc,
+            {
+              ...task,
+              status: data.updateTask.status
+            }
+          ]
+        }
+
+        return [...acc, task]
+      }, [])
+
+      cache.writeQuery({
+        query: GET_TASKS,
+        data: {
+          tasks: updatedTasks,
+        }
+      })
+
+      // cache.modify({
+      //   fields: {
+      //     getProjects: (existingProjects, { readField }) => {
+      //       console.log(existingProjects);
+      //       if (data) {
+      //         return existingProjects.filter(
+      //           (projectRef) => projectId !== readField('_id', projectRef)
+      //         );
+      //       }
+      //     }
+      //   },
+      // });
+    },
+	});
   const {
     data: devData,
     loading: loadingDevs,
@@ -67,131 +110,111 @@ const TaskModal = ({taskDetailsModal, setTaskDetailsModal}) => {
   return (
     <CustomModal
         width='800px'
-        open={taskDetailsModal.isOpen}
+        open={!!task}
         handleClose={
-          () => setTaskDetailsModal({
-            isOpen: false,
-            data: {}
-          })
+          () => closeTaskModal()
         }
       >
         <Grid container spacing={2} >
           <Grid item md={9}>
-            <Formik
-              initialValues={taskDetailsModal.data}
-              validationSchema={schema}
-              onSubmit={handleUpdate}
-            >
-              {() => (
-                <Form>
-                  <Stack spacing={3}
+            <Stack spacing={3}>
+              <FormItem
+                icon={<SubtitlesIcon />}
+              >
+                <Stack spacing={2}>
+                  <Box mb={1}>
+                      <EditInput
+                        name="title"
+                        variant="standard"
+                        value={task?.title}
+                      />
+                  </Box>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={['DatePicker']}>
+                        <DatePicker
+                          sx={{ width: '50%'}}
+                          // label="Due date"
+                          onChange={(newDate) => setDate(newDate)}
+                          format="LL"
+                        />
+                      </DemoContainer>
+                  </LocalizationProvider>
+                  <FormControl>
+                    <FormLabel id="demo-row-radio-buttons-group-label">Priority</FormLabel>
+                    <RadioGroup
+                      row
+                      aria-labelledby="demo-row-radio-buttons-group-label"
+                      name="row-radio-buttons-group"
+                    >
+                      <FormControlLabel value="Low" control={<Radio />} label="Low" />
+                      <FormControlLabel value="Medium" control={<Radio />} label="Medium" />
+                      <FormControlLabel value="High" control={<Radio />} label="High" />
+                    </RadioGroup>
+                  </FormControl>
+                </Stack>
+              </FormItem>
+              <FormItem
+                icon={<TocIcon />}
+                title='Description'
+              >
+                <StyledEditor>
+                    <CKEditor
+                        editor={ ClassicEditor }
+                        data={ editorcontent }
+                        onChange={ ( event, editor ) => {
+                            const data = editor.getData();
+                            console.log( { event, editor, data } );
+                        } }
+                        onBlur={ ( event, editor ) => {
+                            console.log( 'Blur.', editor );
+                        } }
+                        onFocus={ ( event, editor ) => {
+                            console.log( 'Focus.', editor );
+                        } }
+                    />
+                </StyledEditor>
+              </FormItem>
+              <FormItem
+                icon={<PeopleAltIcon />}
+                title='Members'
+              >
+                <Stack spacing={2}>
+                  <Dropdown 
+                    button={
+                      <Fab size="small" color="secondary" aria-label="add">
+                        <AddIcon />
+                      </Fab>
+                    }
+                    width='250px'
                   >
-                    <FormItem
-                      icon={<SubtitlesIcon />}
-                    >
-                      <Stack spacing={2}>
-                        <Box mb={1}>
-                            <Input
-                              name="title"
-                              variant="standard"
-                              value={taskDetailsModal.data?.title}
-                            />
-                        </Box>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DemoContainer components={['DatePicker']}>
-                              <DatePicker
-                                sx={{ width: '50%'}}
-                                // label="Due date"
-                                onChange={(newDate) => setDate(newDate)}
-                                format="LL"
-                              />
-                            </DemoContainer>
-                        </LocalizationProvider>
-                        <FormControl>
-                          <FormLabel id="demo-row-radio-buttons-group-label">Priority</FormLabel>
-                          <RadioGroup
-                            row
-                            aria-labelledby="demo-row-radio-buttons-group-label"
-                            name="row-radio-buttons-group"
-                          >
-                            <FormControlLabel value="Low" control={<Radio />} label="Low" />
-                            <FormControlLabel value="Medium" control={<Radio />} label="Medium" />
-                            <FormControlLabel value="High" control={<Radio />} label="High" />
-                          </RadioGroup>
-                        </FormControl>
-                      </Stack>
-                    </FormItem>
-                    <FormItem
-                      icon={<TocIcon />}
-                      title='Description'
-                    >
-                      <StyledEditor>
-                          <CKEditor
-                              editor={ ClassicEditor }
-                              data={ editorcontent }
-                              onChange={ ( event, editor ) => {
-                                  const data = editor.getData();
-                                  console.log( { event, editor, data } );
-                              } }
-                              onBlur={ ( event, editor ) => {
-                                  console.log( 'Blur.', editor );
-                              } }
-                              onFocus={ ( event, editor ) => {
-                                  console.log( 'Focus.', editor );
-                              } }
-                          />
-                      </StyledEditor>
-                    </FormItem>
-                    <FormItem
-                      icon={<PeopleAltIcon />}
-                      title='Members'
-                    >
-                      <Stack spacing={2}>
-                        <Dropdown 
-                          button={
-                            <Fab size="small" color="secondary" aria-label="add">
-                              <AddIcon />
-                            </Fab>
-                          }
-                          width='250px'
-                        >
-                          <AutoComplete 
-                            label="Team" 
-                            name="team" 
-                            options={devData?.developers}
-                            setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
-                            valueField='_id'
-                            multiple
-                            async={true}
-                            open={devFieldOpen}
-                            setOpen={setOpenDev}
-                            loading={loadingDevs}
-                          />
-                        </Dropdown>
-                        <Box display='flex' alignItems='center' justifyContent='space-between'>
-                          <ProfileRow user={{firstname: 'Jhon', lastname: 'Ruiz Hernandez', position: 'Front-end'}} />
-                          <IconButton>
-                            <DeleteIcon />
-                          </IconButton>
-                        </Box>
-                        <Box display='flex' alignItems='center' justifyContent='space-between'>
-                          <ProfileRow user={{firstname: 'Jhon Luis', lastname: 'Ruiz Hernandez', position: 'Front-end'}} />
-                          <IconButton>
-                            <DeleteIcon />
-                          </IconButton>
-                        </Box>
-                      </Stack>
-                    </FormItem>
-                    {/* <CustomButton 
-                      text='Create task' 
-                      type="submit"
-                      btnstyle="primary"
-                      loading={postLoading}
-                    /> */}
-                  </Stack>
-                </Form>
-              )}
-            </Formik>
+                    <AutoComplete 
+                      label="Team" 
+                      name="team" 
+                      options={devData?.developers}
+                      setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
+                      valueField='_id'
+                      multiple
+                      async={true}
+                      open={devFieldOpen}
+                      setOpen={setOpenDev}
+                      loading={loadingDevs}
+                    />
+                  </Dropdown>
+                  <Box display='flex' alignItems='center' justifyContent='space-between'>
+                    <ProfileRow user={{firstname: 'Jhon', lastname: 'Ruiz Hernandez', position: 'Front-end'}} />
+                    <IconButton>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                  <Box display='flex' alignItems='center' justifyContent='space-between'>
+                    <ProfileRow user={{firstname: 'Jhon Luis', lastname: 'Ruiz Hernandez', position: 'Front-end'}} />
+                    <IconButton>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </Stack>
+              </FormItem>
+            </Stack>
           </Grid>
           <Grid item md={3}>
             <Stack>

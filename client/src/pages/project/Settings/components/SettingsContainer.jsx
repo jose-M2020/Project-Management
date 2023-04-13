@@ -11,6 +11,7 @@ import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import ReportIcon from '@mui/icons-material/Report';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Toaster, toast } from 'sonner'
 import Header from '../../../../components/Header';
 import CustomButton from '../../../../components/CustomButton';
 import CustomModal from '../../../../components/CustomModal';
@@ -79,6 +80,7 @@ const SettingsContainer = ({projectData}) => {
       _id: data?.project?._id,
       [name]: value
     }});
+    toast.success(`${name} updated!`)
 
     return true;
   }
@@ -86,6 +88,7 @@ const SettingsContainer = ({projectData}) => {
   // TODO: Problems when updateing tags
   return (
     <Box m="20px">
+      <Toaster />
       <Header title="PROJECT SETTINGS" subtitle="Details project" />
         <Box>
           <CustomButton text='BACK' link='/projects' />

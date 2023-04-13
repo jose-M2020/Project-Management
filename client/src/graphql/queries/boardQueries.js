@@ -35,19 +35,20 @@ export const GET_BOARDBYPROJECT = gql`
         title
         order
         category
-        tasks {
+      }
+      tasks {
+        _id
+        title
+        description
+        priority
+        columnId
+        members {
           _id
-          title
-          description
-          priority
-          members {
-            _id
-            firstname
-            lastname
-          }
-          order
-          dueDate
+          firstname
+          lastname
         }
+        order
+        dueDate
       }
     }
   }

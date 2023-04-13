@@ -22,7 +22,6 @@ const Column = ({
   index,
   column,
   tasks,
-  setTaskDetailsModal,
   projectId,
   boardId
 }) => {
@@ -99,7 +98,7 @@ const Column = ({
       // }
     }
 	});
-
+  console.log('rendering column')
   const handleSubmit = (e) => {
     e.preventDefault();
     const {current: { value }} = taskTitleRef;
@@ -211,7 +210,6 @@ const Column = ({
                       key={task._id}
                       task={task}
                       index={index}
-                      setTaskDetailsModal={setTaskDetailsModal}
                     />
                   ))}
                   {provided.placeholder}

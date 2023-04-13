@@ -1,9 +1,17 @@
-export default function Spinner() {
-    return (
-      <div className='d-flex justify-content-center'>
-        <div className='spinner-border' role='status'>
-          <span className='sr-only'></span>
-        </div>
-      </div>
-    );
-  }
+import { Stack, Typography } from "@mui/material";
+import CircularProgress from '@mui/material/CircularProgress';
+
+const Spinner = () => {
+  return (
+    <Stack
+      spacing={2}
+      alignItems='center'
+      mt={5}
+    >
+      <CircularProgress />
+      <Typography>Loading</Typography>
+    </Stack>
+  );
+}
+
+export default Spinner;

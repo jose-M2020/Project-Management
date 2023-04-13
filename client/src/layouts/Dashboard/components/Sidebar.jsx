@@ -14,8 +14,7 @@ import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { GET_PROJECTOVERVIEW } from "../../../graphql/queries/projectQueries";
-import { useQuery } from "@apollo/client";
+import { useProject } from "../../../context/ProjectContext";
 
 const Item = ({ title, path, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -43,11 +42,8 @@ const Sidebar = () => {
   const [selected, setSelected] = useState(pathname);
   const { collapseSidebar, collapsed } = useProSidebar();
   
-  const { loading, error, data } = useQuery(
-    GET_PROJECTOVERVIEW,
-    { variables: { id } }
-  );
-
+  const project = useProject();
+  
   return (
     <Box
       sx={{
@@ -115,10 +111,10 @@ const Sidebar = () => {
                         fontWeight="bold"
                         // noWrap={true}
                       >
-                        {data?.project?.name}
+                        {project?.name}
                       </Typography>
                       <Typography variant="h5" color={colors.greenAccent[500]}>
-                        {data?.project?.type}
+                        {project?.type}
                       </Typography>
                     </Box>
                   </Box>

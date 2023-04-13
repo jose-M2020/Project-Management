@@ -1,91 +1,50 @@
 import { getNewItemPos } from "./itemPosition";
+import { isTooClose, resetItemsOrder } from "./reorderer";
 
-const taskReorderer = (columns, destination, source) => {
-  // Handling positioning of column cards
-  const newColumns = [...columns];
+const taskReorderer = (tasks, destination, source, draggableId) => {
+  const targetColumnId = destination.droppableId;
+  const sourceColumnId = source.droppableId;
 
-  const sourceColumnIndex = columns.findIndex(
-    column => column._id === source.droppableId
-  )
-  const destColumnIndex = columns.findIndex(
-    column => column._id === destination.droppableId
-  )
+  let targetTasks = tasks.filter(task => task.columnId === targetColumnId);
+  let sourceTasks = tasks.filter(task => task.columnId === sourceColumnId);
+  const restTasks = tasks.filter(task => (
+    task.columnId !== targetColumnId && task.columnId !== sourceColumnId
+  ));
 
-  const sourceColumn = columns[sourceColumnIndex];
-  const destColumn = columns[destColumnIndex];
-  const destColumnItems = [...destColumn.tasks];
-  const isDraggingInSameColumn = source.droppableId === destination.droppableId
-  
-  const columnItems = [...sourceColumn.tasks];
-  const [removed] = columnItems.splice(source.index, 1);
-  console.log({removed, columnItems})
-  const newSourceColumn = {
-    ...sourceColumn,
-    tasks: columnItems,
-  };
-  newColumns.splice(sourceColumnIndex, 1, newSourceColumn);
+  console.log({targetTasks, sourceTasks, restTasks})
 
-  console.log({source, destination})
-  // if(!isDraggingInSameColumn) {
-  //   const newSource = {
-  //     ...sourceColumn,
-  //     tasks: columnItems,
-  //   };
-  //   newColumns.splice(sourceColumnIndex, 1, newSource);
-  //   console.log('newSource: ', newSource);
-  // }
-  // destColumnItems.splice(destination.index, 0, removed);
-  console.log('destColumnItems: ', destColumnItems);
-  
-  // Update the task
-  const updatedTask = {
-    ...removed,
-    columnId: destination.droppableId,
-    order: getNewItemPos(destColumnItems, destination.index)
+  const draggedCard = tasks.find(task => task._id === draggableId);
+
+  const isDraggingInSameColumn = targetColumnId === sourceColumnId;
+
+  if (!isDraggingInSameColumn) {
+    sourceTasks.splice(source.index, 1);
+  } else {
+    targetTasks.splice(source.index, 1);
   }
-  // destColumnItems.splice(destination.index, 1, updatedTask);
-  
-  // Update columns
-  // const newColumn = {
-  //   ...destColumn,
-  //   tasks: destColumnItems,
-  // };
-  // newColumns.splice(destColumnIndex, 1, newColumn);
-  console.log('newColumns: ', newColumns)
+
+  targetTasks.splice(destination.index, 0, draggedCard);
+
+  const updatedTask = {
+    ...draggedCard,
+    order: getNewItemPos(targetTasks, destination.index),
+    columnId: targetColumnId,
+  };
+
+  targetTasks.splice(destination.index, 1, updatedTask);
+
+  const processedTasks = isTooClose(updatedTask.order)
+    ? resetItemsOrder(targetTasks)
+    : targetTasks;
 
   if (isDraggingInSameColumn) {
-    // columnItems.splice(destination.index, 0, removed);
-
-    // const newColumn = {
-    //   ...destColumn,
-    //   tasks: destColumnItems,
-    // };
-
-    // newColumns.splice(sourceColumnIndex, 1, newColumn);
-  } else {
-    // moving from one list to another
-    // const newSource = {
-    //   ...sourceColumn,
-    //   tasks: columnItems,
-    // };
-    // TODO: removed throw error when getting new position, because the destcolunsItems is not updated
-    // destColumnItems.splice(destination.index, 0, removed);
-    
-    // const newForeign = {
-    //   ...destColumn,
-    //   tasks: destColumnItems,
-    // };
-
-    // newColumns.splice(sourceColumnIndex, 1, newSource);
-    // newColumns.splice(destColumnIndex, 1, newForeign);
+    return { newTasks: [...restTasks, ...processedTasks], updatedTask };
   }
-
-  
 
   return {
+    newTasks: [...restTasks, ...sourceTasks, ...processedTasks],
     updatedTask,
-    newColumns
-  }
+  };
 }
 
 export default taskReorderer;
