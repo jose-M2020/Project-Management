@@ -1,5 +1,6 @@
-import { Avatar, Box, Typography, useTheme } from '@mui/material'
-import { tokens } from '../theme';
+import { Avatar, useTheme } from '@mui/material';
+import React from 'react'
+import { tokens } from '../../theme';
 
 function stringToColor(string) {
   let hash = 0;
@@ -21,7 +22,7 @@ function stringToColor(string) {
   return color;
 }
 
-const ProfileAvatar = ({name}) => {
+const ProfileAvatar = ({ name }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode)
   const nameArray = name.split(' ');
@@ -40,29 +41,4 @@ const ProfileAvatar = ({name}) => {
   );
 }
 
-const ProfileRow = ({ user, ...props }) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode)
-  
-  return (
-    <Box
-      display='flex'
-      gap='10px'
-      alignItems='center'
-      {...props}
-    >
-      <ProfileAvatar name={user?.firstname} />
-      <Box>
-        <Typography mb='4px'>{user?.firstname} {user?.lastname}</Typography>
-        <Typography 
-          fontSize='12px'
-          color={colors.greenAccent[400]}
-        >
-          {user?.position}
-        </Typography>
-      </Box>
-    </Box>
-  )
-}
-
-export default ProfileRow
+export default ProfileAvatar

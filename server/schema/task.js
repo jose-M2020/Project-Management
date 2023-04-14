@@ -39,6 +39,7 @@ export const typeDefs = gql`
       newPosition: Int!,
       columnId: ID!,
       boardId: ID,
+      done: Boolean!
     ): Task
     deleteTask(_id: ID!): Task
   }
@@ -48,7 +49,8 @@ export const typeDefs = gql`
     title: String!
     description: String
     project: Project
-    projectId: String
+    projectId: ID
+    columnId: ID
     done: Boolean
     priority: String!
     column: Column
@@ -74,9 +76,10 @@ export const resolvers = {
       title,
       description,
       projectId,
+      boardId,
+      columnId,
       done,
       priority,
-      columnId, 
       order,
       dueDate,
     }) => {
@@ -89,9 +92,10 @@ export const resolvers = {
         title,
         description,
         projectId,
+        boardId,
+        columnId,
         done,
         priority: 'Low',
-        columnId, 
         order,
         dueDate,
       });
@@ -112,14 +116,16 @@ export const resolvers = {
       const {
         _id,
         newPosition,
-        columnId
+        columnId,
+        done,
       } = args;
 
       try {
         const updatedTask = Task.findByIdAndUpdate(_id, {
           $set: {
             order: newPosition,
-            columnId
+            columnId,
+            done
           }
         })
 

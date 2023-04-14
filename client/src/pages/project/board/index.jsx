@@ -18,7 +18,10 @@ const Board = () => {
   
   return (
     <>
-      <BoardProvider >
+      <BoardProvider value={{
+        projectId,
+        boardId: data.boardByProject._id
+      }}>
         <BoardContainer board={data.boardByProject} projectId={projectId} />
         {!!(!data.boardByProject) && (
           <Box>

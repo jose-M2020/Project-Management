@@ -1,13 +1,13 @@
 import { Avatar, AvatarGroup, Box, Chip, Stack, Typography, useTheme } from '@mui/material'
 import { Draggable } from 'react-beautiful-dnd'
-import { tokens } from '../../../../theme';
-import { useBoard } from '../../../../context/BoardContext';
+import { tokens } from '../../../../../theme';
+import { useBoard } from '../../../../../context/BoardContext';
 
 const TaskCard = ({ task, index }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { openTaskModal } = useBoard();
-  console.log('rendering taskcard');
+  
   return (
     <Draggable
       draggableId={task._id}

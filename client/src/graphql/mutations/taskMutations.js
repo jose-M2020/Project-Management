@@ -76,11 +76,13 @@ export const UPDATE_TASKPOSITION = gql`
     $_id: ID!,
     $newPosition: Int!,
     $columnId: ID!
+    $done: Boolean!
   ) {
     updateTaskPosition(
       _id: $_id,
       newPosition: $newPosition,
       columnId: $columnId,
+      done: $done
     ) {
       title
     }

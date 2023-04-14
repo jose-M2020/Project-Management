@@ -13,7 +13,7 @@ import { tokens } from '../../../../theme';
 import AutoComplete from '../../../../components/form/AutoComplete';
 import Dropdown from '../../../../components/Dropdown';
 import CustomButton from '../../../../components/CustomButton';
-import ProfileRow from '../../../../components/ProfileRow';
+import ProfileRow from '../../../../components/user/ProfileRow';
 import { UPDATE_PROJECT } from '../../../../graphql/mutations/projectMutations';
 import { GET_PROJECT } from '../../../../graphql/queries/projectQueries';
 

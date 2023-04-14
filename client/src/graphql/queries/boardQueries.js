@@ -47,6 +47,7 @@ export const GET_BOARDBYPROJECT = gql`
           firstname
           lastname
         }
+        done
         order
         dueDate
       }

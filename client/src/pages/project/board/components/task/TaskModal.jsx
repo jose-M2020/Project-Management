@@ -1,33 +1,27 @@
 import { useState } from 'react'
-import { Avatar, Box, Fab, FormControl, FormControlLabel, FormLabel, Grid, IconButton, Radio, RadioGroup, Stack, Typography, useTheme } from '@mui/material';
+import { Box, Fab, FormControl, FormControlLabel, FormLabel, Grid, IconButton, Radio, RadioGroup, Stack, Typography, useTheme } from '@mui/material';
 import SubtitlesIcon from '@mui/icons-material/Subtitles';
 import TocIcon from '@mui/icons-material/Toc';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Form, Formik } from 'formik';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import CustomModal from '../../../../components/CustomModal';
-import { tokens } from '../../../../theme';
-import Input from '../../../../components/form/Input';
-import StyledEditor from '../styles/StyledEditor';
+import CustomModal from '../../../../../components/CustomModal';
+import { tokens } from '../../../../../theme';
+import StyledEditor from '../../styles/StyledEditor';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import Dropdown from '../../../../components/Dropdown';
-import CustomButton from '../../../../components/CustomButton';
-import AutoComplete from '../../../../components/form/AutoComplete';
-import ProfileRow from '../../../../components/ProfileRow';
-import useAsyncAutocomplete from '../../../../hooks/useAsyncAutocomplete';
-import { GET_PROJECTNAMES } from '../../../../graphql/queries/projectQueries';
-import { GET_DEVNAMES } from '../../../../graphql/queries/devsQueries';
-import { schema } from '../TaskValidation';
+import Dropdown from '../../../../../components/Dropdown';
+import AutoComplete from '../../../../../components/form/AutoComplete';
+import ProfileRow from '../../../../../components/user/ProfileRow';
+import useAsyncAutocomplete from '../../../../../hooks/useAsyncAutocomplete';
+import { GET_DEVNAMES } from '../../../../../graphql/queries/devsQueries';
 import { useMutation } from '@apollo/client';
-import { UPDATE_TASK } from '../../../../graphql/mutations/taskMutations';
-import { GET_TASKS } from '../../../../graphql/queries/taskQueries';
-import EditInput from '../../../../components/form/EditInput';
+import { UPDATE_TASK } from '../../../../../graphql/mutations/taskMutations';
+import { GET_TASKS } from '../../../../../graphql/queries/taskQueries';
+import EditInput from '../../../../../components/form/EditInput';
 
 const FormItem = ({icon, title, children}) => (
   <Stack gap={1} direction='row' >
@@ -46,11 +40,9 @@ const FormItem = ({icon, title, children}) => (
 );
 
 const TaskModal = ({task, closeTaskModal}) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const [editorcontent, setEditorContent] = useState(task?.description || '')
   const [date, setDate] = useState();
-
+  
   const [
     updateTask,
     { loadingTaskUpdate, taskUpdateError }

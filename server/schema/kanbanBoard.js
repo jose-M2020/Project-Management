@@ -3,6 +3,7 @@ import KanbanBoard from "../models/KanbanBoard.js";
 import KanbanColumn from "../models/KanbanColumn.js";
 import Developer from "../models/Developer.js";
 import Project from "../models/Project.js";
+import Task from "../models/Task.js";
 
 export const typeDefs = gql`
   extend type Query {
@@ -21,10 +22,10 @@ export const typeDefs = gql`
     ): Board
     updateBoard(
       _id: ID!,
-      title: String!,
+      title: String,
       description: String,
-      ownerId: ID!,
-      projectId: ID!,
+      ownerId: ID,
+      projectId: ID,
       members: [ID],
     ): Board
     deleteBoard(_id: ID!): Board
@@ -38,6 +39,7 @@ export const typeDefs = gql`
     project: Project
     members: [Developer]
     columns: [Column]
+    tasks: [Task]
     createdAt: String
   }
 `;
@@ -99,6 +101,9 @@ export const resolvers = {
     },
     columns: async (parent) => {
       return await KanbanColumn.find({ boardId: parent?._id });
+    },
+    tasks: async (parent) => {
+      return await Task.find({ boardId: parent?._id });
     },
   }
 }

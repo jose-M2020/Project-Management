@@ -25,10 +25,10 @@ export const CREATE_BOARD = gql`
 export const UPDATE_BOARD = gql`
   mutation updateBoard(
     $_id: ID!
-    $title: String!
+    $title: String
     $description: String
-    $ownerId: ID!
-    $projectId: String!
+    $ownerId: ID
+    $projectId: ID
     $members: [ID]
   ) {
     updateBoard(

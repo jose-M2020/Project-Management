@@ -6,13 +6,11 @@ import {
   Chip,
   Stack,
   Typography,
-  useTheme,
-  LinearProgress 
+  useTheme
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { tokens } from "../../../../theme";
 import { formatDateTime } from "../../../../helpers/dateTime";
-import AssignmentIcon from '@mui/icons-material/Assignment';
 
 const GetStatusProps = (status) => {
   const theme = useTheme();
@@ -37,12 +35,6 @@ export default function ProjectCard({ project }) {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { color } = GetStatusProps(project.status)
-  
-  // const totalTask = project.tasks.length;
-  // const totalCompletedTask = project.tasks.reduce((acc, item) => (
-  //   item.status === 'Completed' ? acc+=1 : acc
-  // ), 0);
-  // const percentageCompletedTask = Math.round(100*(totalCompletedTask/totalTask)) || 0;
 
   return (
       <CardActionArea 
@@ -137,27 +129,6 @@ export default function ProjectCard({ project }) {
               </Box>
             </CardContent>
             {/* Footer */}
-            {/* <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                gap: '5px'
-              }}
-            >
-              <Box display='flex' alignItems='center' gap='3px'>
-                <AssignmentIcon fontSize="small" />
-                <Typography variant="span" >
-                  {totalCompletedTask}/{totalTask}
-                </Typography>
-              </Box>
-              <Box sx={{ width: '100%'}}>
-                <LinearProgress variant="determinate" value={percentageCompletedTask} />
-              </Box>
-              <Typography variant="span" >
-                {percentageCompletedTask}%
-              </Typography>
-            </Box> */}
           </Box>
         </Card>
       </CardActionArea>

@@ -6,8 +6,9 @@ import Header from '../../../../components/Header'
 import { GET_BOARDBYPROJECT } from '../../../../graphql/queries/boardQueries'
 import { UPDATE_COLUMNPOSITION } from '../../../../graphql/mutations/columnMutations'
 import { UPDATE_TASKPOSITION } from '../../../../graphql/mutations/taskMutations';
-import Column from './Column'
+import Column from './column/Column'
 import taskReorderer from '../../../../helpers/taskReorderer';
+import BoardHeader from './BoardHeader';
 
 const sortData = (items) => {
   let sortedItems = items.sort((a, b) => a.order - b.order);
@@ -106,6 +107,7 @@ const BoardContainer = ({board, projectId}) => {
 
     const {updatedTask, newTasks} = taskReorderer(
       tasks,
+      columns,
       destination,
       source,
       draggableId
@@ -117,13 +119,15 @@ const BoardContainer = ({board, projectId}) => {
     updateTaskPosition({variables: {
       _id: draggableId,
       columnId: updatedTask.columnId,
-      newPosition: updatedTask.order
+      newPosition: updatedTask.order,
+      done: updatedTask.done
     }});
   };
   
   return (
     <Box mx="20px" mt="20px">
       <Header title="BOARD" subtitle="All project tasks" />
+      <BoardHeader members={board.members} tasks={tasks} />
       {board && (
         <Box sx={{ overflow: 'hidden' }}>
           <DragDropContext
