@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Box, Fab, TextField, useTheme } from "@mui/material";
+import { Box, Button, Fab, TextField, useTheme } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import { tokens } from "../../theme";
 import AutoComplete from "./AutoComplete";
 import { arraysEqual } from "../../helpers/array";
+import CustomButton from "../CustomButton";
 
 const EditInput = ({onAccept, value = '', children, ...props}) => {
   const theme = useTheme();
@@ -78,7 +79,7 @@ const EditInput = ({onAccept, value = '', children, ...props}) => {
         )}
       </>
       <Box
-        gap={1}
+        gap='2px'
         sx={{
           bgcolor: colors.primary[500],
           borderRadius: '8px',
@@ -89,38 +90,26 @@ const EditInput = ({onAccept, value = '', children, ...props}) => {
           right: 0,
           zIndex: 100,
           display: activeEdit ? 'flex' : 'none',
+          alignItems: 'center'
         }}
       >
-        <Fab
+        <CustomButton
           id='input-actions'
-          sx={{
-            bgcolor: colors.blueAccent[600],
-            color: colors.blueAccent[100],
-            width: '34px',
-            height: '33px',
-            '&:hover': {
-              bgcolor: colors.blueAccent[700],
-            }
-          }}
+          text={<CheckIcon />}
+          sx={{ minWidth: '45px' }}
+          size="small"
           aria-label='edit'
           onClick={handleClickAccept}
-        >
-          <CheckIcon />
-        </Fab>
-        <Fab
-          sx={{
-            bgcolor: colors.redAccent[500],
-            color: colors.blueAccent[100],
-            width: '34px',
-            height: '33px',
-            '&:hover': {
-              bgcolor: colors.redAccent[600],
-            }
+        />
+        <CustomButton
+          text={<ClearIcon />}
+          btnstyle="transparent"
+          sx={{ 
+            minWidth: '45px',
           }}
+          size="small"
           aria-label="cancel"
-        >
-          <ClearIcon />
-        </Fab>
+        />
       </Box>
     </Box>
   )

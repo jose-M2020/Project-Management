@@ -20,7 +20,7 @@ export const typeDefs = gql`
       columnId: ID!,
       done: Boolean!,
       priority: String,
-      order: Int!,
+      order: Float!,
       dueDate: String
     ): Task
     updateTask(
@@ -31,12 +31,12 @@ export const typeDefs = gql`
       done: Boolean,
       priority: String,
       columnId: ID,
-      order: Int,
+      order: Float,
       dueDate: String
     ): Task
     updateTaskPosition(
       _id: ID!,
-      newPosition: Int!,
+      newPosition: Float!,
       columnId: ID!,
       boardId: ID,
       done: Boolean!
@@ -55,7 +55,7 @@ export const typeDefs = gql`
     priority: String!
     column: Column
     members: [Developer]
-    order: Int!
+    order: Float!
     dueDate: String
     createdAt: String
   }

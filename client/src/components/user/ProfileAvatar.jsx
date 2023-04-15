@@ -22,7 +22,7 @@ function stringToColor(string) {
   return color;
 }
 
-const ProfileAvatar = ({ name }) => {
+const ProfileAvatar = ({ name, sx }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode)
   const nameArray = name.split(' ');
@@ -32,8 +32,8 @@ const ProfileAvatar = ({ name }) => {
       sx={{
         // bgcolor: stringToColor(name),
         bgcolor: colors.blueAccent[600],
-        fontWeight: '800',
-        color: colors.blueAccent[200]
+        color: colors.blueAccent[200],
+        ...sx
       }}
     >
       { nameArray[0][0] }{ nameArray.length > 1 && nameArray[1][0] }

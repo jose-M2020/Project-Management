@@ -32,6 +32,7 @@ export const GET_BOARDBYPROJECT = gql`
       }
       columns {
         _id
+        boardId
         title
         order
         category

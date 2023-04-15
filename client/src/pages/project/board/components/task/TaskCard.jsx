@@ -2,6 +2,41 @@ import { Avatar, AvatarGroup, Box, Chip, Stack, Typography, useTheme } from '@mu
 import { Draggable } from 'react-beautiful-dnd'
 import { tokens } from '../../../../../theme';
 import { useBoard } from '../../../../../context/BoardContext';
+import ProfileAvatar from '../../../../../components/user/ProfileAvatar';
+
+const PriorityLabel = ({priority}) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+
+  const color = {
+    'Low': {
+      color: colors.blueAccent[700],
+      bgColor: colors.blueAccent[200]
+    },
+    'Medium': {
+      color: colors.greenAccent[700],
+      bgColor: colors.greenAccent[200]
+    },
+    'High': {
+      color: colors.redAccent[700],
+      bgColor: colors.redAccent[200]
+    }
+  }
+
+  return (
+    <Box>
+      <Chip
+        label={`${priority} priority`}
+        size="small"
+        sx={{
+          backgroundColor: color[priority].bgColor,
+          color: color[priority].color,
+          fontWeight: 'bold'
+        }}
+      />
+    </Box>
+  )
+}
 
 const TaskCard = ({ task, index }) => {
   const theme = useTheme();
@@ -29,13 +64,7 @@ const TaskCard = ({ task, index }) => {
           }}
           onClick={() => openTaskModal(task)}
         >
-          <Box>
-            <Chip
-              label={`${task.priority} priority`}
-              size="small"
-              sx={{ backgroundColor: colors.blueAccent[800] }}
-            />
-          </Box>
+          <PriorityLabel priority={task.priority} />
           <Box>
             <Typography
               component='div'
@@ -57,25 +86,20 @@ const TaskCard = ({ task, index }) => {
               {task.description}
             </Typography>
           </Box>
-          <AvatarGroup max={3}>
-            <Avatar 
-              sx={{
-                bgcolor: colors.blueAccent[500],
-                width: 24, height: 24
-              }}
-            >
-              N
-            </Avatar>
-            <Avatar 
-              sx={{
-                bgcolor: colors.blueAccent[500],
-                width: 24, height: 24
-              }}
-            >
-              JM
-            </Avatar>
-
-          </AvatarGroup>
+          {task?.members?.length && (
+            <AvatarGroup max={3}>
+              {task.members.map(item => (
+                <ProfileAvatar
+                  name={item.firstname}
+                  sx={{
+                    bgcolor: colors.blueAccent[500],
+                    width: 28, height: 28,
+                    borderColor: `${colors.blueAccent[700]} !important`
+                  }}
+                />
+              ))}
+            </AvatarGroup>
+          )}
         </Stack>
       )}
     </Draggable>

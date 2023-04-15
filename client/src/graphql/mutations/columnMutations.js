@@ -40,16 +40,14 @@ export const UPDATE_COLUMN = gql`
 
 export const UPDATE_COLUMNPOSITION = gql`
   mutation updateColumnPosition(
-    $sourceColumnPosition: Int!,
-    $destinationColumnPosition: Int!,
-    $sourceColumnId: ID!,
-    $destinationColumnId: ID!
+    $_id: ID!,
+    $boardId: ID!,
+    $order: Float!,
   ) {
     updateColumnPosition(
-      sourceColumnPosition: $sourceColumnPosition,
-      destinationColumnPosition: $destinationColumnPosition,
-      sourceColumnId: $sourceColumnId,
-      destinationColumnId: $destinationColumnId
+      _id: $_id,
+      boardId: $boardId,
+      order: $order,
     ) {
       _id
       title

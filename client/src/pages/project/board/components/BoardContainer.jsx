@@ -9,6 +9,7 @@ import { UPDATE_TASKPOSITION } from '../../../../graphql/mutations/taskMutations
 import Column from './column/Column'
 import taskReorderer from '../../../../helpers/taskReorderer';
 import BoardHeader from './BoardHeader';
+import columnReorderer from '../../../../helpers/columnReorderer';
 
 const sortData = (items) => {
   let sortedItems = items.sort((a, b) => a.order - b.order);
@@ -18,7 +19,7 @@ const sortData = (items) => {
 const BoardContainer = ({board, projectId}) => {
   const [columns, setColumns] = useState([]);
   const [tasks, setTasks] = useState([]);
-  console.log('rendering boardContainer')
+  
   const [
     updateTaskPosition,
     { loadingTaskPositionUpdate, taskUpdatePositionError }
@@ -52,7 +53,8 @@ const BoardContainer = ({board, projectId}) => {
       setColumns(sortedColums)
     }
 
-    setTasks(board.tasks);
+    const sortedTasks = sortData([...board?.tasks]);
+    setTasks(sortedTasks);
   }, [board])
   
   const onDragUpdate = (update, provided) => {
@@ -88,24 +90,20 @@ const BoardContainer = ({board, projectId}) => {
     }
     
     if (type === 'column') {
-      const newColumns = [...columns];
-      const [sourceRemoved] = newColumns.splice(source.index, 1);
-      newColumns.splice(destination.index, 0, sourceRemoved)
-      setColumns(newColumns);
+      const { updatedColumn, updatedColumns } = columnReorderer(
+        columns,
+        source,
+        destination,
+      );
 
-      updateColumnPosition({ variables: {
-        sourceColumnPosition: destination.index,
-        destinationColumnPosition: source.index,
-        sourceColumnId: draggableId,
-        destinationColumnId: columns[destination.index]._id
-      }})
-
+      setColumns(updatedColumns)
+      updateColumnPosition({ variables: updatedColumn })
       return;
     }
 
-    // Handling positioning of column cards
+    // Handling positioning of cards
 
-    const {updatedTask, newTasks} = taskReorderer(
+    const { newTasks, updatedTask } = taskReorderer(
       tasks,
       columns,
       destination,
@@ -113,8 +111,6 @@ const BoardContainer = ({board, projectId}) => {
       draggableId
     );
 
-    console.log({updatedTask})
-    
     setTasks(newTasks);
     updateTaskPosition({variables: {
       _id: draggableId,

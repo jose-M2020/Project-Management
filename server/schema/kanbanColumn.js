@@ -2,6 +2,8 @@ import { gql } from "graphql-tag";
 import KanbanColumn from "../models/KanbanColumn.js";
 import KanbanBoard from "../models/KanbanBoard.js";
 import Task from "../models/Task.js";
+import recalcItemsPos from "../helpers/recalcItemsPos.js";
+import isTooClose from "../helpers/isTooClose.js";
 
 export const typeDefs = gql`
   extend type Query {
@@ -13,29 +15,29 @@ export const typeDefs = gql`
     createColumn(
       title: String!,
       boardId: ID!,
-      order: Int!,
+      order: Float!,
       category: String
     ): Column
     updateColumn(
       _id: ID!,
       title: String,
       boardId: ID,
-      order: Int,
+      order: Float,
     ): Column
     updateColumnPosition(
-      sourceColumnPosition: Int!,
-      destinationColumnPosition: Int!,
-      sourceColumnId: ID!,
-      destinationColumnId: ID!
-    ): [Column]
+      _id: ID!,
+      boardId: ID!,
+      order: Float!,
+    ): Column
     deleteColumn(_id: ID!): Column
   }
 
   type Column {
     _id: ID!
     title: String!
+    boardId: ID!
     board: Board!
-    order: Int!
+    order: Float!
     category: String
     tasks: [Task]
     createdAt: String
@@ -77,20 +79,26 @@ export const resolvers = {
         return updatedColumn;
     },
     updateColumnPosition: async (_, args) => {
-      const updatedSourceColumn = await KanbanColumn.findByIdAndUpdate(
-        args.sourceColumnId,
-        { $set: {order: args.sourceColumnPosition} },
-        { new: true }
-      );
+      const { _id, boardId, order } = args
 
-      const updateddestinationColumn = await KanbanColumn.findByIdAndUpdate(
-        args.destinationColumnId,
-        { $set: {order: args.destinationColumnPosition} },
-        { new: true }
-      );
+      try {
+        const updatedColumn = KanbanColumn.findByIdAndUpdate(_id, {
+          $set: {
+            order
+          }
+        })
 
-      if (!updatedSourceColumn) throw new Error("Column not found");
-        return [updatedSourceColumn, updateddestinationColumn];
+        if (!updatedColumn) throw new Error("Column not found");
+
+        if (isTooClose(order)) {
+          const columns = await recalcItemsPos({ boardId }, KanbanColumn);
+          return columns;
+        }
+
+        return updatedColumn;
+      } catch (err) {
+        throw new Error(err);
+      }
     },
     deleteColumn: async (_, { _id }) => {
       const deletedBoard = await KanbanColumn.findByIdAndDelete(_id);

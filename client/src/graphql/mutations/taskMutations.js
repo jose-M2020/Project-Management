@@ -9,7 +9,7 @@ export const CREATE_TASK = gql`
     $priority: String,
     $boardId: ID!,
     $columnId: ID!,
-    $order: Int!,
+    $order: Float!,
     $dueDate: String
   ) {
     createTask(
@@ -74,7 +74,7 @@ export const UPDATE_TASK = gql`
 export const UPDATE_TASKPOSITION = gql`
   mutation updateTaskPosition(
     $_id: ID!,
-    $newPosition: Int!,
+    $newPosition: Float!,
     $columnId: ID!
     $done: Boolean!
   ) {
