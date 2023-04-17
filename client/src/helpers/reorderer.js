@@ -3,7 +3,7 @@ export const isTooClose = (number) => {
 };
 
 export const resetItemsOrder = (items) => {
-  let sortedItems = items.sort((a, b) => a.order - b.order);
+  let sortedItems = [...items].sort((a, b) => a.order - b.order);
   let position = 32768;
 
   for (const item of sortedItems) {

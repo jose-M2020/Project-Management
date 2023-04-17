@@ -10,16 +10,22 @@ import Column from './column/Column'
 import taskReorderer from '../../../../helpers/taskReorderer';
 import BoardHeader from './BoardHeader';
 import columnReorderer from '../../../../helpers/columnReorderer';
+import ColumnsContainer from './column/ColumnsContainer';
 
 const sortData = (items) => {
   let sortedItems = items.sort((a, b) => a.order - b.order);
   return sortedItems;
 };
 
+const padding = {
+  sm: '20px',
+  md: '40px'
+}
+
 const BoardContainer = ({board, projectId}) => {
   const [columns, setColumns] = useState([]);
   const [tasks, setTasks] = useState([]);
-  
+
   const [
     updateTaskPosition,
     { loadingTaskPositionUpdate, taskUpdatePositionError }
@@ -121,52 +127,56 @@ const BoardContainer = ({board, projectId}) => {
   };
   
   return (
-    <Box mx="20px" mt="20px">
-      <Header title="BOARD" subtitle="All project tasks" />
-      <BoardHeader members={board.members} tasks={tasks} />
-      {board && (
-        <Box sx={{ overflow: 'hidden' }}>
-          <DragDropContext
-            onDragUpdate={onDragUpdate}
-            onDragEnd={handleDragEnd}
+    <Box
+      pt="20px"
+      height={'calc(100vh - 70.28px)'}
+      overflow='hidden'
+      display='flex'
+    >
+      <Box
+        display='flex'
+        flexDirection='column'
+        width='100%'
+      >
+        <Header title="BOARD" subtitle="All project tasks" px={padding} />
+        <BoardHeader members={board.members} tasks={tasks} px={padding} />
+        {board && (
+          <Box
+            height='100%'
+            maxHeight='100%'
+            overflow='hidden'
           >
-            <Droppable
-              droppableId="all-columns"
-              direction="horizontal"
-              type="column"
+            <Box
+              display='flex'
+              height='100%'
             >
-              {provided => (
+              <Box
+                width='100%'
+                height='100%'
+                minWidth='0px'
+                position='relative'
+              >
                 <Box
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  display='flex'
-                  gap={2}
-                  sx={{
-                    overflowX: 'auto',
-                    paddingBottom: '15px'
-                  }}
+                  width='100%'
+                  maxHeight='100%'
+                  height='100%'
+                  overflow='auto'
+                  position='relative'
+                  px={padding}
                 >
-                  {columns.map((column, index) => {
-                    const orderedTasks = tasks.filter(task => task.columnId === column._id)
-                                       .sort((a, b) => a.order - b.order);
-                    return (
-                      <Column
-                        key={column._id}
-                        column={column}
-                        tasks={orderedTasks}
-                        index={index}
-                        projectId={projectId}
-                        boardId={board._id}
-                      />
-                    )
-                  })}
-                  {provided.placeholder}
+                    <DragDropContext
+                      onDragUpdate={onDragUpdate}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <ColumnsContainer columns={columns} tasks={tasks} />
+                    </DragDropContext>
                 </Box>
-              )}
-            </Droppable>
-          </DragDropContext>
-        </Box>
-      )}
+                    <Box width='100px' height='100px'></Box>
+              </Box>
+            </Box>
+          </Box>
+        )}
+      </Box>
     </Box>
   )
 }

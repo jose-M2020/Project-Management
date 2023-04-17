@@ -4,14 +4,10 @@ import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link, useLocation, useParams } from "react-router-dom";
 // import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../../theme";
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import LastPageIcon from '@mui/icons-material/LastPage';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useProject } from "../../../context/ProjectContext";
@@ -49,10 +45,10 @@ const Sidebar = () => {
       sx={{
         position: "sticky",
         display: "flex",
-        height: "100vh",
-        top: 0,
+        height: "calc(100vh - 70.28px)",
+        top: '70.28px',
         bottom: 0,
-        zIndex: 1000,
+        zIndex: 900,
       }}
     >
       <ProSidebar 
@@ -78,27 +74,20 @@ const Sidebar = () => {
           {/*  CARD AND MENU ICON */}
           <Box position='relative'>
             {!collapsed && (
-              <>
+              <Box paddingX='20px'>
                 <Box
-                  sx={{
-                    position: 'absolute',
-                    right: 0,
-                    top: '50%',
-                    transform: 'translate(0,-50%)'
-                  }}
+                  textAlign='right'
+                  marginTop='15px'
                 >
                   <IconButton 
                     onClick={() => collapseSidebar(!collapsed)}
                     sx={{ backgroundColor: colors.primary[600] }}
                   >
-                      <ArrowBackIosIcon />
+                      <FirstPageIcon />
                     </IconButton>
                 </Box>
-                <Box 
-                  my="15px"              
-                  paddingLeft={"10%"}
-                >
-                  <Box paddingX='20px' >
+                <Box my="15px" >
+                  <Box>
                     <Box
                       backgroundColor={colors.blueAccent[700]}
                       padding={1}
@@ -119,11 +108,11 @@ const Sidebar = () => {
                     </Box>
                   </Box>
                 </Box>
-              </>
+              </Box>
             )}
             {collapsed && (
               <MenuItem
-                icon={ <MenuOutlinedIcon onClick={() => collapseSidebar(!collapsed)} /> }
+                icon={ <LastPageIcon sx={{fontSize: '25px'}} onClick={() => collapseSidebar(!collapsed)} /> }
                 style={{
                   margin: "10px 0 10px 0",
                   color: colors.grey[100],
@@ -132,7 +121,7 @@ const Sidebar = () => {
             )}
           </Box>
 
-          <Box paddingLeft={collapsed ? undefined : "10%"}>
+          <Box>
             <Item
               title="Overview"
               path={`projects/${id}/overview`}

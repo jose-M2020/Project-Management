@@ -22,6 +22,9 @@ import { useMutation } from '@apollo/client';
 import { UPDATE_TASK } from '../../../../../graphql/mutations/taskMutations';
 import { GET_TASKS } from '../../../../../graphql/queries/taskQueries';
 import EditInput from '../../../../../components/form/EditInput';
+import { GET_BOARDBYPROJECT } from '../../../../../graphql/queries/boardQueries';
+import { useBoard } from '../../../../../context/BoardContext';
+import dayjs from 'dayjs';
 
 const FormItem = ({icon, title, children}) => (
   <Stack gap={1} direction='row' >
@@ -41,36 +44,30 @@ const FormItem = ({icon, title, children}) => (
 
 const TaskModal = ({task, closeTaskModal}) => {
   const [editorcontent, setEditorContent] = useState(task?.description || '')
-  const [date, setDate] = useState();
-  
+  const [date, setDate] = useState(task.dueDate && dayjs(+task.dueDate));
+  const { projectId } = useBoard();
   const [
     updateTask,
     { loadingTaskUpdate, taskUpdateError }
   ] = useMutation(UPDATE_TASK, {
-    update: (cache, { data }) => {
-      // const projectId = data.updateTask.project._id;
-      const { tasks } = cache.readQuery({
-        query: GET_TASKS
+    update: (cache, { data: { updateTask } }) => {
+      const { boardByProject } = cache.readQuery({
+        query: GET_BOARDBYPROJECT,
+        variables: { projectId },
       })
+      const clonedTasks = [...boardByProject?.tasks];
 
-      const updatedTasks = tasks.reduce((acc, task) => {
-        if(data.updateTask._id === task._id){
-          return [
-            ...acc,
-            {
-              ...task,
-              status: data.updateTask.status
-            }
-          ]
-        }
-
-        return [...acc, task]
-      }, [])
+      const index = clonedTasks.findIndex(item => item._id === task._id);
+      clonedTasks.splice(index, 1, updateTask);
 
       cache.writeQuery({
-        query: GET_TASKS,
+        query: GET_BOARDBYPROJECT,
+        variables: { projectId },
         data: {
-          tasks: updatedTasks,
+          boardByProject: {
+            ...boardByProject,
+            tasks: clonedTasks,
+          }
         }
       })
 
@@ -95,8 +92,19 @@ const TaskModal = ({task, closeTaskModal}) => {
     setOpen: setOpenDev
   } = useAsyncAutocomplete(GET_DEVNAMES);
 
-  const handleUpdate = (values, actions) => {
-    actions.resetForm();
+  const handleUpdate = async (value, name) => {
+    await updateTask({variables: {
+      _id: task._id,
+      [name]: value
+    }});
+    // toast.success(`${name} updated!`)
+
+    return true;
+  }
+
+  const handleDateChange = (newDate) => {
+    setDate(newDate)
+    handleUpdate(newDate, 'dueDate');
   }
 
   return (
@@ -119,6 +127,7 @@ const TaskModal = ({task, closeTaskModal}) => {
                         name="title"
                         variant="standard"
                         value={task?.title}
+                        onAccept={handleUpdate}
                       />
                   </Box>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -126,7 +135,8 @@ const TaskModal = ({task, closeTaskModal}) => {
                         <DatePicker
                           sx={{ width: '50%'}}
                           // label="Due date"
-                          onChange={(newDate) => setDate(newDate)}
+                          value={date}
+                          onChange={handleDateChange}
                           format="LL"
                         />
                       </DemoContainer>
@@ -134,9 +144,11 @@ const TaskModal = ({task, closeTaskModal}) => {
                   <FormControl>
                     <FormLabel id="demo-row-radio-buttons-group-label">Priority</FormLabel>
                     <RadioGroup
+                      value={'Low'}
                       row
                       aria-labelledby="demo-row-radio-buttons-group-label"
                       name="row-radio-buttons-group"
+                      onChange={(e) => console.log(e.target.value) }
                     >
                       <FormControlLabel value="Low" control={<Radio />} label="Low" />
                       <FormControlLabel value="Medium" control={<Radio />} label="Medium" />

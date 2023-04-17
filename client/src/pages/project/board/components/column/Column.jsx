@@ -25,9 +25,10 @@ const Column = ({
           ref={provided.innerRef}
           {...provided.draggableProps}
           sx={{
-            backgroundColor: hexToRgba(colors.blueAccent[800], .5),
+            backgroundColor: hexToRgba(colors.primary[400], .7),
+            // backdropFilter: 'blur(20px)',
             borderRadius: '5px',
-            boxShadow: `0 0 4px ${colors.blueAccent[400]}`,
+            // boxShadow: `0 0 4px ${colors.blueAccent[400]}`,
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
@@ -37,13 +38,19 @@ const Column = ({
           }}
         >
           <Stack
-            direction="row"
+            padding='10px'
             spacing={1}
+            direction="row"
             justifyContent='space-between'
             alignItems='center'
-            padding='10px'
             borderBottom={`.5px solid ${colors.blueAccent[400]}`}
             mb='8px'
+            position='sticky'
+            top='0'
+            sx={{
+              backdropFilter: 'blur(20px)',
+            }}
+            zIndex={100}
           >
             <Box
               {...provided.dragHandleProps}
@@ -52,9 +59,7 @@ const Column = ({
               alignItems='center'
               gap='3px'
             >
-              <Typography
-                variant='h4'
-              >
+              <Typography variant='h4' >
                 {column.title}
               </Typography>
               {column.category === 'done' && (

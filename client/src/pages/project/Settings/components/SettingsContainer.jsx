@@ -71,7 +71,7 @@ const SettingsContainer = ({projectData}) => {
     }});
   }
 
-  const handleEdit = async (value, name) => {
+  const handleUpdate = async (value, name) => {
     if(name === 'tags'){
       value = value.map(tag => tag.value);
     }
@@ -99,13 +99,13 @@ const SettingsContainer = ({projectData}) => {
                   name='name'
                   label='Name'
                   value={data?.project?.name}
-                  onAccept={handleEdit}
+                  onAccept={handleUpdate}
                 />
                 <EditInput
                   name='description'
                   label='Description'
                   value={data?.project?.description}
-                  onAccept={handleEdit}
+                  onAccept={handleUpdate}
                   multiline
                   rows={4}
                 />
@@ -113,7 +113,7 @@ const SettingsContainer = ({projectData}) => {
                   name='type'
                   label='Type'
                   value={data?.project?.type}
-                  onAccept={handleEdit}
+                  onAccept={handleUpdate}
                 />
                 <EditInput
                   name='tags'
@@ -122,7 +122,7 @@ const SettingsContainer = ({projectData}) => {
                     tag => !(data?.project?.tags).includes(tag?.value)
                   )}
                   value={data?.project?.tags}
-                  onAccept={handleEdit}
+                  onAccept={handleUpdate}
                   multiple
                   freeSolo
                 />
@@ -151,20 +151,20 @@ const SettingsContainer = ({projectData}) => {
                   name='repository'
                   label='Repository'
                   value={data?.project?.repository}
-                  onAccept={handleEdit}
+                  onAccept={handleUpdate}
                 />
                 <EditInput
                   name='url'
                   label='URL'
                   value={data?.project?.url}
-                  onAccept={handleEdit}
+                  onAccept={handleUpdate}
                 />
               </Stack>
             </SettingSection>
             <ProjectUsers
               team={data?.project?.team}
               client={data?.project?.client}
-              projectId={id} 
+              projectId={id}
             />
             <SettingSection title='Danger zone' icon={<ReportIcon />}>
               <Stack spacing={2}>

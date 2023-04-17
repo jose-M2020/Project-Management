@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { AvatarGroup, Box, Fab, Grid, Typography } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import ProfileAvatar from '../../../../components/user/ProfileAvatar'
 import Dropdown from '../../../../components/Dropdown'
 import AutoComplete from '../../../../components/form/AutoComplete'
@@ -15,7 +15,7 @@ import CustomButton from '../../../../components/CustomButton';
 import { UPDATE_BOARD } from '../../../../graphql/mutations/boardMutations';
 import { GET_BOARDBYPROJECT } from '../../../../graphql/queries/boardQueries';
 
-const BoardHeader = ({members, tasks}) => {
+const BoardHeader = ({ members, tasks, ...props }) => {
   const { projectId, boardId } = useBoard();
   const [filteredDevs, setFilteredDevs] = useState([])
   const [membersInput, setMembersInput] = useState([]);
@@ -61,7 +61,7 @@ const BoardHeader = ({members, tasks}) => {
   }
 
   return (
-    <Grid container spacing={2} mb={4} alignItems='center' justifyContent='space-between'>
+    <Grid container spacing={2} mb={4} alignItems='center' justifyContent='space-between' {...props} >
       <Grid item xs={12} sm={6} md={5} display='flex' alignItems='center' gap={1}>
         {members.length ? (
           <AvatarGroup max={6}>
@@ -76,7 +76,7 @@ const BoardHeader = ({members, tasks}) => {
           <Dropdown
             button={
               <Fab size="small" color="secondary" aria-label="add">
-                <AddIcon />
+                <PersonAddAltIcon />
               </Fab>
             }
             width='250px'

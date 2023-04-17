@@ -14,16 +14,14 @@ const EditInput = ({onAccept, value = '', children, ...props}) => {
   const [activeEdit, setActiveEdit] = useState(false);
   const [inputValue, setInputValue] = useState(value)
   
-  const handleChange = (e, autoCompleteValue) => {
-    const newValue = !autoCompleteValue ? e.target.value : autoCompleteValue;
-    
-    const isChanged = Array.isArray(newValue) ? (
-      !arraysEqual(newValue, value)
+  const handleChange = (fieldValue) => {
+    const isChanged = Array.isArray(fieldValue) ? (
+      !arraysEqual(fieldValue, value)
     ) : (
-      newValue !== value
+      fieldValue !== value
     )
 
-    setInputValue(newValue)
+    setInputValue(fieldValue)
     isChanged ? setActiveEdit(true) : setActiveEdit(false);
   }
 
@@ -56,7 +54,7 @@ const EditInput = ({onAccept, value = '', children, ...props}) => {
           <AutoComplete
             value={inputValue}
             onChange={(_, value) => {
-              handleChange(null, value)
+              handleChange(value)
             }}
             {...loading && {
               disabled: true
@@ -67,7 +65,7 @@ const EditInput = ({onAccept, value = '', children, ...props}) => {
           <TextField
             value={inputValue}
             // name='name'
-            onChange={e => handleChange(e)}
+            onChange={e => handleChange(e.target.value)}
             fullWidth
             {...loading && {
               disabled: true

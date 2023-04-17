@@ -58,7 +58,15 @@ const Topbar = () => {
   const colorMode = useContext(ColorModeContext);
 
   return (
-    <Box display="flex" justifyContent="space-between" p={2}>
+    <Box
+      p={2}
+      backgroundColor={colors.primary[500]}
+      display="flex"
+      justifyContent="space-between"
+      position='sticky'
+      top='0'
+      zIndex={1000}
+    >
       {/* LEFT SIDE */}
       <Box display="flex" alignItems='center' gap={1} >
         {/* { isMobil && (

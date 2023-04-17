@@ -19,8 +19,6 @@ const taskReorderer = (
     task.columnId !== targetColumnId && task.columnId !== sourceColumnId
   ));
 
-  console.log({targetTasks, sourceTasks, restTasks})
-
   const draggedCard = tasks.find(task => task._id === draggableId);
 
   const isDraggingInSameColumn = targetColumnId === sourceColumnId;

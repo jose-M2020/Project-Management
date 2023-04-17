@@ -112,7 +112,7 @@ const TasksContainer = ({ tasks, column }) => {
               display: 'flex',
               flexDirection: 'column',
               transition: 'background-color 0.2s ease',
-              backgroundColor: snapshot.isDraggingOver ? colors.blueAccent[800] : 'inherit',
+              backgroundColor: snapshot.isDraggingOver ? hexToRgba(colors.blueAccent[400], .1) : 'inherit',
               flexGrow: 1,
               minHeight: '100px',
               gap: '15px'

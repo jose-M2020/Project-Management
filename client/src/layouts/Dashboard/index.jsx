@@ -42,11 +42,9 @@ const DashboardLayout = () => {
         ) : (
           <Sidebar />
         )}
-        <main>
-          <Box>
-            <Outlet />
-          </Box>
-        </main>
+        <Box component='main' height='100%'>
+          <Outlet />
+        </Box>
       </Box>
     </ProjectProvider>
   )
