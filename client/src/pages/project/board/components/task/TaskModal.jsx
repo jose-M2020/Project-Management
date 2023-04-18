@@ -25,6 +25,7 @@ import EditInput from '../../../../../components/form/EditInput';
 import { GET_BOARDBYPROJECT } from '../../../../../graphql/queries/boardQueries';
 import { useBoard } from '../../../../../context/BoardContext';
 import dayjs from 'dayjs';
+import Editor from '../../../../../components/form/Editor';
 
 const FormItem = ({icon, title, children}) => (
   <Stack gap={1} direction='row' >
@@ -43,8 +44,9 @@ const FormItem = ({icon, title, children}) => (
 );
 
 const TaskModal = ({task, closeTaskModal}) => {
-  const [editorcontent, setEditorContent] = useState(task?.description || '')
   const [date, setDate] = useState(task.dueDate && dayjs(+task.dueDate));
+  const [priority, setPriority] = useState(task.priority);
+  const [editorcontent, setEditorContent] = useState(task?.description || '')
   const { projectId } = useBoard();
   const [
     updateTask,
@@ -144,11 +146,14 @@ const TaskModal = ({task, closeTaskModal}) => {
                   <FormControl>
                     <FormLabel id="demo-row-radio-buttons-group-label">Priority</FormLabel>
                     <RadioGroup
-                      value={'Low'}
+                      value={priority}
                       row
                       aria-labelledby="demo-row-radio-buttons-group-label"
                       name="row-radio-buttons-group"
-                      onChange={(e) => console.log(e.target.value) }
+                      onChange={({target: { value }}) => {
+                        setPriority(value);
+                        handleUpdate(value, 'priority');
+                      }}
                     >
                       <FormControlLabel value="Low" control={<Radio />} label="Low" />
                       <FormControlLabel value="Medium" control={<Radio />} label="Medium" />
@@ -162,19 +167,10 @@ const TaskModal = ({task, closeTaskModal}) => {
                 title='Description'
               >
                 <StyledEditor>
-                    <CKEditor
-                        editor={ ClassicEditor }
-                        data={ editorcontent }
-                        onChange={ ( event, editor ) => {
-                            const data = editor.getData();
-                            console.log( { event, editor, data } );
-                        } }
-                        onBlur={ ( event, editor ) => {
-                            console.log( 'Blur.', editor );
-                        } }
-                        onFocus={ ( event, editor ) => {
-                            console.log( 'Focus.', editor );
-                        } }
+                    <Editor
+                      name='description'
+                      value={task.description}
+                      onAccept={handleUpdate}
                     />
                 </StyledEditor>
               </FormItem>

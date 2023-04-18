@@ -18,7 +18,7 @@ const sortData = (items) => {
 };
 
 const padding = {
-  sm: '20px',
+  xs: '20px',
   md: '40px'
 }
 
@@ -156,22 +156,13 @@ const BoardContainer = ({board, projectId}) => {
                 minWidth='0px'
                 position='relative'
               >
-                <Box
-                  width='100%'
-                  maxHeight='100%'
-                  height='100%'
-                  overflow='auto'
-                  position='relative'
-                  px={padding}
-                >
-                    <DragDropContext
-                      onDragUpdate={onDragUpdate}
-                      onDragEnd={handleDragEnd}
-                    >
-                      <ColumnsContainer columns={columns} tasks={tasks} />
-                    </DragDropContext>
-                </Box>
-                    <Box width='100px' height='100px'></Box>
+                
+                  <DragDropContext
+                    onDragUpdate={onDragUpdate}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <ColumnsContainer columns={columns} tasks={tasks} />
+                  </DragDropContext>
               </Box>
             </Box>
           </Box>

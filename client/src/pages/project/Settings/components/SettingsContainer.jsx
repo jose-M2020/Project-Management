@@ -76,13 +76,13 @@ const SettingsContainer = ({projectData}) => {
       value = value.map(tag => tag.value);
     }
 
-    await updateProject({variables: {
+    const res = await updateProject({variables: {
       _id: data?.project?._id,
       [name]: value
     }});
     toast.success(`${name} updated!`)
 
-    return true;
+    return res;
   }
 
   // TODO: Problems when updateing tags

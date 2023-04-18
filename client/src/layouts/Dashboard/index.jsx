@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Box, Drawer, useMediaQuery } from '@mui/material';
 import { useQuery } from '@apollo/client';
 import { Outlet, useParams } from 'react-router-dom';
@@ -11,12 +11,16 @@ const DashboardLayout = () => {
   const { id } = useParams();
   const isMobil = useMediaQuery('(max-width:600px)');
   const [stateMobile, setStateMobile] = useState(false);
-  
+  const [sidebarWidth, setSidebarWidth] = useState()
   const { loading, data } = useQuery(
     GET_PROJECTOVERVIEW,
     { variables: { id } }
   );
 
+  useEffect(() => {
+    isMobil && setSidebarWidth(0);
+  }, [isMobil])
+  
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return;
@@ -29,20 +33,22 @@ const DashboardLayout = () => {
   return (
     <ProjectProvider value={data?.project}>
       <Box sx={{display: 'flex', position: 'relative'}}>
-        {isMobil ? (
-          <>
-            <Drawer
-              anchor='left'
-              open={stateMobile}
-              onClose={toggleDrawer(false)}
-            >
-              <Sidebar />
-            </Drawer>
-          </>
-        ) : (
-          <Sidebar />
-        )}
-        <Box component='main' height='100%'>
+        <Box>
+          {isMobil ? (
+            <>
+              <Drawer
+                anchor='left'
+                open={stateMobile}
+                onClose={toggleDrawer(false)}
+              >
+                <Sidebar setSidebarWidth={setSidebarWidth} />
+              </Drawer>
+            </>
+          ) : (
+            <Sidebar setSidebarWidth={setSidebarWidth} />
+          )}
+        </Box>
+        <Box component='main' height='100%' width={`calc(100vw - ${sidebarWidth}px)`}>
           <Outlet />
         </Box>
       </Box>

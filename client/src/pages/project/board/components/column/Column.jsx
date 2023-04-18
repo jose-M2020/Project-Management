@@ -5,6 +5,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import { tokens } from "../../../../../theme";
 import { hexToRgba } from "../../../../../helpers/colors";
 import TasksContainer from "../task/TasksContainer";
+import EditInput from "../../../../../components/form/EditInput";
 
 const Column = ({
   index,
@@ -33,8 +34,9 @@ const Column = ({
             flexDirection: 'column',
             height: '100%',
             flexShrink: 0,
+            minWidth: '290px',
             maxWidth: '290px',
-            flexBasis: '96%'   
+            // flexBasis: '96%'
           }}
         >
           <Stack
@@ -59,9 +61,13 @@ const Column = ({
               alignItems='center'
               gap='3px'
             >
-              <Typography variant='h4' >
+              <EditInput
+                value={column.title}
+                border='none'
+              />
+              {/* <Typography variant='h4' >
                 {column.title}
-              </Typography>
+              </Typography> */}
               {column.category === 'done' && (
                 <DoneIcon
                   sx={{

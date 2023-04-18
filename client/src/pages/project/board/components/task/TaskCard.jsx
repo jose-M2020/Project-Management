@@ -78,18 +78,6 @@ const TaskCard = ({ task, index }) => {
             >
               {task.title}
             </Typography>
-            <Typography
-              component='div'
-              variant='p'
-              sx={{
-                  display: '-webkit-box',
-                  overflow: 'hidden',
-                  WebkitBoxOrient: 'vertical',
-                  WebkitLineClamp: 2,
-              }}
-            >
-              {task.description}
-            </Typography>
           </Box>
           { (task.dueDate || task.members) && (
             <Box

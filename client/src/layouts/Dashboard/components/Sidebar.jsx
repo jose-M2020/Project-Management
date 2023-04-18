@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Sidebar as ProSidebar, Menu, MenuItem, useProSidebar } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link, useLocation, useParams } from "react-router-dom";
@@ -30,7 +30,7 @@ const Item = ({ title, path, icon, selected, setSelected }) => {
   );
 };
 
-const Sidebar = () => {
+const Sidebar = ({setSidebarWidth, ...props}) => {
   const { pathname } = useLocation();
   const { id } = useParams();
   const theme = useTheme();
@@ -40,6 +40,15 @@ const Sidebar = () => {
   
   const project = useProject();
   
+  const sidebarRef = useRef();
+
+  useEffect(() => {
+    // setTimeout(() => {
+    //   setSidebarWidth(sidebarRef?.current?.clientWidth);
+    // }, 300);
+    collapsed ? setSidebarWidth(80) : setSidebarWidth(250);
+  }, [collapsed])
+
   return (
     <Box
       sx={{
@@ -50,6 +59,7 @@ const Sidebar = () => {
         bottom: 0,
         zIndex: 900,
       }}
+      {...props}
     >
       <ProSidebar 
         backgroundColor={colors.primary[400]}
@@ -70,6 +80,7 @@ const Sidebar = () => {
                 };
             }
           }}
+          ref={sidebarRef}
         >
           {/*  CARD AND MENU ICON */}
           <Box position='relative'>
@@ -81,7 +92,7 @@ const Sidebar = () => {
                 >
                   <IconButton 
                     onClick={() => collapseSidebar(!collapsed)}
-                    sx={{ backgroundColor: colors.primary[600] }}
+                    sx={{ backgroundColor: colors.blueAccent[900] }}
                   >
                       <FirstPageIcon />
                     </IconButton>
