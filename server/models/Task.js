@@ -11,14 +11,24 @@ const TaskSchema = new mongoose.Schema({
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
+    require: true
   },
   // status: {
   //   type: String,
   //   enum: ['Not Started', 'In Progress', 'Completed'],
   // },
+  done: {
+    type: Boolean,
+    require: true
+  },
   priority: {
     type: String,
     enum: ['Low', 'Medium', 'High'],
+  },
+  boardId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'KanbanBoard',
+    required: true
   },
   columnId: {
     type: mongoose.Schema.Types.ObjectId,

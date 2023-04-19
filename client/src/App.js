@@ -2,17 +2,17 @@ import { Route, Routes } from 'react-router-dom';
 import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import Topbar from './layouts/Dashboard/components/Topbar';
-import Dashboard from './pages/dashboard';
 import Projects from './pages/project/ProjectList';
 import ProjectForm from './pages/project/ProjectForm';
-import Tasks from './pages/Tasks';
+import Overview from './pages/project/Overview';
+import Board from './pages/project/board';
 import Calendar from './pages/Calendar';
+import Settings from './pages/project/Settings';
 import Bugs from './pages/bug/Bugs';
 import Clients from './pages/client/Clients';
 import ClientForm from './pages/client/ClientForm';
 import Team from './pages/team/Team';
 import TeamForm from './pages/team/TeamForm';
-import Faq from './pages/Faq';
 import Bar from './pages/chart/Bar';
 import Pie from './pages/chart/Pie';
 import Line from './pages/chart/Line';
@@ -21,8 +21,6 @@ import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
 import { ColorModeContext, useMode } from './theme';
 import DashboardLayout from './layouts/Dashboard';
-import Settings from './pages/project/Settings';
-import Overview from './pages/project/Overview';
 
 const cache = new InMemoryCache({
   typePolicies: {
@@ -90,7 +88,7 @@ function App() {
                   
                   <Route path='/projects/:id/settings' element={<Settings />} />
                   {/* <Route path='/projects/:id/edit' element={<ProjectForm />} /> */}
-                  <Route path='/projects/:id/board' element={<Tasks />} />
+                  <Route path='/projects/:id/board' element={<Board />} />
                   <Route path='/projects/:id/calendar' element={<Calendar />} />
                   <Route path='/projects/:id/bugs' element={<Bugs />} />
                   <Route path='/bar' element={<Bar />} />

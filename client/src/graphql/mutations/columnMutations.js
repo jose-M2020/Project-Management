@@ -20,13 +20,13 @@ export const CREATE_COLUMN = gql`
 
 export const UPDATE_COLUMN = gql`
   mutation updateColumn(
-    $_id: ID!
-    $title: String!
-    $boardId: ID!
-    $order: Int!
+    $id: ID!
+    $title: String
+    $boardId: ID
+    $order: Int
   ) {
     updateColumn(
-      _id: $_id
+      _id: $id
       title: $title,
       boardId: $boardId,
       order: $order,
@@ -34,6 +34,25 @@ export const UPDATE_COLUMN = gql`
       _id
       title
       order
+    }
+  }
+`;
+
+export const UPDATE_COLUMNPOSITION = gql`
+  mutation updateColumnPosition(
+    $_id: ID!,
+    $boardId: ID!,
+    $order: Float!,
+  ) {
+    updateColumnPosition(
+      _id: $_id,
+      boardId: $boardId,
+      order: $order,
+    ) {
+      _id
+      title
+      order
+      category
     }
   }
 `;

@@ -30,7 +30,7 @@ const CustomModal = ({title, subtitle, width = '450px', open = false, handleClos
           <Box sx={style}>
             {title && (
               <Box mb={2}>
-                <Typography id="transition-modal-title" variant="h4" component="h2">
+                <Typography id="transition-modal-title" variant="h4" component="h2" mb={1}>
                   {title}
                 </Typography>
                 <Typography variant="span">

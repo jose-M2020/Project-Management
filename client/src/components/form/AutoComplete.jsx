@@ -61,10 +61,12 @@ const AutoComplete = ({
               sx={{ display: 'block' }}
               variant="outlined"
               label={
-                (typeof option === 'string') ? (
-                  option 
-                ) : (
-                  setLabel ? setLabel(option) : option.label
+                option && (
+                  (typeof option === 'string') ? (
+                    option 
+                  ) : (
+                    setLabel ? setLabel(option) : option.label
+                  )
                 )
               } 
               {...getTagProps({ index })}

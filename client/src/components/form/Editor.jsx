@@ -6,32 +6,35 @@ import { tokens } from "../../theme";
 import AutoComplete from "./AutoComplete";
 import { arraysEqual } from "../../helpers/array";
 import CustomButton from "../CustomButton";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
 
-const EditInput = ({onAccept, value = '', children, ...props}) => {
+const Editor = ({onAccept, value = '', children, handleUpdate, ...props}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [loading, setLoading] = useState(false);
   const [activeEdit, setActiveEdit] = useState(false);
-  const [inputValue, setInputValue] = useState(value)
+  const [editorContent, setEditorContent] = useState(value);
   
   const handleChange = (fieldValue) => {
-    const isChanged = Array.isArray(fieldValue) ? (
-      !arraysEqual(fieldValue, value)
-    ) : (
-      fieldValue !== value
-    )
-
-    setInputValue(fieldValue)
+    const isChanged = fieldValue !== value
+    console.log(fieldValue, value)
+    setEditorContent(fieldValue)
     isChanged ? setActiveEdit(true) : setActiveEdit(false);
   }
 
   const setDefaultValue = (e) => {
-    setInputValue(value)
+    setEditorContent(value)
     setActiveEdit(false)
   }
 
-  const handleBlur = (e) => {
-    if(e?.relatedTarget?.id === 'input-actions' || !activeEdit){
+  const handleBlur = ({e}) => {
+    console.log(e)
+    if(
+      e?.relatedTarget?.id === 'input-actions' ||
+      e?.relatedTarget?.id === 'editor-container' ||
+      !activeEdit
+    ){
       return
     }
     
@@ -41,40 +44,26 @@ const EditInput = ({onAccept, value = '', children, ...props}) => {
   const handleClickAccept = async () => {
     setLoading(true);
     setActiveEdit(false);
-    const status = await onAccept(inputValue, props.name);
-    // status ? setInputValue()
+    const status = await onAccept(editorContent, props.name);
+    // status ? setEditorContent()
     setLoading(false);
   }
 
   return (
-    <Box position='relative' onBlur={handleBlur} >
-      <>
-        {props.options ? (
-          <AutoComplete
-            value={inputValue}
-            onChange={(_, value) => {
-              handleChange(value)
-            }}
-            {...loading && {
-              disabled: true
-            }}
-            {...props}
-          />
-        ) : (
-          <TextField
-            value={inputValue}
-            // name='name'
-            onChange={e => handleChange(e.target.value)}
-            fullWidth
-            {...loading && {
-              disabled: true
-            }}
-            {...props}
-          >
-            {children}
-          </TextField>             
-        )}
-      </>
+    <Box position='relative' onBlur={handleBlur} id='editor-container' >
+      <CKEditor
+          editor={ ClassicEditor }
+          data={ editorContent }
+          onChange={ ( event, editor ) => {
+              const data = editor.getData();
+              console.log({data})
+              handleChange(data);
+              // handleUpdate(data, 'description')
+          }}
+          {...loading && {
+            disabled: true
+          }}
+      />
       <Box
         gap='2px'
         sx={{
@@ -112,4 +101,4 @@ const EditInput = ({onAccept, value = '', children, ...props}) => {
   )
 }
 
-export default EditInput;
+export default Editor;

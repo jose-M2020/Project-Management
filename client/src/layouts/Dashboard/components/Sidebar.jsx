@@ -1,21 +1,16 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Sidebar as ProSidebar, Menu, MenuItem, useProSidebar } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link, useLocation, useParams } from "react-router-dom";
 // import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../../theme";
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import LastPageIcon from '@mui/icons-material/LastPage';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { GET_PROJECTOVERVIEW } from "../../../graphql/queries/projectQueries";
-import { useQuery } from "@apollo/client";
+import { useProject } from "../../../context/ProjectContext";
 
 const Item = ({ title, path, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -35,7 +30,7 @@ const Item = ({ title, path, icon, selected, setSelected }) => {
   );
 };
 
-const Sidebar = () => {
+const Sidebar = ({setSidebarWidth, ...props}) => {
   const { pathname } = useLocation();
   const { id } = useParams();
   const theme = useTheme();
@@ -43,21 +38,28 @@ const Sidebar = () => {
   const [selected, setSelected] = useState(pathname);
   const { collapseSidebar, collapsed } = useProSidebar();
   
-  const { loading, error, data } = useQuery(
-    GET_PROJECTOVERVIEW,
-    { variables: { id } }
-  );
+  const project = useProject();
+  
+  const sidebarRef = useRef();
+
+  useEffect(() => {
+    // setTimeout(() => {
+    //   setSidebarWidth(sidebarRef?.current?.clientWidth);
+    // }, 300);
+    collapsed ? setSidebarWidth(80) : setSidebarWidth(250);
+  }, [collapsed])
 
   return (
     <Box
       sx={{
         position: "sticky",
         display: "flex",
-        height: "100vh",
-        top: 0,
+        height: "calc(100vh - 70.28px)",
+        top: '70.28px',
         bottom: 0,
-        zIndex: 1000,
+        zIndex: 900,
       }}
+      {...props}
     >
       <ProSidebar 
         backgroundColor={colors.primary[400]}
@@ -78,31 +80,25 @@ const Sidebar = () => {
                 };
             }
           }}
+          ref={sidebarRef}
         >
           {/*  CARD AND MENU ICON */}
           <Box position='relative'>
             {!collapsed && (
-              <>
+              <Box paddingX='20px'>
                 <Box
-                  sx={{
-                    position: 'absolute',
-                    right: 0,
-                    top: '50%',
-                    transform: 'translate(0,-50%)'
-                  }}
+                  textAlign='right'
+                  marginTop='15px'
                 >
                   <IconButton 
                     onClick={() => collapseSidebar(!collapsed)}
-                    sx={{ backgroundColor: colors.primary[600] }}
+                    sx={{ backgroundColor: colors.blueAccent[900] }}
                   >
-                      <ArrowBackIosIcon />
+                      <FirstPageIcon />
                     </IconButton>
                 </Box>
-                <Box 
-                  my="15px"              
-                  paddingLeft={"10%"}
-                >
-                  <Box paddingX='20px' >
+                <Box my="15px" >
+                  <Box>
                     <Box
                       backgroundColor={colors.blueAccent[700]}
                       padding={1}
@@ -115,19 +111,19 @@ const Sidebar = () => {
                         fontWeight="bold"
                         // noWrap={true}
                       >
-                        {data?.project?.name}
+                        {project?.name}
                       </Typography>
                       <Typography variant="h5" color={colors.greenAccent[500]}>
-                        {data?.project?.type}
+                        {project?.type}
                       </Typography>
                     </Box>
                   </Box>
                 </Box>
-              </>
+              </Box>
             )}
             {collapsed && (
               <MenuItem
-                icon={ <MenuOutlinedIcon onClick={() => collapseSidebar(!collapsed)} /> }
+                icon={ <LastPageIcon sx={{fontSize: '25px'}} onClick={() => collapseSidebar(!collapsed)} /> }
                 style={{
                   margin: "10px 0 10px 0",
                   color: colors.grey[100],
@@ -136,7 +132,7 @@ const Sidebar = () => {
             )}
           </Box>
 
-          <Box paddingLeft={collapsed ? undefined : "10%"}>
+          <Box>
             <Item
               title="Overview"
               path={`projects/${id}/overview`}

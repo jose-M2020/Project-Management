@@ -32,7 +32,7 @@ import CheckboxField from "../components/form/CheckboxField";
 import { GET_PROJECTNAMES } from "../graphql/queries/projectQueries";
 import AutoComplete from "../components/form/AutoComplete";
 import CustomModal from "../components/CustomModal";
-import { formatDateTime } from "../helpers/helpers";
+import { formatDateTime } from "../helpers/dateTime";
 import useAsyncAutocomplete from "../hooks/useAsyncAutocomplete";
 
 const schema = yup.object().shape({

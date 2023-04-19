@@ -1,5 +1,5 @@
 import { Box, useTheme } from '@mui/material';
-import { tokens } from '../../../theme';
+import { tokens } from '../../../../theme';
 
 const StyledEditor = ({children}) => {
   const theme = useTheme();

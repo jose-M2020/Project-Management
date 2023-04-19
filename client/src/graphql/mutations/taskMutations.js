@@ -2,31 +2,41 @@ import { gql } from '@apollo/client';
 
 export const CREATE_TASK = gql`
   mutation createTask(
-    $title: String!
-    $description: String
-    $projectId: ID
-    $status: String!
-    $priority: String
-    $date: String
+    $title: String!,
+    $description: String,
+    $projectId: ID!,
+    $done: Boolean!,
+    $priority: String,
+    $boardId: ID!,
+    $columnId: ID!,
+    $order: Float!,
+    $dueDate: String
   ) {
     createTask(
       title: $title,
       description: $description,
       projectId: $projectId,
-      status: $status,
+      done: $done,
       priority: $priority,
-      date: $date,
+      boardId: $boardId,
+      columnId: $columnId,
+      order: $order,
+      dueDate: $dueDate
     ) {
       _id
       title
       description
-      project{
+      project {
         _id
         name
       }
-      status
+      column {
+        _id
+      }
+      done
       priority
-      date
+      order
+      dueDate
     }
   }
 `;
@@ -37,26 +47,55 @@ export const UPDATE_TASK = gql`
     $title: String
     $description: String
     $projectId: ID
-    $status: String
-    $priority: String
-    $date: String
+    $done: Boolean,
+    $priority: String,
+    $columnId: ID,
+    $order: Float,
+    $dueDate: String
   ) {
     updateTask(
       _id: $_id
       title: $title,
       description: $description,
       projectId: $projectId,
-      status: $status,
+      done: $done,
       priority: $priority,
-      date: $date,
+      columnId: $columnId,
+      order: $order,
+      dueDate: $dueDate,
     ) {
       _id
       title
-      status
+      description
+      projectId
+      done
       priority
-      project{
+      columnId
+      order
+      dueDate
+      members {
         _id
+        firstname
+        lastname
       }
+    }
+  }
+`;
+
+export const UPDATE_TASKPOSITION = gql`
+  mutation updateTaskPosition(
+    $_id: ID!,
+    $newPosition: Float!,
+    $columnId: ID!
+    $done: Boolean!
+  ) {
+    updateTaskPosition(
+      _id: $_id,
+      newPosition: $newPosition,
+      columnId: $columnId,
+      done: $done
+    ) {
+      title
     }
   }
 `;

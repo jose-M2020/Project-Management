@@ -32,21 +32,25 @@ export const GET_BOARDBYPROJECT = gql`
       }
       columns {
         _id
+        boardId
         title
         order
-        tasks {
+        category
+      }
+      tasks {
+        _id
+        title
+        description
+        priority
+        columnId
+        members {
           _id
-          title
-          description
-          priority
-          members {
-            _id
-            firstname
-            lastname
-          }
-          order
-          dueDate
+          firstname
+          lastname
         }
+        done
+        order
+        dueDate
       }
     }
   }

@@ -60,7 +60,7 @@ export const typeDefs = gql`
 export const resolvers = {
   Query: {
     projects: async () => {
-      return await Project.find();
+      return await Project.find().sort({createdAt: -1});
     },
     project: async (_, { _id }) => {
       return await Project.findById(_id);
@@ -104,22 +104,26 @@ export const resolvers = {
         {
           title: 'Not Started',
           boardId: savedBoard._id,
-          order: 0
+          order: 0,
+          category: 'incomplete'
         },
         {
           title: 'In Progress',
           boardId: savedBoard._id,
-          order: 1
+          order: 1,
+          category: 'incomplete'
         },
         {
           title: 'Testing',
           boardId: savedBoard._id,
-          order: 2
+          order: 2,
+          category: 'incomplete'
         },
         {
           title: 'Completed',
           boardId: savedBoard._id,
-          order: 3
+          order: 3,
+          category: 'done'
         },
       ])
 
@@ -138,6 +142,8 @@ export const resolvers = {
       const deletedProject = await Project.findByIdAndDelete(_id);
       if (!deletedProject) throw new Error("Project not found");
       
+      const deletedBoard = await KanbanBoard.deleteOne({ projectId: _id });
+      await KanbanColumn.deleteMany({ boardId: deletedBoard._id });
       await Task.deleteMany({projectId: _id})
       await Event.deleteMany({projectId: _id})
       
