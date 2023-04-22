@@ -1,13 +1,21 @@
 import { Box, Fade, Modal, Typography, useTheme } from '@mui/material'
 import { tokens } from '../theme';
 
-const CustomModal = ({title, subtitle, width = '450px', open = false, handleClose, children}) => {
+const CustomModal = ({
+  title,
+  subtitle,
+  width = '450px',
+  open = false,
+  handleClose,
+  children,
+  ...props
+}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const style = {
     borderRadius: '8px',
     bgcolor: colors.primary[500],
-    p: 4,
+    p: props.p ? props.p : 4,
     position: 'absolute',
     boxShadow: 24,
     top: '50%',
@@ -25,9 +33,10 @@ const CustomModal = ({title, subtitle, width = '450px', open = false, handleClos
         open={open}
         onClose={handleClose}
         closeAfterTransition
+        sx={{ zIndex: 1300 }}
       >
         <Fade in={open}>
-          <Box sx={style}>
+          <Box sx={style} {...props}>
             {title && (
               <Box mb={2}>
                 <Typography id="transition-modal-title" variant="h4" component="h2" mb={1}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { AvatarGroup, Box, Fab, Grid, Typography } from '@mui/material'
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import ProfileAvatar from '../../../../components/user/ProfileAvatar'
@@ -8,16 +8,15 @@ import ProgressBar from './ProgressBar'
 import useAsyncAutocomplete from '../../../../hooks/useAsyncAutocomplete'
 import { GET_DEVNAMES } from '../../../../graphql/queries/devsQueries'
 import { useMutation } from '@apollo/client';
-import { UPDATE_PROJECT } from '../../../../graphql/mutations/projectMutations';
-import { GET_PROJECT } from '../../../../graphql/queries/projectQueries';
-import { useBoard } from '../../../../context/BoardContext';
 import CustomButton from '../../../../components/CustomButton';
 import { UPDATE_BOARD } from '../../../../graphql/mutations/boardMutations';
 import { GET_BOARDBYPROJECT } from '../../../../graphql/queries/boardQueries';
+import useFilterStoredData from '../../../../hooks/useFilterStoredData';
+import { useBoard } from '../context/BoardContext';
 
 const BoardHeader = ({ members, tasks, ...props }) => {
   const { projectId, boardId } = useBoard();
-  const [filteredDevs, setFilteredDevs] = useState([])
+  // const [filteredDevs, setFilteredDevs] = useState([])
   const [membersInput, setMembersInput] = useState([]);
 
   const {
@@ -33,19 +32,7 @@ const BoardHeader = ({ members, tasks, ...props }) => {
     }],
   });
 
-  useEffect(() => {
-    if(devData?.developers?.length){
-      const devId = members.map(item => (
-        item._id
-      ))
-      
-      const newDevs = devData.developers.filter(item => (
-        !devId.includes(item._id)
-      ));
-
-      setFilteredDevs(newDevs);
-    }
-  }, [loadingDevs, members])
+  const filteredDevs = useFilterStoredData(members, devData?.developers);
 
   const handleEdit = async (value, name) => {
     if(name === 'tags'){

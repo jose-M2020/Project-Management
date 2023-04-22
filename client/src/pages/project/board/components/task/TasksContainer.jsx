@@ -7,10 +7,10 @@ import { GET_BOARDBYPROJECT } from '../../../../../graphql/queries/boardQueries'
 import { getAppendedItemPos } from '../../../../../helpers/itemPosition';
 import CustomButton from '../../../../../components/CustomButton';
 import TaskCard from './TaskCard';
-import { useBoard } from '../../../../../context/BoardContext';
 import { Droppable } from 'react-beautiful-dnd';
 import { tokens } from '../../../../../theme';
 import { hexToRgba } from '../../../../../helpers/colors';
+import { useBoard } from '../../context/BoardContext';
 
 const TasksContainer = ({ tasks, column }) => {
   const theme = useTheme();

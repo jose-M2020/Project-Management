@@ -1,11 +1,18 @@
 import React from "react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
-import { Box, Stack, Typography, useTheme } from "@mui/material";
+import { Box, IconButton, Stack, Typography, useTheme } from "@mui/material";
 import DoneIcon from '@mui/icons-material/Done';
+import MoreIcon from '@mui/icons-material/MoreVert';
 import { tokens } from "../../../../../theme";
 import { hexToRgba } from "../../../../../helpers/colors";
+
 import TasksContainer from "../task/TasksContainer";
-import EditInput from "../../../../../components/form/EditInput";
+import EditableText from "../../../../../components/EditableText";
+import Dropdown from "../../../../../components/Dropdown";
+import { UPDATE_COLUMN } from "../../../../../graphql/mutations/columnMutations";
+import { useMutation } from "@apollo/client";
+import { GET_BOARDBYPROJECT } from "../../../../../graphql/queries/boardQueries";
+import { useBoard } from "../../context/BoardContext";
 
 const Column = ({
   index,
@@ -14,6 +21,22 @@ const Column = ({
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { projectId  } = useBoard();
+
+  const [ updateColumn ] = useMutation(UPDATE_COLUMN, {
+    refetchQueries: [{ 
+      query: GET_BOARDBYPROJECT, variables: { projectId } 
+    }]
+  });
+  
+  const handleUpdate = async (value) => {
+    await updateColumn({variables: {
+      id: column._id,
+      title: value
+    }})
+
+    return true;
+  }
 
   return (
     <Draggable
@@ -61,20 +84,31 @@ const Column = ({
               alignItems='center'
               gap='3px'
             >
-              <EditInput
-                value={column.title}
-                border='none'
+              <EditableText
+                text={column.title}
+                onAccept={handleUpdate}
+                textComplement={column.category === 'done' && (
+                  <DoneIcon
+                    sx={{
+                      color: colors.greenAccent[300]
+                    }}
+                  />
+                )}
+                padding="12px 5px"
               />
-              {/* <Typography variant='h4' >
-                {column.title}
-              </Typography> */}
-              {column.category === 'done' && (
-                <DoneIcon
-                  sx={{
-                    color: colors.greenAccent[300]
-                  }}
-                />
-              )}
+              <Dropdown
+                button={
+                  <IconButton>
+                    <MoreIcon />
+                  </IconButton>
+                }
+                options={[
+                  {
+                    title: 'Delete',
+                    onClick: () => console.log('click')
+                  }
+                ]}
+              />
               {/* <Typography 
                 variant="span"
                 ml={1}

@@ -23,7 +23,7 @@ export const UPDATE_COLUMN = gql`
     $id: ID!
     $title: String
     $boardId: ID
-    $order: Int
+    $order: Float
   ) {
     updateColumn(
       _id: $id

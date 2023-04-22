@@ -46,6 +46,7 @@ export const UPDATE_TASK = gql`
     $_id: ID!
     $title: String
     $description: String
+    $members: [ID]
     $projectId: ID
     $done: Boolean,
     $priority: String,
@@ -57,6 +58,7 @@ export const UPDATE_TASK = gql`
       _id: $_id
       title: $title,
       description: $description,
+      members: $members,
       projectId: $projectId,
       done: $done,
       priority: $priority,
@@ -77,6 +79,7 @@ export const UPDATE_TASK = gql`
         _id
         firstname
         lastname
+        position
       }
     }
   }

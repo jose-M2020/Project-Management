@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Box, Fab, IconButton, Stack, Typography, useTheme } from '@mui/material';
 import { useMutation } from '@apollo/client';
 import GroupIcon from '@mui/icons-material/Group';
@@ -16,6 +16,7 @@ import CustomButton from '../../../../components/CustomButton';
 import ProfileRow from '../../../../components/user/ProfileRow';
 import { UPDATE_PROJECT } from '../../../../graphql/mutations/projectMutations';
 import { GET_PROJECT } from '../../../../graphql/queries/projectQueries';
+import useFilterStoredData from '../../../../hooks/useFilterStoredData';
 
 function ProjectUsers({team, client, projectId}) {
   const theme = useTheme();
@@ -25,7 +26,6 @@ function ProjectUsers({team, client, projectId}) {
     client: null,
     team: [],
   });
-  const [filteredDevs, setFilteredDevs] = useState([])
 
   // GraphQL
   const {
@@ -48,19 +48,7 @@ function ProjectUsers({team, client, projectId}) {
     }],
   });
 
-  useEffect(() => {
-    if(devData?.developers?.length){
-      const devId = team.map(item => (
-        item._id
-      ))
-      
-      const newDevs = devData.developers.filter(item => (
-        !devId.includes(item._id)
-      ));
-
-      setFilteredDevs(newDevs);
-    }
-  }, [loadingDevs, team])
+  const filteredDevs = useFilterStoredData(team, devData?.developers)
   
   // Other functions
 
