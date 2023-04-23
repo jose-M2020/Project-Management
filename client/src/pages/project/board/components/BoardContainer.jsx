@@ -53,15 +53,12 @@ const BoardContainer = ({board, projectId}) => {
 	});
   
   useEffect(() => {
-    if(!columns.length){
-      const sortedColums = sortData([...board?.columns]);
-      setColumns(sortedColums)
-      console.log('render BoardContainer', {board, columns})
-    }
+    const sortedColums = sortData([...board?.columns]);
+    setColumns(sortedColums)
 
     const sortedTasks = sortData([...board?.tasks]);
     setTasks(sortedTasks);
-  }, [board])
+  }, [board]) 
   
   const onDragUpdate = (update, provided) => {
     const message = update.destination

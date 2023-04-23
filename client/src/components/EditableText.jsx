@@ -8,9 +8,10 @@ import AutoComplete from "./form/AutoComplete";
 import CustomButton from "./CustomButton";
 
 const EditableText = ({
-  onAccept,
   text,
   textComplement,
+  onAccept,
+  onCancel,
   mode = 'text',
   padding = '16.5px 14px',
   children,
@@ -20,7 +21,7 @@ const EditableText = ({
   const colors = tokens(theme.palette.mode);
   const [loading, setLoading] = useState(false);
   const [isValueChanged, setIsValueChanged] = useState(false);
-  const [inputValue, setInputValue] = useState(text)
+  const [inputValue, setInputValue] = useState(text ?? '')
   const [isEditing, setIsEditing] = useState(mode === 'text' ? false : true);
   // console.log(text)
   const handleChange = (fieldValue) => {
@@ -41,17 +42,24 @@ const EditableText = ({
 
   const handleBlur = (e) => {
     setIsEditing(false);  
-
-    if(e?.relatedTarget?.id === 'input-actions' || !isValueChanged){
+    
+    if((e?.relatedTarget?.id === 'edit-button')){
       return
     }
     
+    if(!isValueChanged){
+      onCancel && onCancel();
+      return
+    }
+    
+    onCancel && onCancel();
     setDefaultValue();
   }
   
   const handleClickAccept = async () => {
     setLoading(true);
     setIsValueChanged(false);
+    console.log('accepted', inputValue)
     const status = await onAccept(inputValue, props.name);
     // status ? setInputValue()
     setLoading(false);
@@ -60,7 +68,7 @@ const EditableText = ({
 
   return (
     <Box position='relative' onBlur={handleBlur} width='100%' >
-      {!isEditing ? (
+      {!isEditing && mode === 'text' ? (
         <Box
           onClick={() => setIsEditing(true)}
           display='flex'
@@ -105,6 +113,7 @@ const EditableText = ({
               {children}
             </TextField>             
           )}
+          {/* Buttons Actions */}
           <Box
             gap='2px'
             sx={{
@@ -121,7 +130,7 @@ const EditableText = ({
             }}
           >
             <CustomButton
-              id='input-actions'
+              id='edit-button'
               text={<CheckIcon />}
               sx={{
                 minWidth: '30px',
@@ -131,6 +140,7 @@ const EditableText = ({
               onClick={handleClickAccept}
             />
             <CustomButton
+              id='cancel-button'
               text={<ClearIcon />}
               btnstyle="transparent"
               sx={{ 

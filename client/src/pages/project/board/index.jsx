@@ -14,9 +14,9 @@ const Board = () => {
     { variables: { projectId } }
   );
   
+  
   if (loading) return <Spinner />
   if (error) return <p>An error occurred</p>;
-  
 
   return (
     <>

@@ -22,7 +22,7 @@ const Column = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { projectId  } = useBoard();
-
+  
   const [ updateColumn ] = useMutation(UPDATE_COLUMN, {
     refetchQueries: [{ 
       query: GET_BOARDBYPROJECT, variables: { projectId } 
@@ -31,7 +31,7 @@ const Column = ({
   
   const handleUpdate = async (value) => {
     await updateColumn({variables: {
-      id: column._id,
+      id: column?._id,
       title: value
     }})
 
@@ -41,8 +41,8 @@ const Column = ({
   return (
     <Draggable
       index={index}
-      draggableId={column._id}
-      category={column.category}
+      draggableId={column?._id}
+      category={column?.category}
     >
       {(provided, snapshot) => (
         <Box
@@ -85,9 +85,9 @@ const Column = ({
               gap='3px'
             >
               <EditableText
-                text={column.title}
+                text={column?.title}
                 onAccept={handleUpdate}
-                textComplement={column.category === 'done' && (
+                textComplement={column?.category === 'done' && (
                   <DoneIcon
                     sx={{
                       color: colors.greenAccent[300]
@@ -117,7 +117,7 @@ const Column = ({
                   backgroundColor: colors.blueAccent[500],
                 }}
               >
-                {column.items.length}
+                {column?.items.length}
               </Typography> */}
             </Box>
           </Stack>

@@ -99,9 +99,9 @@ const TasksContainer = ({ tasks, column }) => {
   return (
     <>
       <Droppable
-        droppableId={column._id}
+        droppableId={column?._id}
         type="card"
-        key={column._id}
+        key={column?._id}
       >
         {(provided, snapshot) => (
           <Box
@@ -118,9 +118,9 @@ const TasksContainer = ({ tasks, column }) => {
               gap: '15px'
             }}
           >
-            {tasks.map((task, index) => (
+            {tasks?.map((task, index) => (
               <TaskCard
-                key={task._id}
+                key={task?._id}
                 task={task}
                 index={index}
               />
