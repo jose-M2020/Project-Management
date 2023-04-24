@@ -6,7 +6,7 @@ import { tokens } from '../../../../../theme';
 import ProfileAvatar from '../../../../../components/user/ProfileAvatar';
 import { formatDate } from '@fullcalendar/core';
 import { hexToRgba } from '../../../../../helpers/colors';
-import { useModal } from '../../context/ModalContext';
+import { useTaskModal } from '../../context/TaskModalContext';
 
 const PriorityLabel = ({priority}) => {
   const theme = useTheme();
@@ -45,7 +45,7 @@ const PriorityLabel = ({priority}) => {
 const TaskCard = ({ task, index }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { openTaskModal } = useModal();
+  const { openTaskModal } = useTaskModal();
   
   return (
     <Draggable

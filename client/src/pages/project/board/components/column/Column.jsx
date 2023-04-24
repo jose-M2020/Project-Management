@@ -9,10 +9,11 @@ import { hexToRgba } from "../../../../../helpers/colors";
 import TasksContainer from "../task/TasksContainer";
 import EditableText from "../../../../../components/EditableText";
 import Dropdown from "../../../../../components/Dropdown";
-import { UPDATE_COLUMN } from "../../../../../graphql/mutations/columnMutations";
+import { DELETE_COLUMN, UPDATE_COLUMN } from "../../../../../graphql/mutations/columnMutations";
 import { useMutation } from "@apollo/client";
 import { GET_BOARDBYPROJECT } from "../../../../../graphql/queries/boardQueries";
 import { useBoard } from "../../context/BoardContext";
+import { useDeleteModal } from "../../context/DeleteModalContext";
 
 const Column = ({
   index,
@@ -22,11 +23,36 @@ const Column = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { projectId  } = useBoard();
+  const { openDeleteModal  } = useDeleteModal();
   
   const [ updateColumn ] = useMutation(UPDATE_COLUMN, {
     refetchQueries: [{ 
       query: GET_BOARDBYPROJECT, variables: { projectId } 
     }]
+  });
+  const [ deleteColumn ] = useMutation(DELETE_COLUMN, {
+    update: (cache, { data }) => {
+      const { boardByProject } = cache.readQuery({
+        query: GET_BOARDBYPROJECT,
+        variables: {
+          projectId
+        },
+      })
+      const filteredColumns = boardByProject.columns.filter(item => (
+        item._id !== data.deleteColumn._id
+      ))
+
+      cache.writeQuery({
+        query: GET_BOARDBYPROJECT,
+        variables: { projectId },
+        data: {
+          boardByProject: {
+            ...boardByProject,
+            columns: filteredColumns
+          }
+        }
+      })
+    }
   });
   
   const handleUpdate = async (value) => {
@@ -36,6 +62,17 @@ const Column = ({
     }})
 
     return true;
+  }
+
+  const handleDelete = () => {
+    openDeleteModal({
+      item: column.title,
+      onAccept: () => (
+        deleteColumn({
+          variables: { id: column._id },
+        })
+      )
+    })
   }
 
   return (
@@ -105,7 +142,7 @@ const Column = ({
                 options={[
                   {
                     title: 'Delete',
-                    onClick: () => console.log('click')
+                    onClick: handleDelete
                   }
                 ]}
               />

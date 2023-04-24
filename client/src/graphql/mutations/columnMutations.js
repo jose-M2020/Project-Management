@@ -4,7 +4,7 @@ export const CREATE_COLUMN = gql`
   mutation createColumn(
     $title: String!
     $boardId: ID!
-    $order: Int!
+    $order: Float!
   ) {
     createColumn(
       title: $title,
@@ -13,7 +13,9 @@ export const CREATE_COLUMN = gql`
     ) {
       _id
       title
+      boardId
       order
+      category
     }
   }
 `;

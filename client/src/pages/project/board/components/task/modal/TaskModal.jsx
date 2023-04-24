@@ -72,7 +72,7 @@ const TaskModal = ({task, closeTaskModal}) => {
       // });
     },
 	});
-  console.log('rendering TaskModal...', task);
+  
   const handleUpdate = async (value, name) => {
     await updateTask({variables: {
       _id: task._id,

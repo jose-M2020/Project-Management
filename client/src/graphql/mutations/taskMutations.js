@@ -26,13 +26,7 @@ export const CREATE_TASK = gql`
       _id
       title
       description
-      project {
-        _id
-        name
-      }
-      column {
-        _id
-      }
+      columnId
       done
       priority
       order

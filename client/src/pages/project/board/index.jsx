@@ -5,7 +5,8 @@ import BoardContainer from './components/BoardContainer';
 import Spinner from '../../../components/Spinner';
 import { Box, Typography } from '@mui/material';
 import { BoardProvider } from './context/BoardContext';
-import { ModalProvider } from './context/ModalContext';
+import { TaskModalProvider } from './context/TaskModalContext';
+import { DeleteModalProvider } from './context/DeleteModalContext';
 
 const Board = () => {
   const { id: projectId } = useParams();
@@ -24,14 +25,16 @@ const Board = () => {
         projectId,
         boardId: data.boardByProject._id
       }}>
-        <ModalProvider>
-          <BoardContainer board={data.boardByProject} projectId={projectId} />
-          {!!(!data.boardByProject) && (
-            <Box>
-              <Typography>No board</Typography>
-            </Box>
-          )}
-        </ModalProvider>
+        <DeleteModalProvider>
+          <TaskModalProvider>
+            <BoardContainer board={data.boardByProject} projectId={projectId} />
+            {!!(!data.boardByProject) && (
+              <Box>
+                <Typography>No board</Typography>
+              </Box>
+            )}
+          </TaskModalProvider>
+        </DeleteModalProvider>
       </BoardProvider>
     </>
   )

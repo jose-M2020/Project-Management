@@ -27,7 +27,7 @@ const BoardContainer = ({board, projectId}) => {
   
   const [
     updateTaskPosition,
-    { loadingTaskPositionUpdate, taskUpdatePositionError }
+    { loading: loadingTaskPositionUpdate }
   ] = useMutation(UPDATE_TASKPOSITION, {
     update: (cache, { data }) => {
       
@@ -35,7 +35,7 @@ const BoardContainer = ({board, projectId}) => {
 	});
   const [
     updateColumnPosition,
-    { loadingColumnUpdate, columnUpdateError }
+    { loading: loadingColumnUpdate }
   ] = useMutation(UPDATE_COLUMNPOSITION, {
     update: (cache, { data }) => {
       // TODO: Find out if there's a better way to update board cache
@@ -142,6 +142,10 @@ const BoardContainer = ({board, projectId}) => {
             height='100%'
             maxHeight='100%'
             overflow='hidden'
+            sx={{ 
+              pointerEvents: 
+                (loadingColumnUpdate || loadingTaskPositionUpdate) ? 'none' : 'auto'
+            }}
           >
             <Box
               display='flex'

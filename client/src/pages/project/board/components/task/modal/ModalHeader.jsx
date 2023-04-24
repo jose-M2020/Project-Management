@@ -7,26 +7,51 @@ import { tokens } from '../../../../../../theme';
 import { DELETE_TASK } from '../../../../../../graphql/mutations/taskMutations';
 import { GET_BOARDBYPROJECT } from '../../../../../../graphql/queries/boardQueries';
 import { useBoard } from '../../../context/BoardContext';
-import { useModal } from '../../../context/ModalContext';
+import { useTaskModal } from '../../../context/TaskModalContext';
+import { useDeleteModal } from '../../../context/DeleteModalContext';
 
 const ModalHeader = ({ task }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { projectId  } = useBoard();
-  const { closeTaskModal } = useModal();
+  const { closeTaskModal } = useTaskModal();
+  const { openDeleteModal  } = useDeleteModal();
 
   const [ deleteTask ] = useMutation(DELETE_TASK, {
-    refetchQueries: [{ 
-      query: GET_BOARDBYPROJECT, variables: { projectId } 
-    }]
+    update: (cache, { data }) => {
+      const { boardByProject } = cache.readQuery({
+        query: GET_BOARDBYPROJECT,
+        variables: {
+          projectId
+        },
+      })
+      const filteredTasks = boardByProject.tasks.filter(item => (
+        item._id !== data.deleteTask._id
+      ))
+
+      cache.writeQuery({
+        query: GET_BOARDBYPROJECT,
+        variables: { projectId },
+        data: {
+          boardByProject: {
+            ...boardByProject,
+            tasks: filteredTasks
+          }
+        }
+      })
+    }
   });
 
   const handleDelete = () => {
-    console.log('deleting...')
-    deleteTask({
-			variables: { id: task._id },
-		})
     closeTaskModal();
+    openDeleteModal({
+      item: task.title,
+      onAccept: () => (
+        deleteTask({
+          variables: { id: task._id },
+        })
+      )
+    })
   }
 
   return (

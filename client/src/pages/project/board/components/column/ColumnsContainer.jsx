@@ -1,15 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Droppable } from "react-beautiful-dnd";
-import { Box, Fab, useTheme } from "@mui/material";
-import AddIcon from '@mui/icons-material/Add';
+import { Box, useTheme } from "@mui/material";
 import Column from "./Column";
 import { tokens } from "../../../../../theme";
-import { hexToRgba } from "../../../../../helpers/colors";
-import EditableText from "../../../../../components/EditableText";
-import { CREATE_COLUMN } from "../../../../../graphql/mutations/columnMutations";
-import { useMutation } from "@apollo/client";
-import { GET_BOARDBYPROJECT } from "../../../../../graphql/queries/boardQueries";
-import { useBoard } from "../../context/BoardContext";
+import NewColumn from "./NewColumn";
 
 const padding = {
   xs: '20px',
@@ -22,15 +16,7 @@ const ColumnsContainer = ({
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [newColumn, setNewColumn] = useState(false)
-  const { projectId } = useBoard();
-
-  const [createColumn, { loading, error }] = useMutation(CREATE_COLUMN, {
-    refetchQueries: [{ 
-      query: GET_BOARDBYPROJECT, variables: { projectId } 
-    }],  
-  });
-
+  
   return (
     // <Box display='flex' minWidth='fit-content'>
       // <Box px={padding}>
@@ -74,51 +60,10 @@ const ColumnsContainer = ({
                           />
                         )
                       })}
-                      {newColumn && (
-                        <Box
-                          sx={{
-                            backgroundColor: hexToRgba(colors.primary[400], .7),
-                            borderRadius: '5px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            height: '220px',
-                            flexShrink: 0,
-                            minWidth: '290px',
-                            maxWidth: '290px',
-                          }}
-                        >
-                          <Box
-                            padding='10px'
-                            borderBottom={`.5px solid ${colors.blueAccent[400]}`}
-                            mb='8px'
-                            sx={{
-                              backdropFilter: 'blur(20px)',
-                            }}
-                            zIndex={100}
-                          >
-                            <EditableText
-                              onAccept={() => console.log('accept')}
-                              onCancel={() => setNewColumn(false)}
-                              mode="input"
-                              padding="12px 5px"
-                            />
-                          </Box>
-                        </Box>
-                      )}
                       {provided.placeholder}
                     </Box>
                   </Box>
-                  {!newColumn && (
-                    <Fab 
-                      onClick={() => setNewColumn(true)}
-                      size="small"
-                      color="secondary"
-                      aria-label="add"
-                      sx={{ marginLeft: 2 }}
-                    >
-                      <AddIcon />
-                    </Fab>
-                  )}
+                  <NewColumn columns={columns} />
                   <Box 
                     width='28px'
                     bgcolor={colors.primary[500]}

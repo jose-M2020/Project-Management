@@ -34,7 +34,7 @@ const TaskDetails = ({ data }) => {
       query: GET_BOARDBYPROJECT, variables: { projectId } 
     }]
   });
-  console.log('rendering task details...', data);
+  
   const filteredDevs = useFilterStoredData(members, devData?.developers);
 
   const handleAddUser = () => {

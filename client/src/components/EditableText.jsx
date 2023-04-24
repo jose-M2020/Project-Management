@@ -23,7 +23,7 @@ const EditableText = ({
   const [isValueChanged, setIsValueChanged] = useState(false);
   const [inputValue, setInputValue] = useState(text ?? '')
   const [isEditing, setIsEditing] = useState(mode === 'text' ? false : true);
-  // console.log(text)
+  
   const handleChange = (fieldValue) => {
     const isChanged = Array.isArray(fieldValue) ? (
       !arraysEqual(fieldValue, text)
@@ -41,15 +41,15 @@ const EditableText = ({
   }
 
   const handleBlur = (e) => {
-    setIsEditing(false);  
-    
-    if((e?.relatedTarget?.id === 'edit-button')){
+    setIsEditing(false);
+
+    if((e?.relatedTarget?.id === 'edit-button') || loading
+    ){
       return
     }
-    
     if(!isValueChanged){
       onCancel && onCancel();
-      return
+      return;
     }
     
     onCancel && onCancel();
@@ -58,10 +58,8 @@ const EditableText = ({
   
   const handleClickAccept = async () => {
     setLoading(true);
-    setIsValueChanged(false);
-    console.log('accepted', inputValue)
     const status = await onAccept(inputValue, props.name);
-    // status ? setInputValue()
+    setIsValueChanged(false);
     setLoading(false);
     setIsEditing(false);
   }
@@ -125,7 +123,7 @@ const EditableText = ({
               top: '100%',
               right: 0,
               zIndex: 100,
-              display: isValueChanged ? 'flex' : 'none',
+              display: (isValueChanged && !loading) ? 'flex' : 'none',
               alignItems: 'center'
             }}
           >

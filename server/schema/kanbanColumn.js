@@ -101,9 +101,12 @@ export const resolvers = {
       }
     },
     deleteColumn: async (_, { _id }) => {
-      const deletedBoard = await KanbanColumn.findByIdAndDelete(_id);
-      if (!deletedBoard) throw new Error("Column not found");
-      return deletedBoard;
+      const deletedColumn = await KanbanColumn.findByIdAndDelete(_id);
+      if (!deletedColumn) throw new Error("Column not found");
+
+      await Task.deleteMany({ columnId: _id });
+
+      return deletedColumn;
     }
   },
   Column: {

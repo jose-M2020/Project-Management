@@ -1,34 +1,33 @@
 import { createContext, useContext, useState } from "react";
 import TaskModal from "../components/task/modal/TaskModal";
 
-const ModalContext = createContext();
+const TaskModalContext = createContext();
 
-const ModalProvider = ({ value, children, ...props }) => {
+const TaskModalProvider = ({ value, children, ...props }) => {
   const [taskModal, setTaskModal] = useState();
   
   const openTaskModal = (modalProps) => {
-    console.log('openTaskModal; ', modalProps)
     setTaskModal(modalProps)
   };
   const closeTaskModal = () => setTaskModal(undefined);
 
   return (
-    <ModalContext.Provider value={{ openTaskModal, closeTaskModal }} {...props} >
+    <TaskModalContext.Provider value={{ openTaskModal, closeTaskModal }} {...props} >
       {children}
       {taskModal && (
         <TaskModal task={taskModal} closeTaskModal={closeTaskModal} />
       )}
-    </ModalContext.Provider>
+    </TaskModalContext.Provider>
   )
 }
 
-const useModal = () => {
-  const context = useContext(ModalContext)
+const useTaskModal = () => {
+  const context = useContext(TaskModalContext)
   if (context === undefined) {
-    throw new Error('useModal must be used within a ModalProvider')
+    throw new Error('useTaskModal must be used within a TaskModalProvider')
   }
 
   return context
 }
 
-export { ModalProvider, useModal }
+export { TaskModalProvider, useTaskModal }
