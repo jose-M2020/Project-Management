@@ -23,7 +23,7 @@ export const typeDefs = gql`
       phone: String!,
       position: String!
     ): Developer
-    deleteDeveloper(_id: ID!): Developer
+    deleteDeveloper(ids: [ID]!): [Developer]
   }
 
   type Developer {
@@ -71,9 +71,13 @@ export const resolvers = {
       if (!updatedDev) throw new Error("Developer not found");
       return updatedDev;
     },
-    deleteDeveloper: async (_, { _id }) => {
-      const deletedDev = await Developer.findByIdAndDelete(_id);
+    deleteDeveloper: async (_, { ids }) => {
+      const deletedDev = await Developer.deleteMany({
+        _id: { $in: ids }
+      });
+
       if (!deletedDev) throw new Error("Developer not found");
+      console.log(deletedDev)
       return deletedDev;
     },
   },

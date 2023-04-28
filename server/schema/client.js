@@ -34,7 +34,7 @@ export const typeDefs = gql`
       state: String!,
       city: String!,
     ): Client
-    deleteClient(_id: ID!): Client
+    deleteClient(ids: [ID]!): Client
   }
 
   type Client {
@@ -109,8 +109,11 @@ export const resolvers = {
       if (!updatedClient) throw new Error("Client not found");
         return updatedClient;
     },
-    deleteClient: async (_, { _id }) => {
-      const deletedClient = await Client.findByIdAndDelete(_id);
+    deleteClient: async (_, { ids }) => {
+      const deletedClient = await Client.deleteMany({
+        _id: { $in: ids }
+      });
+
       if (!deletedClient) throw new Error("Client not found");
       return deletedClient;
     }

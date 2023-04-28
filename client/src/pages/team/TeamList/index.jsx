@@ -1,19 +1,23 @@
+import { useState } from 'react';
 import { useQuery } from '@apollo/client';
-import { Box, useTheme } from '@mui/material'
+import { Box, IconButton, useTheme } from '@mui/material'
 import { DataGrid } from "@mui/x-data-grid";
-import CustomButton from '../../components/CustomButton';
-import Header from '../../components/Header'
-import Spinner from '../../components/Spinner';
-import { GET_CLIENTS } from '../../graphql/queries/clientQueries';
-import { tokens } from '../../theme';
 
-const Clients = () => {
-  const { loading, error, data } = useQuery(GET_CLIENTS);
+import CustomButton from '../../../components/CustomButton';
+import Header from '../../../components/Header'
+import Spinner from '../../../components/Spinner';
+import { GET_DEVS } from '../../../graphql/queries/devsQueries';
+import { tokens } from '../../../theme';
+import DeleteButton from './components/DeleteButton';
+
+const TeamList = () => {
+  const { loading, error, data } = useQuery(GET_DEVS);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  
+  const [selectedModel, setSelectedModel] = useState([])
+
   if (error) return <p>Something Went Wrong</p>;
-  
+
   const columns = [
     { field: "_id", headerName: "ID" },
     {
@@ -21,28 +25,40 @@ const Clients = () => {
       headerName: "First name",
       flex: 1,
       cellClassName: "firstname-column--cell",
-      editable: true
     },
     {
       field: "lastname",
       headerName: "Last name",
       flex: 1,
       cellClassName: "lastname-column--cell",
-      editable: true
     },
     {
       field: "email",
       headerName: "Email",
       flex: 1,
-      editable: true
     },
     {
       field: "phone",
       headerName: "Phone Number",
       flex: 1,
-      editable: true
     },
-    
+    {
+      field: "position",
+      headerName: "Position",
+      flex: 1,
+    },
+    {
+      field: "delete",
+      width: 1,
+      sortable: false,
+      disableColumnMenu: true,
+      hideable: false,
+      renderHeader: () => {
+        return (
+          <DeleteButton selectedItems={ selectedModel } />
+        );
+      }
+    }
   ];
 
   const handleEdit = (params) => {
@@ -52,10 +68,10 @@ const Clients = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="CLIENTS" subtitle="List of clients" />
+        <Header title="TEAM" subtitle="Managing the team members" />
         <CustomButton
-          text='Add Client'
-          link='/clients/add'
+          text='Add member'
+          link='/team/add'
           btnstyle="primary"
         />
       </Box>
@@ -91,13 +107,14 @@ const Clients = () => {
             },
           }}
         >
-          <DataGrid 
-            rows={data.clients}
+          <DataGrid
+            rows={data.developers}
             columns={columns}
-            getRowId={(row) => row._id} 
+            getRowId={(row) => row._id}
             onCellEditCommit={handleEdit}
             checkboxSelection
             disableSelectionOnClick
+            onSelectionModelChange={(ids) => setSelectedModel(ids)}
           />
         </Box>
       )}
@@ -105,4 +122,4 @@ const Clients = () => {
   )
 };
 
-export default Clients;
+export default TeamList;

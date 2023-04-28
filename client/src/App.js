@@ -9,9 +9,9 @@ import Board from './pages/project/board';
 import Calendar from './pages/Calendar';
 import Settings from './pages/project/Settings';
 import Bugs from './pages/bug/Bugs';
-import Clients from './pages/client/Clients';
+import ClientList from './pages/client/ClientList';
 import ClientForm from './pages/client/ClientForm';
-import Team from './pages/team/Team';
+import TeamList from './pages/team/TeamList';
 import TeamForm from './pages/team/TeamForm';
 import Bar from './pages/chart/Bar';
 import Pie from './pages/chart/Pie';
@@ -76,9 +76,9 @@ function App() {
               <Routes>
                 <Route path='/projects' element={<Projects />} />
                 <Route path='/projects/add' element={<ProjectForm />} />
-                <Route path='/clients' element={<Clients />} />
+                <Route path='/clients' element={<ClientList />} />
                 <Route path='/clients/add' element={<ClientForm />} />
-                <Route path='/team' element={<Team />} />
+                <Route path='/team' element={<TeamList />} />
                 <Route path='/team/add' element={<TeamForm />} />
                 <Route
                   path='/'

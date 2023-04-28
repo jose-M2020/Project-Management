@@ -53,8 +53,8 @@ const UPDATE_DEV = gql`
 `;
 
 const DELETE_DEV = gql`
-  mutation deleteDeveloper($id: ID!) {
-    deleteDeveloper(_id: $id) {
+  mutation deleteDeveloper($ids: [ID]!) {
+    deleteDeveloper(ids: $ids) {
       _id
       firstname
       lastname

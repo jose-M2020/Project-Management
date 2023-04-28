@@ -57,12 +57,9 @@ export const UPDATE_CLIENT = gql`
 `;
 
 export const DELETE_CLIENT = gql`
-  mutation deleteClient($id: ID!) {
-    deleteClient(id: $id) {
+  mutation deleteClient($ids: [ID]!) {
+    deleteClient(ids: $ids) {
       id
-      name
-      email
-      phone
     }
   }
 `;
