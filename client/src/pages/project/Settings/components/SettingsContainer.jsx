@@ -162,7 +162,7 @@ const SettingsContainer = ({projectData}) => {
               </Stack>
             </SettingSection>
             <ProjectUsers
-              team={data?.project?.team}
+              members={data?.project?.members}
               client={data?.project?.client}
               projectId={id}
             />

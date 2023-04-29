@@ -28,11 +28,11 @@ const CREATE_DEV = gql`
 const UPDATE_DEV = gql`
   mutation updateDeveloper(
     $_id: ID!
-    $firstname: String!,
-    $lastname: String!,
-    $email: String!,
-    $phone: String!
-    $position: String!
+    $firstname: String,
+    $lastname: String,
+    $email: String,
+    $phone: String,
+    $position: String
   ) {
     updateDeveloper(
       _id: $_id

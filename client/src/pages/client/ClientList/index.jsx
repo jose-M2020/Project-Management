@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { Box, useTheme } from '@mui/material'
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -9,12 +9,20 @@ import Spinner from '../../../components/Spinner';
 import { GET_CLIENTS } from '../../../graphql/queries/clientQueries';
 import { tokens } from '../../../theme';
 import DeleteButton from '../../team/TeamList/components/DeleteButton';
+import { UPDATE_CLIENT } from '../../../graphql/mutations/clientMutations';
 
 const ClientList = () => {
   const { loading, error, data } = useQuery(GET_CLIENTS);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [selectedModel, setSelectedModel] = useState([])
+
+  const [
+    update,
+    {loading: updating }
+  ] = useMutation(UPDATE_CLIENT, {
+    refetchQueries: ["getClients"],
+  });
 
   if (error) return <p>Something Went Wrong</p>;
   
@@ -61,7 +69,10 @@ const ClientList = () => {
   ];
 
   const handleEdit = (params) => {
-    console.log(params);
+    update({variables: {
+      _id: params.id,
+      [params.field]: params.value
+    }})
   }
 
   return (

@@ -17,11 +17,11 @@ export const typeDefs = gql`
     ): Developer
     updateDeveloper(
       _id: ID!,
-      firstname: String!,
-      lastname: String!,
-      email: String!,
-      phone: String!,
-      position: String!
+      firstname: String,
+      lastname: String,
+      email: String,
+      phone: String,
+      position: String
     ): Developer
     deleteDeveloper(ids: [ID]!): [Developer]
   }
@@ -65,9 +65,11 @@ export const resolvers = {
       return savedDev;
     },
     updateDeveloper: async (_, args) => {
-      const updatedDev = await Developer.findByIdAndUpdate(args._id, args, {
-        new: true,
-      });
+      const updatedDev = await Developer.findByIdAndUpdate(
+        args._id, 
+        { $set: args },
+        { new: true }
+      );
       if (!updatedDev) throw new Error("Developer not found");
       return updatedDev;
     },
@@ -77,7 +79,6 @@ export const resolvers = {
       });
 
       if (!deletedDev) throw new Error("Developer not found");
-      console.log(deletedDev)
       return deletedDev;
     },
   },

@@ -23,16 +23,16 @@ export const typeDefs = gql`
     ): Client
     updateClient(
       _id: ID!,
-      firstname: String!,
-      lastname: String!,
-      email: String!,
-      phone: String!,
+      firstname: String,
+      lastname: String,
+      email: String,
+      phone: String,
       # company: CompanyInput
-      name: String!,
+      name: String,
       website: String,
-      country: String!,
-      state: String!,
-      city: String!,
+      country: String,
+      state: String,
+      city: String,
     ): Client
     deleteClient(ids: [ID]!): Client
   }
@@ -103,9 +103,11 @@ export const resolvers = {
       return savedClient;
     },
     updateClient: async (_, args) => {
-      const updatedClient = await Client.findByIdAndUpdate(args._id, args, {
-      new: true,
-      });
+      const updatedClient = await Client.findByIdAndUpdate(
+        args._id, 
+        { $set: args },
+        { new: true }
+      );
       if (!updatedClient) throw new Error("Client not found");
         return updatedClient;
     },

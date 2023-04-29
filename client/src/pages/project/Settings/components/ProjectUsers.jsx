@@ -18,13 +18,13 @@ import { UPDATE_PROJECT } from '../../../../graphql/mutations/projectMutations';
 import { GET_PROJECT } from '../../../../graphql/queries/projectQueries';
 import useFilterStoredData from '../../../../hooks/useFilterStoredData';
 
-function ProjectUsers({team, client, projectId}) {
+function ProjectUsers({members, client, projectId}) {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   
   const [usersInput, setUsersInput] = useState({
     client: null,
-    team: [],
+    members: [],
   });
 
   // GraphQL
@@ -48,7 +48,7 @@ function ProjectUsers({team, client, projectId}) {
     }],
   });
 
-  const filteredDevs = useFilterStoredData(team, devData?.developers)
+  const filteredDevs = useFilterStoredData(members, devData?.developers)
   
   // Other functions
 
@@ -131,9 +131,9 @@ function ProjectUsers({team, client, projectId}) {
             width='250px'
           >
             <AutoComplete 
-              label="Team" 
-              name="team"
-              value={usersInput.team}
+              label="members" 
+              name="members"
+              value={usersInput.members}
               options={filteredDevs}
               setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
               valueField='_id'
@@ -143,7 +143,7 @@ function ProjectUsers({team, client, projectId}) {
               setOpen={setOpenDev}
               loading={loadingDevs}
               onChange={ (_, value) => (
-                setUsersInput({...usersInput, team: value || []})
+                setUsersInput({...usersInput, members: value || []})
               )}
             />
             <Box mt={1}>
@@ -151,27 +151,27 @@ function ProjectUsers({team, client, projectId}) {
                 text='Add members'
                 size='small'
                 onClick={() => {
-                  if(!usersInput?.team?.length) return;
+                  if(!usersInput?.members?.length) return;
                   handleEdit(
                     [
-                      ...(team.reduce((acc, user) => [...acc, user._id], [])),
-                      ...(usersInput.team.reduce((acc, user) => [...acc, user._id], []))
+                      ...(members.reduce((acc, user) => [...acc, user._id], [])),
+                      ...(usersInput.members.reduce((acc, user) => [...acc, user._id], []))
                     ],
                     'team'
                   )
-                  setUsersInput({...usersInput, team: []})
+                  setUsersInput({...usersInput, members: []})
                 }}
               />
             </Box>
           </Dropdown>
         </Box>
-        {team.length ? (
-          team.map( (item, i) => (
+        {members?.length ? (
+          members.map( (item, i) => (
             <Box key={i} display='flex' alignItems='center' justifyContent='space-between'>
               <ProfileRow user={item} />  
               <IconButton
                 onClick={() => {
-                  const filteredDevs = team.filter(dev => dev._id !== item._id)
+                  const filteredDevs = members.filter(dev => dev._id !== item._id)
                                            .map(item => item._id)
                   handleEdit(filteredDevs, 'team');
                 }}

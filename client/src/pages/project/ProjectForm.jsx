@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import * as yup from 'yup';
-import { Box, Step, StepContent, StepLabel, Stepper } from '@mui/material';
+import { Box, Grid, Step, StepContent, StepLabel, Stepper, useTheme } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 import CustomButton from '../../components/CustomButton';
 import Input from '../../components/form/Input';
@@ -15,6 +15,7 @@ import { GET_DEVNAMES } from '../../graphql/queries/devsQueries';
 import useAsyncAutocomplete from '../../hooks/useAsyncAutocomplete';
 import { GET_CLIENTNAMES } from '../../graphql/queries/clientQueries';
 import { tagsOptions } from '../../data';
+import { tokens } from '../../theme';
 
 const schema = yup.object().shape({
   name: yup.string().required(),
@@ -50,6 +51,8 @@ const schema = yup.object().shape({
 
 const ProjectForm = () => {
   const { id } = useParams();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [activeSteps, setActiveSteps] = useState(false);
@@ -134,125 +137,149 @@ const ProjectForm = () => {
 	}, [id, projectData])
 
   return (
-    <Box m="20px">
-      <Header title="NEW PROJECT" subtitle="Fill the fields to create new project" />
-      { (!projectLoading) && (
-        <Formik
-          initialValues={initialValues}
-          validationSchema={schema}
-          onSubmit={onSubmit}
-        >
-          {({values}) => (
-            <Form>
-              <Stepper orientation="vertical" 
-                sx={{
-                  maxWidth: '600px',
-                  marginX: 'auto',
-                  marginBottom: '10px'
-                }}
+    <Box sx={{ width: '100%' }} p='20px'>
+      <Grid
+        container
+        spacing={2}
+        alignItems='center'
+        minHeight='86vh'
+      >
+        <Grid item sm={12} md={6}>
+          <img
+            src='/img/project.png'
+            alt='project'
+            width='100%'
+            maxWidth='100px'
+          />
+        </Grid>
+        <Grid  item sm={12} md={6}>
+          <Box
+            p={4}
+            bgcolor={colors.primary[400]}
+            maxWidth='600px'
+            borderRadius={5}
+          >
+            <Header title="NEW PROJECT" subtitle="Fill the fields to create new project" />
+            { (!projectLoading) && (
+              <Formik
+                initialValues={initialValues}
+                validationSchema={schema}
+                onSubmit={onSubmit}
               >
-                <Step active={(activeStep === 0) || activeSteps}>
-                  <StepLabel>
-                    Set project
-                  </StepLabel>
-                  <StepContent>
-                    <Box sx={{ display: 'flex', gap: 3, flexDirection: 'column' }}>
-                      <Input label="Name*" name="name" />
-                      <Input label="Description*" name="description" multiline rows={4} />
-                      <Input label="Type" name="type" />
-                      {!activeSteps && (
-                        <Box sx={{ display: 'flex', mb: 2, gap: 1 }}>
-                          <CustomButton text='Continue' onClick={handleNext} btnstyle="primary" />
-                        </Box>
-                      )}
-                    </Box>
-                  </StepContent>
-                </Step>
-                <Step active={(activeStep === 1) || activeSteps}>
-                  <StepLabel>
-                    Add client and collaborators
-                  </StepLabel>
-                  <StepContent>
-                    <Box sx={{ display: 'flex', gap: 3, flexDirection: 'column' }}>
-                      <AutoComplete 
-                        label="Client" 
-                        name="clientId" 
-                        options={clientData?.clients}
-                        // defaultValue={data.clients.find((option) => (
-                        //   option._id === values?.clientId
-                        // )) || null}
-                        setLabel={(option) => `${option.firstname} ${option.lastname}`}
-                        valueField='_id'
-                        async={true}
-                        open={clientFieldOpen}
-                        setOpen={setOpenClient}
-                        loading={loadingClients}
-                      />
-                      <AutoComplete 
-                        label="Team" 
-                        name="team" 
-                        options={devData?.developers}
-                        setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
-                        valueField='_id'
-                        multiple
-                        async={true}
-                        open={devFieldOpen}
-                        setOpen={setOpenDev}
-                        loading={loadingDevs}
-                      />
-                      {!activeSteps && (
-                        <Box sx={{ display: 'flex', mb: 2, gap: 1 }}>
-                          <CustomButton text='Back' onClick={handleBack} btnstyle="secondary" />
-                          <CustomButton text='Continue' onClick={handleNext} btnstyle="primary" />
-                        </Box>
-                      )}
-                    </Box>
-                  </StepContent>
-                </Step>
-                <Step active={(activeStep === 2) || activeSteps}>
-                  <StepLabel>
-                    Project Details
-                  </StepLabel>
-                  <StepContent>
-                    <Box sx={{ display: 'flex', gap: 3, flexDirection: 'column' }}>
-                      <AutoComplete 
-                        label="Tags" 
-                        name="tags"
-                        options={tagsOptions} 
-                        multiple
-                        freeSolo
-                      />
-                      <Input label="Repository" name="repository" 
-                            icon={<LanguageIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />} 
-                            variant="standard"     
-                      />
-                      <Input label="URL" name="url" 
-                            icon={<LanguageIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />} 
-                            variant="standard"     
-                      />    
-                      <Box sx={{ display: 'flex', mb: 2, gap: 1 }}>
-                        {!activeSteps && (
-                          <CustomButton text='Back' onClick={handleBack} btnstyle="secondary" />
-                        )} 
-                        <CustomButton 
-                          text={id ? 'Update project' : 'Create project'} 
-                          onClick={async () => {
-                            const isValid = await schema.isValid(values);
-                            !isValid && setActiveSteps(true);
-                          }} 
-                          type="submit"
-                          btnstyle="primary"
-                          loading={postLoading}
-                        />
-                      </Box>
-                    </Box>
-                  </StepContent>
-                </Step>
-              </Stepper>
-            </Form>
-          )}
-        </Formik>
-      )}
+                {({values}) => (
+                  <Form>
+                    <Stepper orientation="vertical" 
+                      sx={{
+                        // maxWidth: '600px',
+                        marginX: 'auto',
+                        marginBottom: '10px'
+                      }}
+                    >
+                      <Step active={(activeStep === 0) || activeSteps}>
+                        <StepLabel>
+                          Set project
+                        </StepLabel>
+                        <StepContent>
+                          <Box sx={{ display: 'flex', gap: 3, flexDirection: 'column' }}>
+                            <Input label="Name*" name="name" />
+                            <Input label="Description*" name="description" multiline rows={4} />
+                            <Input label="Type" name="type" />
+                            {!activeSteps && (
+                              <Box sx={{ display: 'flex', mb: 2, gap: 1 }}>
+                                <CustomButton text='Continue' onClick={handleNext} btnstyle="primary" />
+                              </Box>
+                            )}
+                          </Box>
+                        </StepContent>
+                      </Step>
+                      <Step active={(activeStep === 1) || activeSteps}>
+                        <StepLabel>
+                          Add client and collaborators
+                        </StepLabel>
+                        <StepContent>
+                          <Box sx={{ display: 'flex', gap: 3, flexDirection: 'column' }}>
+                            <AutoComplete 
+                              label="Client" 
+                              name="clientId" 
+                              options={clientData?.clients}
+                              // defaultValue={data.clients.find((option) => (
+                              //   option._id === values?.clientId
+                              // )) || null}
+                              setLabel={(option) => `${option.firstname} ${option.lastname}`}
+                              valueField='_id'
+                              async={true}
+                              open={clientFieldOpen}
+                              setOpen={setOpenClient}
+                              loading={loadingClients}
+                            />
+                            <AutoComplete 
+                              label="Team" 
+                              name="team" 
+                              options={devData?.developers}
+                              setLabel={(option) => `${option?.firstname} ${option?.lastname}`}
+                              valueField='_id'
+                              multiple
+                              async={true}
+                              open={devFieldOpen}
+                              setOpen={setOpenDev}
+                              loading={loadingDevs}
+                            />
+                            {!activeSteps && (
+                              <Box sx={{ display: 'flex', mb: 2, gap: 1 }}>
+                                <CustomButton text='Back' onClick={handleBack} btnstyle="secondary" />
+                                <CustomButton text='Continue' onClick={handleNext} btnstyle="primary" />
+                              </Box>
+                            )}
+                          </Box>
+                        </StepContent>
+                      </Step>
+                      <Step active={(activeStep === 2) || activeSteps}>
+                        <StepLabel>
+                          Project Details
+                        </StepLabel>
+                        <StepContent>
+                          <Box sx={{ display: 'flex', gap: 3, flexDirection: 'column' }}>
+                            <AutoComplete 
+                              label="Tags" 
+                              name="tags"
+                              options={tagsOptions} 
+                              multiple
+                              freeSolo
+                            />
+                            <Input label="Repository" name="repository" 
+                                  icon={<LanguageIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />} 
+                                  variant="standard"     
+                            />
+                            <Input label="URL" name="url" 
+                                  icon={<LanguageIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />} 
+                                  variant="standard"     
+                            />    
+                            <Box sx={{ display: 'flex', mb: 2, gap: 1 }}>
+                              {!activeSteps && (
+                                <CustomButton text='Back' onClick={handleBack} btnstyle="secondary" />
+                              )} 
+                              <CustomButton 
+                                text={id ? 'Update project' : 'Create project'} 
+                                onClick={async () => {
+                                  const isValid = await schema.isValid(values);
+                                  !isValid && setActiveSteps(true);
+                                }} 
+                                type="submit"
+                                btnstyle="primary"
+                                loading={postLoading}
+                              />
+                            </Box>
+                          </Box>
+                        </StepContent>
+                      </Step>
+                    </Stepper>
+                  </Form>
+                )}
+              </Formik>
+            )}
+          </Box>
+        </Grid>
+      </Grid>
     </Box>
   )
 }
