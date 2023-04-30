@@ -3,10 +3,10 @@ import AlarmOffIcon from '@mui/icons-material/AlarmOff';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { Draggable } from 'react-beautiful-dnd'
 import { tokens } from '../../../../../theme';
-import { useBoard } from '../../../../../context/BoardContext';
 import ProfileAvatar from '../../../../../components/user/ProfileAvatar';
 import { formatDate } from '@fullcalendar/core';
 import { hexToRgba } from '../../../../../helpers/colors';
+import { useTaskModal } from '../../context/TaskModalContext';
 
 const PriorityLabel = ({priority}) => {
   const theme = useTheme();
@@ -45,7 +45,7 @@ const PriorityLabel = ({priority}) => {
 const TaskCard = ({ task, index }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { openTaskModal } = useBoard();
+  const { openTaskModal } = useTaskModal();
   
   return (
     <Draggable
@@ -79,7 +79,7 @@ const TaskCard = ({ task, index }) => {
               {task.title}
             </Typography>
           </Box>
-          { (task.dueDate || task.members) && (
+          { (!!(task.dueDate) || !!(task.members.length)) && (
             <Box
               display='flex'
               justifyContent='space-between'
@@ -91,22 +91,25 @@ const TaskCard = ({ task, index }) => {
                 alignItems='center'
                 gap='2px'
               >
-                {!!task?.dueDate ? (
-                  <ScheduleIcon />
+                {!!(task?.dueDate) ? (
+                  <>
+                    <ScheduleIcon />
+                    <Typography component='span'>
+                      {formatDate(+task?.dueDate, {
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </Typography>
+                  </>
                 ) : (
                   <AlarmOffIcon />
                 )}
-                <Typography component='span'>
-                  {formatDate(+task?.dueDate, {
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </Typography>
               </Box>
-              {task?.members?.length && (
+              {!!(task?.members?.length) && (
                 <AvatarGroup max={3}>
-                  {task.members.map(item => (
+                  {task.members.map((item, index) => (
                     <ProfileAvatar
+                      key={index}
                       name={item.firstname}
                       sx={{
                         bgcolor: colors.blueAccent[500],

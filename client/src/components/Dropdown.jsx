@@ -73,8 +73,9 @@ const Dropdown = ({button, options, children, width = 'auto', ...props}) => {
           },
         }}
         sx={{
+          // zIndex: 2000,
           '& .MuiPaper-root': {
-            boxShadow: `1px 1px 6px ${colors.primary[600]}`,
+            boxShadow: `1px 1px 6px ${colors.blueAccent[900]}`,
             width,
             borderRadius: 2,
             padding: 1,
@@ -103,7 +104,8 @@ const Dropdown = ({button, options, children, width = 'auto', ...props}) => {
               key={index}
               onClick={() => {
                 handleItemClick();
-                item?.path && navigate(item.path)
+                item?.path && navigate(item.path);
+                item?.onClick && item.onClick();
               }}
               disableRipple
             >

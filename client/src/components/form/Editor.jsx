@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Box, Button, Fab, TextField, useTheme } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -15,10 +15,10 @@ const Editor = ({onAccept, value = '', children, handleUpdate, ...props}) => {
   const [loading, setLoading] = useState(false);
   const [activeEdit, setActiveEdit] = useState(false);
   const [editorContent, setEditorContent] = useState(value);
+  const refEditor = useRef();
   
   const handleChange = (fieldValue) => {
     const isChanged = fieldValue !== value
-    console.log(fieldValue, value)
     setEditorContent(fieldValue)
     isChanged ? setActiveEdit(true) : setActiveEdit(false);
   }
@@ -28,11 +28,12 @@ const Editor = ({onAccept, value = '', children, handleUpdate, ...props}) => {
     setActiveEdit(false)
   }
 
-  const handleBlur = ({e}) => {
-    console.log(e)
+  const handleBlur = (e) => {
+    // TODO: When click in the editor toolbar, anywhere other than the button refEditor.current.contains throw false
+    console.log(refEditor.current.contains(e.relatedTarget))
     if(
       e?.relatedTarget?.id === 'input-actions' ||
-      e?.relatedTarget?.id === 'editor-container' ||
+      refEditor.current.contains(e.relatedTarget) ||
       !activeEdit
     ){
       return
@@ -50,15 +51,18 @@ const Editor = ({onAccept, value = '', children, handleUpdate, ...props}) => {
   }
 
   return (
-    <Box position='relative' onBlur={handleBlur} id='editor-container' >
+    <Box
+      id='editor-container'
+      position='relative'
+      ref={refEditor}
+      onBlur={handleBlur}
+    >
       <CKEditor
           editor={ ClassicEditor }
           data={ editorContent }
           onChange={ ( event, editor ) => {
               const data = editor.getData();
-              console.log({data})
               handleChange(data);
-              // handleUpdate(data, 'description')
           }}
           {...loading && {
             disabled: true

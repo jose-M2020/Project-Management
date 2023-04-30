@@ -1,4 +1,5 @@
 import { 
+  AvatarGroup,
   Box,
   Card,
   CardActionArea,
@@ -11,6 +12,7 @@ import {
 import { Link } from "react-router-dom";
 import { tokens } from "../../../../theme";
 import { formatDateTime } from "../../../../helpers/dateTime";
+import ProfileAvatar from "../../../../components/user/ProfileAvatar";
 
 const GetStatusProps = (status) => {
   const theme = useTheme();
@@ -96,7 +98,7 @@ export default function ProjectCard({ project }) {
                 flexDirection: 'column',
                 gap: '10px',
                 flex: '1 0 auto',
-                padding: 0
+                padding: '0 !important'
               }}
             >
               
@@ -127,6 +129,21 @@ export default function ProjectCard({ project }) {
                   <Chip key={i} label={item} variant="outlined" color="secondary" />
                 ))}
               </Box>
+              {!!(project?.members?.length) && (
+                <AvatarGroup max={3}>
+                  {project.members.map((item, index) => (
+                    <ProfileAvatar
+                      key={index}
+                      name={item.firstname}
+                      sx={{
+                        // bgcolor: colors.blueAccent[500],
+                        width: 28, height: 28,
+                        borderColor: `${colors.primary[400]} !important`
+                      }}
+                    />
+                  ))}
+                </AvatarGroup>
+              )}
             </CardContent>
             {/* Footer */}
           </Box>

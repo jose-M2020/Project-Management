@@ -5,12 +5,13 @@ import * as yup from 'yup';
 import { 
   Box, Stack, useTheme
 } from '@mui/material';
-import Header from '../../components/Header';
-import CustomButton from '../../components/CustomButton';
-import Input from '../../components/form/Input';
-import { CREATE_DEV, UPDATE_DEV } from '../../graphql/mutations/developerMutations';
-import { GET_DEV, GET_DEVS } from '../../graphql/queries/devsQueries';
-import { tokens } from '../../theme';
+
+import Header from '../../../components/Header';
+import CustomButton from '../../../components/CustomButton';
+import Input from '../../../components/form/Input';
+import { CREATE_DEV, UPDATE_DEV } from '../../../graphql/mutations/developerMutations';
+import { GET_DEV, GET_DEVS } from '../../../graphql/queries/devsQueries';
+import { tokens } from '../../../theme';
 
 const schema = yup.object().shape({
   firstname: yup.string().required(),

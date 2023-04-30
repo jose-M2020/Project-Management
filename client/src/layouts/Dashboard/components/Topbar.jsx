@@ -65,7 +65,7 @@ const Topbar = () => {
       justifyContent="space-between"
       position='sticky'
       top='0'
-      zIndex={1000}
+      zIndex={1100}
     >
       {/* LEFT SIDE */}
       <Box display="flex" alignItems='center' gap={1} >

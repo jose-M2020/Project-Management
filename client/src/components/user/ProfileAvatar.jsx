@@ -22,10 +22,18 @@ function stringToColor(string) {
   return color;
 }
 
-const ProfileAvatar = ({ name, sx }) => {
+const ProfileAvatar = ({ name, size, sx }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode)
   const nameArray = name.split(' ');
+
+  const sizes = {
+    sm: {
+      width: 30,
+      height: 30,
+      fontSize: '14px',
+    }
+  }
 
   return (
     <Avatar
@@ -33,6 +41,8 @@ const ProfileAvatar = ({ name, sx }) => {
         // bgcolor: stringToColor(name),
         bgcolor: colors.blueAccent[600],
         color: colors.blueAccent[200],
+        fontWeight: 'bold',
+        ...(size && sizes[size]),
         ...sx
       }}
     >

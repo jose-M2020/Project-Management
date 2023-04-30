@@ -22,7 +22,7 @@ export const projectStatus = {
 
 export const tagsOptions = [
   { label: 'HTML', value: 'HTML' },
-  { label: 'CSS', value: 'HTML' },
+  { label: 'CSS', value: 'CSS' },
   { label: 'JavaScript', value: 'JavaScript' },
   { label: 'ReactJS', value: 'ReactJS' },
   { label: 'Angular', value: 'Angular' },

@@ -35,10 +35,10 @@ const TaskSchema = new mongoose.Schema({
     ref: 'KanbanColumn',
     required: true
   },
-  members: {
+  members: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Developer'
-  },
+  }],
   order: {
     type: Number,
     required: true

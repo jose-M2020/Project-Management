@@ -4,6 +4,7 @@ import Task from "../models/Task.js";
 import KanbanColumn from "../models/KanbanColumn.js";
 import isTooClose from "../helpers/isTooClose.js";
 import recalcItemsPos from "../helpers/recalcItemsPos.js";
+import Developer from "../models/Developer.js";
 
 export const typeDefs = gql`
   extend type Query {
@@ -27,6 +28,7 @@ export const typeDefs = gql`
       _id: ID!, 
       title: String,
       description: String,
+      members: [ID],
       projectId: ID,
       done: Boolean,
       priority: String,
@@ -151,6 +153,9 @@ export const resolvers = {
     },
     column: async (parent) => {
       return await KanbanColumn.findById(parent.columnId);
+    },
+    members: async (parent) => {
+      return await Developer.find({ _id: parent?.members });
     }
   }
 }

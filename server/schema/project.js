@@ -48,7 +48,7 @@ export const typeDefs = gql`
     url: String
     type: String!
     status: String
-    team: [Developer]
+    members: [Developer]
     client: Client
     clientId: ID
     tags: [String]!
@@ -154,7 +154,7 @@ export const resolvers = {
     tasks: async (parent) => {
       return await Task.find({ projectId: parent._id });
     },
-    team: async (parent) => {
+    members: async (parent) => {
       return await Developer.find({ _id: parent.team });
     },
     client: async (parent) => {

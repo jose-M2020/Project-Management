@@ -10,6 +10,10 @@ export const GET_PROJECTS = gql`
       tags,
       createdAt,
       type,
+      members{
+        firstname,
+        lastname
+      }
       # tasks{
       #   _id,
       #   status
@@ -37,7 +41,7 @@ export const GET_PROJECT = gql`
       url
       type
       status
-      team{
+      members{
         _id
         firstname
         lastname

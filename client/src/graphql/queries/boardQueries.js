@@ -47,6 +47,7 @@ export const GET_BOARDBYPROJECT = gql`
           _id
           firstname
           lastname
+          position
         }
         done
         order

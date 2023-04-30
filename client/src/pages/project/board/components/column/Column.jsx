@@ -1,11 +1,19 @@
 import React from "react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
-import { Box, Stack, Typography, useTheme } from "@mui/material";
+import { Box, IconButton, Stack, Typography, useTheme } from "@mui/material";
 import DoneIcon from '@mui/icons-material/Done';
+import MoreIcon from '@mui/icons-material/MoreVert';
 import { tokens } from "../../../../../theme";
 import { hexToRgba } from "../../../../../helpers/colors";
+
 import TasksContainer from "../task/TasksContainer";
-import EditInput from "../../../../../components/form/EditInput";
+import EditableText from "../../../../../components/EditableText";
+import Dropdown from "../../../../../components/Dropdown";
+import { DELETE_COLUMN, UPDATE_COLUMN } from "../../../../../graphql/mutations/columnMutations";
+import { useMutation } from "@apollo/client";
+import { GET_BOARDBYPROJECT } from "../../../../../graphql/queries/boardQueries";
+import { useBoard } from "../../context/BoardContext";
+import { useDeleteModal } from "../../context/DeleteModalContext";
 
 const Column = ({
   index,
@@ -14,12 +22,64 @@ const Column = ({
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { projectId  } = useBoard();
+  const { openDeleteModal  } = useDeleteModal();
+  
+  const [ updateColumn ] = useMutation(UPDATE_COLUMN, {
+    refetchQueries: [{ 
+      query: GET_BOARDBYPROJECT, variables: { projectId } 
+    }]
+  });
+  const [ deleteColumn ] = useMutation(DELETE_COLUMN, {
+    update: (cache, { data }) => {
+      const { boardByProject } = cache.readQuery({
+        query: GET_BOARDBYPROJECT,
+        variables: {
+          projectId
+        },
+      })
+      const filteredColumns = boardByProject.columns.filter(item => (
+        item._id !== data.deleteColumn._id
+      ))
+
+      cache.writeQuery({
+        query: GET_BOARDBYPROJECT,
+        variables: { projectId },
+        data: {
+          boardByProject: {
+            ...boardByProject,
+            columns: filteredColumns
+          }
+        }
+      })
+    }
+  });
+  
+  const handleUpdate = async (value) => {
+    await updateColumn({variables: {
+      id: column?._id,
+      title: value
+    }})
+
+    return true;
+  }
+
+  const handleDelete = () => {
+    openDeleteModal({
+      item: column.title,
+      onAccept: () => (
+        deleteColumn({
+          variables: { id: column._id },
+        })
+      )
+    })
+  }
 
   return (
     <Draggable
       index={index}
-      draggableId={column._id}
-      category={column.category}
+      draggableId={column?._id}
+      category={column?.category}
     >
       {(provided, snapshot) => (
         <Box
@@ -61,20 +121,31 @@ const Column = ({
               alignItems='center'
               gap='3px'
             >
-              <EditInput
-                value={column.title}
-                border='none'
+              <EditableText
+                text={column?.title}
+                onAccept={handleUpdate}
+                textComplement={column?.category === 'done' && (
+                  <DoneIcon
+                    sx={{
+                      color: colors.greenAccent[300]
+                    }}
+                  />
+                )}
+                padding="12px 5px"
               />
-              {/* <Typography variant='h4' >
-                {column.title}
-              </Typography> */}
-              {column.category === 'done' && (
-                <DoneIcon
-                  sx={{
-                    color: colors.greenAccent[300]
-                  }}
-                />
-              )}
+              <Dropdown
+                button={
+                  <IconButton>
+                    <MoreIcon />
+                  </IconButton>
+                }
+                options={[
+                  {
+                    title: 'Delete',
+                    onClick: handleDelete
+                  }
+                ]}
+              />
               {/* <Typography 
                 variant="span"
                 ml={1}
@@ -83,7 +154,7 @@ const Column = ({
                   backgroundColor: colors.blueAccent[500],
                 }}
               >
-                {column.items.length}
+                {column?.items.length}
               </Typography> */}
             </Box>
           </Stack>

@@ -24,9 +24,16 @@ export const ADD_PROJECT = gql`
       tags: $tags
     ) {
       _id
-      name
-      description
-      status
+      name,
+      description,
+      status,
+      tags,
+      createdAt,
+      type,
+      members{
+        firstname,
+        lastname
+      }
     }
   }
 `;

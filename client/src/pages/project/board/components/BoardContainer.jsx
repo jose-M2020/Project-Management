@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Box } from '@mui/material'
-import { DragDropContext, Droppable } from 'react-beautiful-dnd'
+import { DragDropContext } from 'react-beautiful-dnd'
 import { useMutation } from '@apollo/client';
 import Header from '../../../../components/Header'
 import { GET_BOARDBYPROJECT } from '../../../../graphql/queries/boardQueries'
 import { UPDATE_COLUMNPOSITION } from '../../../../graphql/mutations/columnMutations'
 import { UPDATE_TASKPOSITION } from '../../../../graphql/mutations/taskMutations';
-import Column from './column/Column'
 import taskReorderer from '../../../../helpers/taskReorderer';
 import BoardHeader from './BoardHeader';
 import columnReorderer from '../../../../helpers/columnReorderer';
@@ -25,10 +24,10 @@ const padding = {
 const BoardContainer = ({board, projectId}) => {
   const [columns, setColumns] = useState([]);
   const [tasks, setTasks] = useState([]);
-
+  
   const [
     updateTaskPosition,
-    { loadingTaskPositionUpdate, taskUpdatePositionError }
+    { loading: loadingTaskPositionUpdate }
   ] = useMutation(UPDATE_TASKPOSITION, {
     update: (cache, { data }) => {
       
@@ -36,7 +35,7 @@ const BoardContainer = ({board, projectId}) => {
 	});
   const [
     updateColumnPosition,
-    { loadingColumnUpdate, columnUpdateError }
+    { loading: loadingColumnUpdate }
   ] = useMutation(UPDATE_COLUMNPOSITION, {
     update: (cache, { data }) => {
       // TODO: Find out if there's a better way to update board cache
@@ -52,16 +51,14 @@ const BoardContainer = ({board, projectId}) => {
       })
     },
 	});
-
+  
   useEffect(() => {
-    if(!columns.length){
-      const sortedColums = sortData([...board?.columns]);
-      setColumns(sortedColums)
-    }
+    const sortedColums = sortData([...board?.columns]);
+    setColumns(sortedColums)
 
     const sortedTasks = sortData([...board?.tasks]);
     setTasks(sortedTasks);
-  }, [board])
+  }, [board]) 
   
   const onDragUpdate = (update, provided) => {
     const message = update.destination
@@ -145,6 +142,10 @@ const BoardContainer = ({board, projectId}) => {
             height='100%'
             maxHeight='100%'
             overflow='hidden'
+            sx={{ 
+              pointerEvents: 
+                (loadingColumnUpdate || loadingTaskPositionUpdate) ? 'none' : 'auto'
+            }}
           >
             <Box
               display='flex'

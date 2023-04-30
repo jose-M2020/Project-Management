@@ -1,9 +1,9 @@
 import React from "react";
 import { Droppable } from "react-beautiful-dnd";
-import { Box, Fab, useTheme } from "@mui/material";
-import AddIcon from '@mui/icons-material/Add';
+import { Box, useTheme } from "@mui/material";
 import Column from "./Column";
 import { tokens } from "../../../../../theme";
+import NewColumn from "./NewColumn";
 
 const padding = {
   xs: '20px',
@@ -16,7 +16,7 @@ const ColumnsContainer = ({
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
+  
   return (
     // <Box display='flex' minWidth='fit-content'>
       // <Box px={padding}>
@@ -63,9 +63,7 @@ const ColumnsContainer = ({
                       {provided.placeholder}
                     </Box>
                   </Box>
-                  <Fab size="small" color="secondary" aria-label="add">
-                    <AddIcon />
-                  </Fab>
+                  <NewColumn columns={columns} />
                   <Box 
                     width='28px'
                     bgcolor={colors.primary[500]}
