@@ -12,12 +12,13 @@ import {
 } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 import { Country, State, City }  from 'country-state-city';
-import Header from '../../components/Header';
-import CustomButton from '../../components/CustomButton';
-import Input from '../../components/form/Input';
-import AutoComplete from '../../components/form/AutoComplete';
-import { CREATE_CLIENT, UPDATE_CLIENT } from '../../graphql/mutations/clientMutations';
-import { GET_CLIENT, GET_CLIENTS } from '../../graphql/queries/clientQueries';
+
+import Header from '../../../components/Header';
+import CustomButton from '../../../components/CustomButton';
+import Input from '../../../components/form/Input';
+import AutoComplete from '../../../components/form/AutoComplete';
+import { CREATE_CLIENT, UPDATE_CLIENT } from '../../../graphql/mutations/clientMutations';
+import { GET_CLIENT, GET_CLIENTS } from '../../../graphql/queries/clientQueries';
 
 const schema = yup.object().shape({
   firstname: yup.string().required(),

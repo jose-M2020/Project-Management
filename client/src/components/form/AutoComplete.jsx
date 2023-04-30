@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { Chip, CircularProgress, TextField } from '@mui/material'
 import Autocomplete from '@mui/material/Autocomplete';
 
@@ -29,7 +29,6 @@ const AutoComplete = ({
   
   return (
     <Autocomplete
-      // value={defaultValues}
       getOptionLabel={(option) => (
         setLabel ? setLabel(option) : option.label
       )}

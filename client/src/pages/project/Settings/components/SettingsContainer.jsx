@@ -15,7 +15,7 @@ import { Toaster, toast } from 'sonner'
 import Header from '../../../../components/Header';
 import CustomButton from '../../../../components/CustomButton';
 import CustomModal from '../../../../components/CustomModal';
-import { GET_PROJECT } from '../../../../graphql/queries/projectQueries';
+import { GET_PROJECT, GET_PROJECTS } from '../../../../graphql/queries/projectQueries';
 import { DELETE_PROJECT, UPDATE_PROJECT } from '../../../../graphql/mutations/projectMutations';
 import EditInput from '../../../../components/form/EditInput';
 import { projectStatus, tagsOptions } from '../../../../data';
@@ -39,7 +39,21 @@ const SettingsContainer = ({projectData}) => {
     deleteProject,
     {loading: deleting }
   ] = useMutation(DELETE_PROJECT, {
-    refetchQueries: ["getProjects"],
+    update: (cache, { data }) => {
+      const { projects } = cache.readQuery({
+        query: GET_PROJECTS
+      })
+      const filteredProjects = projects.filter(item => (
+        item._id !== data.deleteProject._id
+      ))
+      
+      cache.writeQuery({
+        query: GET_PROJECTS,
+        data: {
+          projects: filteredProjects
+        }
+      })
+    }
   });
         
   const [updateProject] = useMutation(UPDATE_PROJECT, {
@@ -58,7 +72,6 @@ const SettingsContainer = ({projectData}) => {
 		});
 		if (result.data.deleteProject._id) {
 			navigate('/projects');
-      console.log('redirecting to')
 		}  
   }
 
