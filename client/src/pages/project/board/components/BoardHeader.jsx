@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { AvatarGroup, Box, Fab, Grid, Typography } from '@mui/material'
+import { AvatarGroup, Box, Fab, Grid, IconButton, Typography } from '@mui/material'
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import DeleteIcon from '@mui/icons-material/Delete';
 import ProfileAvatar from '../../../../components/user/ProfileAvatar'
 import Dropdown from '../../../../components/Dropdown'
 import AutoComplete from '../../../../components/form/AutoComplete'
@@ -47,13 +48,30 @@ const BoardHeader = ({ members, tasks, ...props }) => {
     return true;
   }
 
+  const handleRemoveUser = (id) => {
+    const newMembers = [...members].filter(item => item._id !== id)
+                                   .map(item => item._id );
+    // setMembers(newMembers);
+    
+    handleEdit(newMembers, 'members')
+  }
+
   return (
     <Grid container spacing={2} mb={4} alignItems='center' justifyContent='space-between' {...props} >
       <Grid item xs={12} sm={6} md={5} display='flex' alignItems='center' gap={1}>
         {members.length ? (
           <AvatarGroup max={6}>
             {members.map(item => (
-              <ProfileAvatar name={item.firstname} key={item._id} />
+              <ProfileAvatar
+                key={item._id}
+                userData={item}
+                showDetails={true}
+              >
+                {/* <CustomButton ml='auto' text='delete User' /> */}
+                <IconButton onClick={() => handleRemoveUser(item._id)}>
+                  <DeleteIcon />
+                </IconButton>
+              </ProfileAvatar>
             ))}
           </AvatarGroup>
         ) : (

@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from "react";
+import { useReducer, useState } from "react";
 import { Form, Formik } from 'formik';
 import * as yup from 'yup';
 import FullCalendar from "@fullcalendar/react";
@@ -18,22 +18,20 @@ import {
   useTheme,
 } from "@mui/material";
 import DescriptionIcon from '@mui/icons-material/Description';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
+// import AttachFileIcon from '@mui/icons-material/AttachFile';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 // import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import Header from "../components/Header";
 import { tokens } from "../theme";
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { GET_EVENTS } from "../graphql/queries/eventQueries";
 import Input from "../components/form/Input";
 import CustomButton from "../components/CustomButton";
 import { CREATE_EVENT, DELETE_EVENT } from '../graphql/mutations/eventMutations';
 import CheckboxField from "../components/form/CheckboxField";
-import { GET_PROJECTNAMES } from "../graphql/queries/projectQueries";
-import AutoComplete from "../components/form/AutoComplete";
 import CustomModal from "../components/CustomModal";
 import { formatDateTime } from "../helpers/dateTime";
-import useAsyncAutocomplete from "../hooks/useAsyncAutocomplete";
+import { useProject } from "../context/ProjectContext";
 
 const schema = yup.object().shape({
   title: yup.string().required(),
@@ -63,18 +61,14 @@ const Calendar = () => {
   
   const [selectedDate, setSelectedDate] = useState({});
   const [selectedEvent, setSelectedEvent] = useState({});
-  
+  const { _id: projectId } = useProject();
   // Apollo Client Events
 
-  const { loading, data } = useQuery(GET_EVENTS);
-  const {
-    data: projectData,
-    loading: loadingProjects,
-    open,
-    setOpen
-  } = useAsyncAutocomplete(GET_PROJECTNAMES)
+  const { loading, data } = useQuery(GET_EVENTS, {
+    variables: {projectId}
+  });
 
-  const [createEvent, { postLoading, postError }] = useMutation(CREATE_EVENT, {
+  const [createEvent, { loading: postLoading }] = useMutation(CREATE_EVENT, {
     refetchQueries: [
       {
 				query: GET_EVENTS,
@@ -234,7 +228,7 @@ const Calendar = () => {
             description: '',
             start: '',
             end: '',
-            projectId: null,
+            projectId,
             notify: false,
           }}
           validationSchema={schema}
@@ -246,17 +240,6 @@ const Calendar = () => {
               >
                 <Input label="Title*" name="title" />
                 <Input label="Description" name="description" multiline rows={4} />
-                <AutoComplete
-                  label="Project" 
-                  name="projectId" 
-                  options={projectData?.projects}
-                  valueField='_id'
-                  setLabel={option => option?.name}
-                  async={true}
-                  open={open}
-                  setOpen={setOpen}
-                  loading={loadingProjects}
-                />
                 <CheckboxField
                   name='notify'
                   label='Notify'
@@ -313,7 +296,7 @@ const Calendar = () => {
               secondary={selectedEvent?.description || 'No description'} 
             />
           </ListItem>
-          <ListItem disableGutters>
+          {/* <ListItem disableGutters>
             <ListItemAvatar>
               <Avatar sx={{ bgcolor: colors.blueAccent[300] }}>
                 <AttachFileIcon />
@@ -323,7 +306,7 @@ const Calendar = () => {
               primary="Project"
               secondary={selectedEvent?.project?.name || 'No linked project'} 
             />
-          </ListItem>
+          </ListItem> */}
           <ListItem disableGutters>
             <ListItemAvatar>
               <Avatar sx={{ bgcolor: colors.blueAccent[300] }}>

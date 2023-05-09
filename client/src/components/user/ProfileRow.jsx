@@ -13,7 +13,7 @@ const ProfileRow = ({ user, ...props }) => {
       alignItems='center'
       {...props}
     >
-      <ProfileAvatar name={user?.firstname} />
+      <ProfileAvatar userData={user} />
       <Box>
         <Typography mb='4px'>{user?.firstname} {user?.lastname}</Typography>
         <Typography 

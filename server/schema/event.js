@@ -4,7 +4,9 @@ import Project from "../models/Project.js";
 
 export const typeDefs = gql`
   extend type Query {
-    events: [Event]
+    events(
+      projectId: ID
+    ): [Event]
     event(_id: ID!): Event
   }
 
@@ -48,11 +50,14 @@ export const typeDefs = gql`
 
 export const resolvers = {
   Query: {
-    events: async () => {
+    events: async (_, { projectId }) => {
       const currentDate = new Date().toJSON().slice(0, 10); //Event.find({ start: { $gte: currentDate } })
       
+      const params = {
+        ...(projectId && {projectId})
+      }
       // TODO: find events from now on and return object with all events and events currently
-      return await Event.find()
+      return await Event.find(params)
                         .sort({start: -1});
     },
     event: async (_, { _id }) => {

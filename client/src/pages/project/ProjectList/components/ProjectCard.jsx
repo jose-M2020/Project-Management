@@ -134,7 +134,7 @@ export default function ProjectCard({ project }) {
                   {project.members.map((item, index) => (
                     <ProfileAvatar
                       key={index}
-                      name={item.firstname}
+                      userData={item}
                       sx={{
                         // bgcolor: colors.blueAccent[500],
                         width: 28, height: 28,

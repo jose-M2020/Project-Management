@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Box, Fab, IconButton, Typography, useTheme } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -8,7 +8,7 @@ import ProfileRow from '../../../../../../components/user/ProfileRow';
 import { tokens } from '../../../../../../theme';
 import useAsyncAutocomplete from '../../../../../../hooks/useAsyncAutocomplete';
 import { GET_DEVNAMES } from '../../../../../../graphql/queries/devsQueries';
-import { DELETE_TASK, UPDATE_TASK } from '../../../../../../graphql/mutations/taskMutations';
+import { UPDATE_TASK } from '../../../../../../graphql/mutations/taskMutations';
 import { useMutation } from '@apollo/client';
 import { GET_BOARDBYPROJECT } from '../../../../../../graphql/queries/boardQueries';
 import CustomButton from '../../../../../../components/CustomButton';
