@@ -24,6 +24,7 @@ function stringToColor(string) {
 
 function ProfilePopover({ 
   active,
+  position,
   data,
   popoverChildren,
   children
@@ -31,6 +32,29 @@ function ProfilePopover({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode)
   const [anchorEl, setAnchorEl] = useState(null);
+
+  const positions = {
+    bottom: {
+      anchorOrigin: {
+        vertical: 'bottom',
+        horizontal: 'right',
+      },
+      transformOrigin: {
+        vertical: 'top',
+        horizontal: 'right',
+      }
+    },
+    left: {
+      anchorOrigin: {
+        vertical: 'top',
+        horizontal: 'left',
+      },
+      transformOrigin: {
+        vertical: 'top',
+        horizontal: 'right',
+      }
+    },
+  }
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -63,26 +87,47 @@ function ProfilePopover({
           open={open}
           anchorEl={anchorEl}
           onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
+          {...positions[position]}
+          sx={{ marginTop: '10px' }}
         >
           <Box
             sx={{
-              p: 2,
               bgcolor: colors.primary[400],
               display: 'flex',
               flexDirection: 'column',
-              gap: 2,
+              gap: 1,
+              minWidth: '290px',
             }}
           >
-            <Typography>{data.firstname} {data.lastname}</Typography>
-            <Box>
+            <Box
+              p={2}
+              sx={{
+                display: 'flex',
+                gap: 1,
+                borderRadius: '5px',
+                backgroundImage: `linear-gradient(to bottom, ${colors.blueAccent[400]} 0%, ${colors.blueAccent[400]} 100%)`,
+                backgroundSize: '100% 63%',
+                backgroundRepeat: 'no-repeat',
+              }}
+            >
+              <ProfileAvatar
+                userData={data}
+                sx={{
+                  width: '85px',
+                  height: '85px',
+                  fontSize: '2.4rem',
+                }}
+              />
+              <Box mt={1} color={colors.blueAccent[900]}>
+                <Typography fontWeight={700} fontSize='18px'>
+                  {data.firstname} {data.lastname}
+                </Typography>
+                <Typography fontWeight={600} fontSize='12px'>
+                  {data.email}
+                </Typography>
+              </Box>
+            </Box>
+            <Box px={2} pb={2}>
               { popoverChildren }
             </Box>
           </Box>
@@ -96,6 +141,7 @@ const ProfileAvatar = ({
   userData,
   size,
   showDetails = false,
+  popoverPos = 'bottom',
   children,
   ...props
 }) => {
@@ -108,7 +154,12 @@ const ProfileAvatar = ({
       width: 30,
       height: 30,
       fontSize: '14px',
-    }
+    },
+    md: {
+      width: 40,
+      height: 40,
+      fontSize: '14px',
+    },
   }
 
   return (
@@ -123,6 +174,7 @@ const ProfileAvatar = ({
           data={userData}
           active={showDetails}
           popoverChildren={children}
+          position={popoverPos}
         >
           <Box
             sx={{

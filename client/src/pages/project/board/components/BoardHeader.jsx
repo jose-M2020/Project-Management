@@ -28,9 +28,15 @@ const BoardHeader = ({ members, tasks, ...props }) => {
   } = useAsyncAutocomplete(GET_DEVNAMES);
 
   const [updateBoard] = useMutation(UPDATE_BOARD, {
-    refetchQueries: [{ 
-      query: GET_BOARDBYPROJECT, variables: { projectId } 
-    }],
+    update: (cache, { data: { updateBoard } }) => {
+      cache.writeQuery({
+        query: GET_BOARDBYPROJECT,
+        variables: { projectId },
+        data: {
+          boardByProject: updateBoard
+        }
+      })
+    }
   });
 
   const filteredDevs = useFilterStoredData(members, devData?.developers);
@@ -67,10 +73,15 @@ const BoardHeader = ({ members, tasks, ...props }) => {
                 userData={item}
                 showDetails={true}
               >
-                {/* <CustomButton ml='auto' text='delete User' /> */}
-                <IconButton onClick={() => handleRemoveUser(item._id)}>
+                <CustomButton
+                  text='Remove User'
+                  onClick={() => handleRemoveUser(item._id)}
+                  btnstyle='transparent'
+                  sx={{ width: '100%', display: 'block', textAlign: 'left' }}
+                />
+                {/* <IconButton onClick={() => handleRemoveUser(item._id)}>
                   <DeleteIcon />
-                </IconButton>
+                </IconButton> */}
               </ProfileAvatar>
             ))}
           </AvatarGroup>

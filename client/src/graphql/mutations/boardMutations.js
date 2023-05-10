@@ -42,6 +42,39 @@ export const UPDATE_BOARD = gql`
       _id
       title
       description
+      project {
+        _id
+        name
+      }
+      members {
+        _id
+        firstname
+        lastname
+        email
+      }
+      columns {
+        _id
+        boardId
+        title
+        order
+        category
+      }
+      tasks {
+        _id
+        title
+        description
+        priority
+        columnId
+        members {
+          _id
+          firstname
+          lastname
+          position
+        }
+        done
+        order
+        dueDate
+      }
     }
   }
 `;

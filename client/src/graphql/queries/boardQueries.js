@@ -29,6 +29,7 @@ export const GET_BOARDBYPROJECT = gql`
         _id
         firstname
         lastname
+        email
       }
       columns {
         _id
