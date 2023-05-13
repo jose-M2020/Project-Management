@@ -65,8 +65,9 @@ const CustomButton = ({
       // ...btnSize[size],
       backgroundColor: 'transparent',
       fontWeight: "bold",
-      color: '#e0e0e0',
+      color: colors.blueAccent[100],
       '&:hover': {
+        backgroundColor: 'transparent',
         boxShadow: `0 0 8px ${colors.primary[700]}`,
       },
       ...sx

@@ -1,4 +1,4 @@
-import { Avatar, AvatarGroup, Box, Chip, Stack, Typography, useTheme } from '@mui/material'
+import { AvatarGroup, Box, Chip, Stack, Typography, useTheme } from '@mui/material'
 import AlarmOffIcon from '@mui/icons-material/AlarmOff';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { Draggable } from 'react-beautiful-dnd'
@@ -110,7 +110,7 @@ const TaskCard = ({ task, index }) => {
                   {task.members.map((item, index) => (
                     <ProfileAvatar
                       key={index}
-                      name={item.firstname}
+                      userData={item}
                       sx={{
                         bgcolor: colors.blueAccent[500],
                         width: 28, height: 28,
