@@ -9,10 +9,12 @@ import {
   Typography,
   useTheme
 } from "@mui/material";
+import DateRangeIcon from '@mui/icons-material/DateRange';
 import { Link } from "react-router-dom";
 import { tokens } from "../../../../theme";
 import { formatDateTime } from "../../../../helpers/dateTime";
 import ProfileAvatar from "../../../../components/user/ProfileAvatar";
+import { hexToRgba } from "../../../../helpers/colors";
 
 const GetStatusProps = (status) => {
   const theme = useTheme();
@@ -20,13 +22,13 @@ const GetStatusProps = (status) => {
 
   const props = {
     'Not Started': {
-      color: colors.primary[300],
+      color: colors.grey[400],
     },
     'In Progress': {
-      color: colors.blueAccent[300],
+      color: colors.blueAccent[400],
     },
     'Completed': {
-      color: colors.greenAccent[300],
+      color: colors.greenAccent[400],
     }
   }
 
@@ -71,19 +73,23 @@ export default function ProjectCard({ project }) {
                 gap: '5px'
               }}
             >
-              <Typography component='div' variant="subtitle2">
+              {/* <Typography component='div' variant="subtitle2">
                 {formatDateTime(+project?.createdAt, false)}
-              </Typography>
+              </Typography> */}
+              <ProfileAvatar userData={{firstname: project.name}} />
               <Typography 
                 variant="subtitle2"
                 color={color}
+                bgcolor={hexToRgba(color, .2)}
+                p='5px'
+                borderRadius='7px'
               >
                 <Typography
                   variant="span"
                   sx={{
                     backgroundColor: color,
                     borderRadius: '50%',
-                    width: '10px',
+                    width: '8px',
                     display: 'inline-block',
                     aspectRatio: '1/1',
                     marginRight: '3px'
@@ -92,6 +98,7 @@ export default function ProjectCard({ project }) {
                 <strong>{project.status}</strong>
               </Typography>
             </Box>
+            {/* Content */}
             <CardContent
               sx={{
                 display: 'flex',
@@ -101,7 +108,6 @@ export default function ProjectCard({ project }) {
                 padding: '0 !important'
               }}
             >
-              
               <Stack spacing={1}>
                 <Typography 
                   component="div"
@@ -118,32 +124,65 @@ export default function ProjectCard({ project }) {
                       display: '-webkit-box',
                       overflow: 'hidden',
                       WebkitBoxOrient: 'vertical',
-                      WebkitLineClamp: 3,
-                  }}  
+                      WebkitLineClamp: 2,
+                      color: colors.grey[100]
+                  }}
                 >
                   {project.description}
                 </Typography>
               </Stack>
+
+              { project?.duration?.length > 0 && (
+                <Box display='flex'>
+                  <Box sx={{
+                    position: 'relative',
+                    p: '6px 10px 6px',
+                    border: `1px solid ${colors.grey[600]}`,
+                    borderRadius: '4px',
+                    lineHeight: '1px',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      bottom: 0,
+                      left: 0,
+                      width: '3px',
+                      height: '100%',
+                      bgcolor: colors.blueAccent[300],
+                      borderRadius: '12px',
+                      marginRight: '8px'
+                    }
+                  }}>
+                    <Typography>
+                      { project?.duration[0] } - { project.duration[1] }
+                    </Typography>
+                    <Typography component='span' fontSize='12px' color={colors.blueAccent[200]}>Due date</Typography>
+                  </Box>
+                </Box>
+              )}
+
               <Box display="flex" gap={1}>
                 {project?.tags?.map( (item, i) => (
                   <Chip key={i} label={item} variant="outlined" color="secondary" />
                 ))}
               </Box>
-              {!!(project?.members?.length) && (
-                <AvatarGroup max={3}>
-                  {project.members.map((item, index) => (
-                    <ProfileAvatar
-                      key={index}
-                      userData={item}
-                      sx={{
-                        // bgcolor: colors.blueAccent[500],
-                        width: 28, height: 28,
-                        borderColor: `${colors.primary[400]} !important`
-                      }}
-                    />
-                  ))}
-                </AvatarGroup>
-              )}
+              <Box display='flex'>
+                {!!(project?.members?.length) && (
+                  <AvatarGroup max={3}>
+                    {project.members.map((item, index) => (
+                      <ProfileAvatar
+                        key={index}
+                        userData={item}
+                        sx={{
+                          // bgcolor: colors.blueAccent[500],
+                          width: 28, height: 28,
+                          borderColor: `${colors.primary[400]} !important`
+                        }}
+                      />
+                    ))}
+                  </AvatarGroup>
+                )}
+              </Box>
             </CardContent>
             {/* Footer */}
           </Box>
