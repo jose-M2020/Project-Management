@@ -27,7 +27,7 @@ const BoardHeader = ({ members, tasks, ...props }) => {
     setOpen: setOpenDev
   } = useAsyncAutocomplete(GET_DEVNAMES);
 
-  const [updateBoard] = useMutation(UPDATE_BOARD, {
+  const [updateBoard, {loading: updating}] = useMutation(UPDATE_BOARD, {
     update: (cache, { data: { updateBoard } }) => {
       cache.writeQuery({
         query: GET_BOARDBYPROJECT,
@@ -78,6 +78,7 @@ const BoardHeader = ({ members, tasks, ...props }) => {
                   onClick={() => handleRemoveUser(item._id)}
                   btnstyle='transparent'
                   sx={{ width: '100%', display: 'block', textAlign: 'left' }}
+                  loading={updating}
                 />
                 {/* <IconButton onClick={() => handleRemoveUser(item._id)}>
                   <DeleteIcon />
@@ -128,6 +129,7 @@ const BoardHeader = ({ members, tasks, ...props }) => {
                   )
                   setMembersInput([])
                 }}
+                loading={updating}
               />
             </Box>
           </Dropdown>

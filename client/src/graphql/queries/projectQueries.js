@@ -14,6 +14,9 @@ export const GET_PROJECTS = gql`
         firstname,
         lastname
       }
+      logo
+      budget
+      duration
       # tasks{
       #   _id,
       #   status

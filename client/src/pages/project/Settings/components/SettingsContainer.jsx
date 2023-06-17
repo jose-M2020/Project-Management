@@ -102,7 +102,7 @@ const SettingsContainer = ({projectData}) => {
   return (
     <Box m="20px">
       <Toaster />
-      <Header title="PROJECT SETTINGS" subtitle="Details project" />
+      <Header title="PROJECT SETTINGS" subtitle="Customizable settings and parameters for the project." />
         <Box>
           <CustomButton text='BACK' link='/projects' />
           <Stack spacing={3} mt={4} >
@@ -168,7 +168,7 @@ const SettingsContainer = ({projectData}) => {
                 />
                 <EditInput
                   name='url'
-                  label='URL'
+                  label='Demo'
                   value={data?.project?.url}
                   onAccept={handleUpdate}
                 />

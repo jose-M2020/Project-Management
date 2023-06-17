@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { Box, Drawer, useMediaQuery } from '@mui/material';
+import { Box, Drawer, IconButton, useMediaQuery } from '@mui/material';
 import { useQuery } from '@apollo/client';
 import { Outlet, useParams } from 'react-router-dom';
 import Sidebar from './components/Sidebar'
 import { GET_PROJECTOVERVIEW } from '../../graphql/queries/projectQueries';
 import Spinner from '../../components/Spinner';
 import { ProjectProvider } from '../../context/ProjectContext';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
 
 const DashboardLayout = () => {
   const { id } = useParams();
@@ -47,6 +48,7 @@ const DashboardLayout = () => {
           ) : (
             <Sidebar setSidebarWidth={setSidebarWidth} />
           )}
+          
         </Box>
         <Box component='main' height='100%' width={`calc(100vw - ${sidebarWidth}px)`}>
           <Outlet />

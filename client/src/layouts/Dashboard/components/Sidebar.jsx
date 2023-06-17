@@ -11,6 +11,7 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useProject } from "../../../context/ProjectContext";
+import ProfileAvatar from "../../../components/user/ProfileAvatar";
 
 const Item = ({ title, path, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -86,10 +87,7 @@ const Sidebar = ({setSidebarWidth, ...props}) => {
           <Box position='relative'>
             {!collapsed && (
               <Box paddingX='20px'>
-                <Box
-                  textAlign='right'
-                  marginTop='15px'
-                >
+                <Box textAlign='right' marginTop='15px' position='absolute' right='0'>
                   <IconButton 
                     onClick={() => collapseSidebar(!collapsed)}
                     sx={{ backgroundColor: colors.blueAccent[900] }}
@@ -97,12 +95,16 @@ const Sidebar = ({setSidebarWidth, ...props}) => {
                       <FirstPageIcon />
                     </IconButton>
                 </Box>
+                {/* APP INFO */}
                 <Box my="15px" >
+                  <Box mb='12px' display='flex' justifyContent='center' >
+                    <ProfileAvatar userData={{firstname: project.name}} size='lg' />
+                  </Box>
                   <Box>
                     <Box
-                      backgroundColor={colors.blueAccent[700]}
-                      padding={1}
+                      padding='12px'
                       borderRadius={2}
+                      boxShadow={`0 0 7px ${colors.primary[700]}`}
                     >
                       <Typography
                         variant="h2"
@@ -141,13 +143,13 @@ const Sidebar = ({setSidebarWidth, ...props}) => {
               setSelected={setSelected}
             />
 
-            <Typography
+            {/* <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
               Activity
-            </Typography>
+            </Typography> */}
             <Item
               title="Board"
               path={`projects/${id}/board`}
@@ -158,6 +160,13 @@ const Sidebar = ({setSidebarWidth, ...props}) => {
             <Item
               title="Calendar"
               path={`projects/${id}/calendar`}
+              icon={<CalendarTodayOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Users"
+              path={`projects/${id}/users`}
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
