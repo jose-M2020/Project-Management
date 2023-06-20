@@ -18,13 +18,15 @@ import CustomModal from '../../../../components/CustomModal';
 import { GET_PROJECT, GET_PROJECTS } from '../../../../graphql/queries/projectQueries';
 import { DELETE_PROJECT, UPDATE_PROJECT } from '../../../../graphql/mutations/projectMutations';
 import EditInput from '../../../../components/form/EditInput';
-import { projectStatus, tagsOptions } from '../../../../data';
+import { tagsOptions } from '../../../../data';
 import SettingSection from './SettingSection';
 import ProjectUsers from './ProjectUsers';
+import useProjectStatus from '../../../../hooks/useProjectStatus';
 
 const SettingsContainer = ({projectData}) => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const projectStatus = useProjectStatus();
   
   const [open, setOpen] = useState(false);
   

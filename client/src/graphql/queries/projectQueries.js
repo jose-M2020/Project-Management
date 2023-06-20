@@ -71,6 +71,7 @@ export const GET_PROJECTOVERVIEW = gql`
     project(_id: $id) {
       _id
       name
+      description
       type
       status
       createdAt

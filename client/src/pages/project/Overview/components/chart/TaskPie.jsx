@@ -1,6 +1,11 @@
+import { useTheme } from '@mui/material';
 import { ResponsivePie } from '@nivo/pie'
+import { tokens } from '../../../../../theme';
 
 const TaskPie = ({ data /* see data tab */ }) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+
   const fakeData = [
     {
       "id": "Not Started",
@@ -24,6 +29,7 @@ const TaskPie = ({ data /* see data tab */ }) => {
   return (
       <ResponsivePie
           data={fakeData}
+          colors={{ scheme: 'nivo' }}
           margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
           innerRadius={0.5}
           padAngle={0.7}
@@ -40,7 +46,7 @@ const TaskPie = ({ data /* see data tab */ }) => {
               ]
           }}
           arcLinkLabelsSkipAngle={10}
-          arcLinkLabelsTextColor="#333333"
+          arcLinkLabelsTextColor={colors.blueAccent[200]}
           arcLinkLabelsThickness={2}
           arcLinkLabelsColor={{ from: 'color' }}
           arcLabelsSkipAngle={10}
@@ -73,56 +79,56 @@ const TaskPie = ({ data /* see data tab */ }) => {
                   spacing: 10
               }
           ]}
-          fill={[
-              {
-                  match: {
-                      id: 'ruby'
-                  },
-                  id: 'dots'
-              },
-              {
-                  match: {
-                      id: 'c'
-                  },
-                  id: 'dots'
-              },
-              {
-                  match: {
-                      id: 'go'
-                  },
-                  id: 'dots'
-              },
-              {
-                  match: {
-                      id: 'python'
-                  },
-                  id: 'dots'
-              },
-              {
-                  match: {
-                      id: 'scala'
-                  },
-                  id: 'lines'
-              },
-              {
-                  match: {
-                      id: 'lisp'
-                  },
-                  id: 'lines'
-              },
-              {
-                  match: {
-                      id: 'elixir'
-                  },
-                  id: 'lines'
-              },
-              {
-                  match: {
-                      id: 'javascript'
-                  },
-                  id: 'lines'
-              }
-          ]}
+        //   fill={[
+        //       {
+        //           match: {
+        //               id: 'ruby'
+        //           },
+        //           id: 'dots'
+        //       },
+        //       {
+        //           match: {
+        //               id: 'c'
+        //           },
+        //           id: 'dots'
+        //       },
+        //       {
+        //           match: {
+        //               id: 'go'
+        //           },
+        //           id: 'dots'
+        //       },
+        //       {
+        //           match: {
+        //               id: 'python'
+        //           },
+        //           id: 'dots'
+        //       },
+        //       {
+        //           match: {
+        //               id: 'scala'
+        //           },
+        //           id: 'lines'
+        //       },
+        //       {
+        //           match: {
+        //               id: 'lisp'
+        //           },
+        //           id: 'lines'
+        //       },
+        //       {
+        //           match: {
+        //               id: 'elixir'
+        //           },
+        //           id: 'lines'
+        //       },
+        //       {
+        //           match: {
+        //               id: 'javascript'
+        //           },
+        //           id: 'lines'
+        //       }
+        //   ]}
           legends={[
               {
                   anchor: 'bottom',

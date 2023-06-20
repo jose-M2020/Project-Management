@@ -9,37 +9,18 @@ import {
   Typography,
   useTheme
 } from "@mui/material";
-import DateRangeIcon from '@mui/icons-material/DateRange';
 import { Link } from "react-router-dom";
 import { tokens } from "../../../../theme";
 import { formatDateTime } from "../../../../helpers/dateTime";
 import ProfileAvatar from "../../../../components/user/ProfileAvatar";
 import { hexToRgba } from "../../../../helpers/colors";
-
-const GetStatusProps = (status) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-
-  const props = {
-    'Not Started': {
-      color: colors.grey[400],
-    },
-    'In Progress': {
-      color: colors.blueAccent[400],
-    },
-    'Completed': {
-      color: colors.greenAccent[400],
-    }
-  }
-
-  return props[status];
-}
+import useProjectStatus from "../../../../hooks/useProjectStatus";
 
 export default function ProjectCard({ project }) {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { color } = GetStatusProps(project.status)
-
+  const { color } = useProjectStatus(project.status)
+  
   return (
       <CardActionArea 
         sx={{ height: '100%', maxWidth: 500 }}

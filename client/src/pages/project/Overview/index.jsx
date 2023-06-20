@@ -1,16 +1,20 @@
 import React from 'react'
-import { Box, Typography, useTheme } from '@mui/material'
+import { Box, Grid, Typography, useTheme } from '@mui/material'
 import DateRangeIcon from '@mui/icons-material/DateRange';
+import 'react-circular-progressbar/dist/styles.css';
+
 import Header from '../../../components/Header'
-import StatusCard from './components/StatusCard'
 import { tokens } from '../../../theme'
 import TaskPie from './components/chart/TaskPie';
 import CustomButton from '../../../components/CustomButton';
+import ProgressCard from './components/ProgressCard';
+import { useProject } from '../../../context/ProjectContext';
 
 const Overview = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
+  const { _id } = useProject();
+  console.log(_id)
   return (
     <Box m="20px">
       <Header title="OVERVIEW" subtitle="General project details and key aspects." />
@@ -41,114 +45,79 @@ const Overview = () => {
                 </List>
               </Box>
             </Grid> */}
-      <Box
-        mt="20px"
-        display="grid"
-        gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="160px"
-        gap="20px"
-        // sx={{
-        //   "& > div": { gridColumn: isNonMediumScreens ? undefined : "span 12" },
-        // }}
-      >
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatusCard
-            title="200 days"
-            subtitle="Due date"
-            progress="0.75"
-            increase="+14%"
-            icon={
-              <DateRangeIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "45px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatusCard
-            title="431,225"
-            subtitle="Sales Obtained"
-            progress="0.50"
-            increase="+21%"
-            icon={
-              <DateRangeIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "45px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatusCard
-            title="32,441"
-            subtitle="New Clients"
-            progress="0.30"
-            increase="+5%"
-            icon={
-              <DateRangeIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "45px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatusCard
-            title="1,325,134"
-            subtitle="Traffic Received"
-            progress="0.80"
-            increase="+43%"
-            icon={
-              <DateRangeIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "45px" }}
-              />
-            }
-          />
-        </Box>
-      </Box>
-      <Box
-        bgcolor={colors.primary[400]}
-        width='50%'
-        borderRadius='6px'
-        p='20px 20px 8px'
-      >
-        <Box display='flex' justifyContent='space-between' alignItems='center' >
-          <Box>
-            <Typography component='h3' >
-              Tasks Summary
-            </Typography>
-            <Typography component='span' color={colors.grey[200]} >
-              23 tasks
-            </Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={8}>
+          <Box
+            display="grid"
+            gridTemplateColumns="repeat(12, 1fr)"
+            // gridAutoRows="160px"
+            marginBottom={4}
+            gap="20px"
+            // sx={{
+            //   "& > div": { gridColumn: isNonMediumScreens ? undefined : "span 12" },
+            // }}
+          >
+            <Box
+              gridColumn="span 6"
+            >
+              <ProgressCard
+                title='Days left'
+                subtitle={'Due date: 12-34-2033'}
+                progress={{ value: 66, text: '344' }} />
+            </Box>
+            <Box
+              gridColumn="span 6"
+            >
+              <ProgressCard
+                title='Completed tasks'
+                subtitle={'5/33'}
+                progress={{ value: 13, text: '13%' }} />
+            </Box>
+            <Box
+              gridColumn="span 6"
+            >
+              <ProgressCard
+                title='Bugs fixed'
+                subtitle={'1/3'}
+                progress={{ value: 33, text: '33%' }} />
+            </Box>
+            <Box
+              gridColumn="span 6"
+            >
+              <ProgressCard
+                title='Completed tasks'
+                subtitle={'5/33'}
+                progress={{ value: 13, text: '13%' }} />
+            </Box>
           </Box>
-          <CustomButton text='View tasks' />
-        </Box>
-        <Box height='400px' >
-          <TaskPie />
-        </Box>
-      </Box>
+          <Box
+            bgcolor={colors.primary[400]}
+            borderRadius='6px'
+            p='20px 20px 8px'
+          >
+            <Box display='flex' justifyContent='space-between' alignItems='center' >
+              <Box>
+                <Typography component='h3' >
+                  Tasks Summary
+                </Typography>
+                <Typography component='span' color={colors.grey[200]} >
+                  23 tasks
+                </Typography>
+              </Box>
+              <CustomButton text='View tasks' link={`/projects/${_id}/board`} />
+            </Box>
+            <Box height='400px' >
+              <TaskPie />
+            </Box>
+          </Box>
+        </Grid>
+        <Grid item xs={4}>
+          <Box bgcolor={colors.primary[400]} p='12px' height='100%' >
+
+          </Box>
+        </Grid>
+      </Grid>
+
     </Box>
   )
 }
