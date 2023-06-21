@@ -54,6 +54,11 @@ export const typeDefs = gql`
     tags: [String]!
     tasks: [Task]
     createdAt: String
+
+    managerId: ID
+    logo: String
+    budget: Float
+    duration: [String]
   }
 `;
 

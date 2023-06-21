@@ -9,12 +9,14 @@ import TaskPie from './components/chart/TaskPie';
 import CustomButton from '../../../components/CustomButton';
 import ProgressCard from './components/ProgressCard';
 import { useProject } from '../../../context/ProjectContext';
+import ProgressBar from '../../../components/project/ProgressBar';
+import ProfileRow from '../../../components/user/ProfileRow';
 
 const Overview = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { _id } = useProject();
-  console.log(_id)
+
   return (
     <Box m="20px">
       <Header title="OVERVIEW" subtitle="General project details and key aspects." />
@@ -96,14 +98,7 @@ const Overview = () => {
             p='20px 20px 8px'
           >
             <Box display='flex' justifyContent='space-between' alignItems='center' >
-              <Box>
-                <Typography component='h3' >
-                  Tasks Summary
-                </Typography>
-                <Typography component='span' color={colors.grey[200]} >
-                  23 tasks
-                </Typography>
-              </Box>
+              <Subtitle text1='Tasks Summary' text2='23 tasks' />
               <CustomButton text='View tasks' link={`/projects/${_id}/board`} />
             </Box>
             <Box height='400px' >
@@ -113,11 +108,60 @@ const Overview = () => {
         </Grid>
         <Grid item xs={4}>
           <Box bgcolor={colors.primary[400]} p='12px' height='100%' >
-
+            <Box height='50%' display='flex' flexDirection='column' mb={2} >
+              <Box mb={1}>
+                <Subtitle text1='My tasks' />
+                <ProgressBar tasks={[]} />
+              </Box>
+              <Box overflow='auto' >
+                <Box display='flex' flexDirection='column' gap={1}>
+                  <Box p={1} borderLeft={`2px solid ${colors.greenAccent[300]}`}>
+                    <Typography>
+                      Design form mockups
+                    </Typography>
+                  </Box>
+                  <Box p={1} borderLeft={`2px solid ${colors.greenAccent[300]}`}>
+                    <Typography>
+                      Design form mockups
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+            <Box height='50%' display='flex' flexDirection='column' >
+              <Box mb={2}>
+                <Subtitle text1='Collaborators' />
+              </Box>
+              <Box height='100%'>
+                <Box display='flex' flexDirection='column' gap='10px' >
+                  <ProfileRow user={{ firstname: 'jose', lastname: 'silva' }} />
+                  <ProfileRow user={{ firstname: 'jose', lastname: 'silva' }} />
+                  <ProfileRow user={{ firstname: 'jose', lastname: 'silva' }} />
+                </Box>
+              </Box>
+            </Box>
           </Box>
         </Grid>
       </Grid>
 
+    </Box>
+  )
+}
+
+const Subtitle = ({text1, text2 = undefined}) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+
+  return (
+    <Box>
+      <Typography component='h3' fontSize='16px' fontWeight='bold' >
+      { text1 }
+      </Typography>
+      {text2 && (
+        <Typography component='span' color={colors.grey[200]} >
+          { text2 }
+        </Typography>
+      )}
     </Box>
   )
 }

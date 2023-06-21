@@ -1,11 +1,9 @@
 import { useState } from 'react'
-import { AvatarGroup, Box, Fab, Grid, IconButton, Typography } from '@mui/material'
+import { AvatarGroup, Box, Fab, Grid, Typography } from '@mui/material'
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
-import DeleteIcon from '@mui/icons-material/Delete';
 import ProfileAvatar from '../../../../components/user/ProfileAvatar'
 import Dropdown from '../../../../components/Dropdown'
 import AutoComplete from '../../../../components/form/AutoComplete'
-import ProgressBar from './ProgressBar'
 import useAsyncAutocomplete from '../../../../hooks/useAsyncAutocomplete'
 import { GET_DEVNAMES } from '../../../../graphql/queries/devsQueries'
 import { useMutation } from '@apollo/client';
@@ -14,6 +12,7 @@ import { UPDATE_BOARD } from '../../../../graphql/mutations/boardMutations';
 import { GET_BOARDBYPROJECT } from '../../../../graphql/queries/boardQueries';
 import useFilterStoredData from '../../../../hooks/useFilterStoredData';
 import { useBoard } from '../context/BoardContext';
+import ProgressBar from '../../../../components/project/ProgressBar';
 
 const BoardHeader = ({ members, tasks, ...props }) => {
   const { projectId, boardId } = useBoard();

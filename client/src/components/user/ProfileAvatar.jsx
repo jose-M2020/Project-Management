@@ -148,7 +148,7 @@ const ProfileAvatar = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode)
   const nameArray = userData?.firstname?.split(' ');
-  const name = (`${ nameArray[0][0] }${nameArray.length > 1 && nameArray[1][0]}`).toUpperCase();
+  const name = (`${ nameArray[0][0] }${nameArray.length > 1 ? nameArray[1][0] : ''}`).toUpperCase();
 
   const sizes = {
     sm: {

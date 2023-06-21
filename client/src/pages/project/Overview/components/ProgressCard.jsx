@@ -18,7 +18,12 @@ const ProgressCard = ({
           <CircularProgressbar
             value={value}
             text={text}
-            styles={buildStyles({ textSize: '1.9rem', textColor: colors.blueAccent[100] })} />
+            styles={buildStyles({ 
+              textSize: '1.9rem',
+              textColor: colors.blueAccent[100],
+              pathColor:  colors.greenAccent[400],
+              trailColor: '#3a4760'
+            })} />
         </Box>
         <Box>
           <Typography
