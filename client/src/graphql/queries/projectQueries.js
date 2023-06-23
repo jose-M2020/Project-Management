@@ -61,6 +61,7 @@ export const GET_PROJECT = gql`
         _id
         title
       }
+      duration
       createdAt
     }
   }

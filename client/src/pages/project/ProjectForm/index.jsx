@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import * as yup from 'yup';
-import { Box, Step, StepContent, StepLabel, Stepper, useTheme } from '@mui/material';
+import { Box, Step, StepContent, StepLabel, Stepper, TextField, useTheme } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 import CustomButton from '../../../components/CustomButton';
 import Input from '../../../components/form/Input';
@@ -33,6 +35,9 @@ const ProjectForm = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [activeSteps, setActiveSteps] = useState(false);
   
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
+
   const initialValues = {
     name: '',
     description: '',
@@ -42,30 +47,11 @@ const ProjectForm = () => {
     status: 'Not Started',
     team: [],
     clientId: null,
-    tags: []
+    tags: [],
+    duration: [],
   };
 
-  // TODO: set the values in dev and client fields before clicking
-  // const {
-  //   data: devData,
-  //   loading: loadingDevs,
-  //   open: devFieldOpen,
-  //   setOpen: setOpenDev
-  // } = useAsyncAutocomplete(GET_DEVNAMES)
-  
-  // const {
-  //   data: clientData,
-  //   loading: loadingClients,
-  //   open: clientFieldOpen,
-  //   setOpen: setOpenClient
-  // } = useAsyncAutocomplete(GET_CLIENTNAMES)
-  
   const [createProject, { loading }] = useMutation(ADD_PROJECT, {
-		// refetchQueries: [{
-		// 	query: GET_PROJECTS,
-		// },
-		// 	"getProjects",
-		// ],
     update: (cache, { data }) => {
       const { projects } = cache.readQuery({
         query: GET_PROJECTS
@@ -82,7 +68,11 @@ const ProjectForm = () => {
 	});
 
   const onSubmit = async (values, actions) => {
-    await createProject({ variables: values});
+    const newValues = {
+      ...values,
+      duration: [startDate, endDate]
+    }
+    await createProject({ variables: newValues});
     actions.resetForm();
     navigate('/projects');
   }
@@ -140,15 +130,14 @@ const ProjectForm = () => {
                   >
                     <Step active={(activeStep === 0) || activeSteps}>
                       <StepLabel>
-                        Project Information
+                        General Information
                       </StepLabel>
                       <StepContent>
                         <Box sx={{ display: 'flex', gap: 3, flexDirection: 'column' }}>
                           <Input label="Name*" name="name" />
                           <Input label="Description*" name="description" multiline rows={4} />
-                          <Input label="Type" name="type" />
                           {!activeSteps && (
-                            <Box sx={{ display: 'flex', mb: 2, gap: 1 }}>
+                            <Box>
                               <CustomButton text='Continue' onClick={handleNext} btnstyle="primary" />
                             </Box>
                           )}
@@ -202,6 +191,28 @@ const ProjectForm = () => {
                       </StepLabel>
                       <StepContent>
                         <Box sx={{ display: 'flex', gap: 3, flexDirection: 'column' }}>
+                          <Input label="Type" name="type" />
+                          <Box display='flex' gap={2} alignItems='center'>
+                            <DatePicker
+                              selected={startDate}
+                              onChange={(date) => setStartDate(date)}
+                              selectsStart
+                              startDate={startDate}
+                              endDate={endDate}
+                              minDate={new Date()}
+                              customInput={<ExampleCustomInput label="Start date" />}
+                            />
+                            <span>-</span>
+                            <DatePicker
+                              selected={endDate}
+                              onChange={(date) => setEndDate(date)}
+                              selectsEnd
+                              startDate={startDate}
+                              endDate={endDate}
+                              minDate={startDate}
+                              customInput={<ExampleCustomInput label="End date" />}
+                            />
+                          </Box>
                           <AutoComplete
                             value={ values.tags }
                             onChange={(_, value) => {
@@ -217,15 +228,15 @@ const ProjectForm = () => {
                             multiple
                             freeSolo
                           />
-                          <Input label="Repository" name="repository" 
+                          {/* <Input label="Repository" name="repository" 
                                 icon={<LanguageIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />} 
                                 variant="standard"     
                           />
                           <Input label="URL" name="url" 
                                 icon={<LanguageIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />} 
                                 variant="standard"     
-                          />    
-                          <Box sx={{ display: 'flex', mb: 2, gap: 1 }}>
+                          />     */}
+                          <Box sx={{ display: 'flex', gap: 1 }}>
                             {!activeSteps && (
                               <CustomButton text='Back' onClick={handleBack} btnstyle="secondary" />
                             )} 
@@ -253,5 +264,16 @@ const ProjectForm = () => {
     </Box>
   )
 }
+
+const ExampleCustomInput = forwardRef(({ value, onClick, ...props }, ref) => (
+  <TextField
+    value={value}
+    variant='outlined'
+    onFocus={onClick}
+    // helperText={(meta.touched && meta.error) && meta.error}
+    // error={meta.touched && !!(meta.error)}
+    {...props}
+  />
+));
 
 export default ProjectForm

@@ -1,5 +1,6 @@
 import React from 'react'
-import { Box, Grid, Typography, useTheme } from '@mui/material'
+import { Box, Grid, Tooltip, Typography, useTheme } from '@mui/material'
+import InfoIcon from '@mui/icons-material/Info';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import 'react-circular-progressbar/dist/styles.css';
 
@@ -18,7 +19,7 @@ const Overview = () => {
   const { _id } = useProject();
 
   return (
-    <Box m="20px">
+    <Box m="20px" maxWidth={{ xl: '1250px' }} mx={{ xl: 'auto' }} >
       <Header title="OVERVIEW" subtitle="General project details and key aspects." />
       {/* <Grid item xs={4}>
               <CircularProgressWithLabel
@@ -79,17 +80,17 @@ const Overview = () => {
               gridColumn="span 6"
             >
               <ProgressCard
-                title='Bugs fixed'
-                subtitle={'1/3'}
-                progress={{ value: 33, text: '33%' }} />
+                title='Completed requirements'
+                subtitle={'6/33'}
+                progress={{ value: 43, text: '43%' }} />
             </Box>
             <Box
               gridColumn="span 6"
             >
               <ProgressCard
-                title='Completed tasks'
-                subtitle={'5/33'}
-                progress={{ value: 13, text: '13%' }} />
+                title='Bugs fixed'
+                subtitle={'1/3'}
+                progress={{ value: 33, text: '33%' }} />
             </Box>
           </Box>
           <Box
@@ -115,15 +116,62 @@ const Overview = () => {
               </Box>
               <Box overflow='auto' >
                 <Box display='flex' flexDirection='column' gap={1}>
-                  <Box p={1} borderLeft={`2px solid ${colors.greenAccent[300]}`}>
-                    <Typography>
-                      Design form mockups
-                    </Typography>
+                  <Box
+                    paddingLeft={1}
+                    borderLeft={`2px solid ${colors.greenAccent[300]}`}
+                    display='flex'
+                    justifyContent='space-between'
+                    alignItems='center'
+                  >
+                    <Box>
+                      <Typography lineHeight={1}>
+                        Design form mockups
+                      </Typography>
+                      <Typography variant='span' color={colors.primary[200]}>
+                        Due in 3 days
+                      </Typography>
+                    </Box>
+                    <Tooltip title={'Low priority'}>
+                      <InfoIcon /> 
+                    </Tooltip>
                   </Box>
-                  <Box p={1} borderLeft={`2px solid ${colors.greenAccent[300]}`}>
-                    <Typography>
-                      Design form mockups
-                    </Typography>
+                  <Box
+                    paddingLeft={1}
+                    borderLeft={`2px solid ${colors.greenAccent[300]}`}
+                    display='flex'
+                    justifyContent='space-between'
+                    alignItems='center'
+                  >
+                    <Box>
+                      <Typography lineHeight={1}>
+                        Design form mockups
+                      </Typography>
+                      <Typography variant='span' color={colors.primary[200]}>
+                        Due in 3 days
+                      </Typography>
+                    </Box>
+                    <Tooltip title={'Low priority'}>
+                      <InfoIcon /> 
+                    </Tooltip>
+                  </Box>
+                  <Box
+                    paddingLeft={1}
+                    borderLeft={`2px solid ${colors.greenAccent[300]}`}
+                    display='flex'
+                    justifyContent='space-between'
+                    alignItems='center'
+                  >
+                    <Box>
+                      <Typography lineHeight={1}>
+                        Design form mockups
+                      </Typography>
+                      <Typography variant='span' color={colors.primary[200]}>
+                        Due in 3 days
+                      </Typography>
+                    </Box>
+                    <Tooltip title={'Low priority'}>
+                      <InfoIcon /> 
+                    </Tooltip>
                   </Box>
                 </Box>
               </Box>

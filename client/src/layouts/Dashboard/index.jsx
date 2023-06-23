@@ -49,7 +49,11 @@ const DashboardLayout = () => {
           )}
           
         </Box>
-        <Box component='main' height='100%' width={`calc(100vw - ${sidebarWidth}px)`}>
+        <Box
+          component='main'
+          height='100%'
+          width={`calc(100vw - ${sidebarWidth}px)`}
+        >
           <Outlet />
         </Box>
       </Box>

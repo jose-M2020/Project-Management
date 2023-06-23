@@ -10,7 +10,8 @@ export const ADD_PROJECT = gql`
     $status: String,
     $team: [ID],
     $clientId: ID,
-    $tags: [String]
+    $tags: [String],
+    $duration: [String],
   ) {
     createProject(
       name: $name,
@@ -22,6 +23,7 @@ export const ADD_PROJECT = gql`
       team: $team,
       clientId: $clientId,
       tags: $tags
+      duration: $duration
     ) {
       _id
       name,
@@ -34,6 +36,7 @@ export const ADD_PROJECT = gql`
         firstname,
         lastname
       }
+      duration
     }
   }
 `;
@@ -57,7 +60,8 @@ export const UPDATE_PROJECT = gql`
     $type: String,
     $team: [ID],
     $clientId: ID,
-    $tags: [String]
+    $tags: [String],
+    $duration: [String]
   ) {
     updateProject(
       _id: $_id
@@ -70,6 +74,7 @@ export const UPDATE_PROJECT = gql`
       team: $team
       clientId: $clientId
       tags: $tags
+      duration: $duration
     ) {
       _id
       name
@@ -82,6 +87,7 @@ export const UPDATE_PROJECT = gql`
         email
         phone
       }
+      duration
     }
   }
 `;

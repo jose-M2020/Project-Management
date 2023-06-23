@@ -135,7 +135,7 @@ export default function ProjectCard({ project }) {
                     }
                   }}>
                     <Typography>
-                      { project?.duration[0] } - { project.duration[1] }
+                      { formatDateTime(+project?.duration[0], false) } - { formatDateTime(+project.duration[1], false) }
                     </Typography>
                     <Typography component='span' fontSize='12px' color={colors.blueAccent[200]}>Due date</Typography>
                   </Box>

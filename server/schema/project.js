@@ -23,7 +23,8 @@ export const typeDefs = gql`
       status: String,
       team: [ID],
       clientId: ID,
-      tags: [String]
+      tags: [String],
+      duration: [String]
     ): Project
     updateProject(
       _id: ID!, 
@@ -36,6 +37,7 @@ export const typeDefs = gql`
       team: [ID],
       clientId: ID,
       tags: [String]
+      duration: [String]
     ): Project
     deleteProject(_id: ID!): Project
   }
@@ -81,7 +83,8 @@ export const resolvers = {
       status,
       team,
       clientId,
-      tags
+      tags,
+      duration
     }) => {
       const project = new Project({
         name,
@@ -92,7 +95,8 @@ export const resolvers = {
         status,
         team,
         clientId,
-        tags
+        tags,
+        duration
       });
       const savedProject = await project.save();
 

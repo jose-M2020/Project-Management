@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { 
   Box,
@@ -10,18 +11,19 @@ import {
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import ReportIcon from '@mui/icons-material/Report';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import { useNavigate, useParams } from 'react-router-dom';
 import { Toaster, toast } from 'sonner'
+
 import Header from '../../../../components/Header';
 import CustomButton from '../../../../components/CustomButton';
 import CustomModal from '../../../../components/CustomModal';
+import EditInput from '../../../../components/form/EditInput';
 import { GET_PROJECT, GET_PROJECTS } from '../../../../graphql/queries/projectQueries';
 import { DELETE_PROJECT, UPDATE_PROJECT } from '../../../../graphql/mutations/projectMutations';
-import EditInput from '../../../../components/form/EditInput';
 import { tagsOptions } from '../../../../data';
 import SettingSection from './SettingSection';
 import ProjectUsers from './ProjectUsers';
 import useProjectStatus from '../../../../hooks/useProjectStatus';
+import RangeDatePicker from './RangeDatePicker';
 
 const SettingsContainer = ({projectData}) => {
   const { id } = useParams();
@@ -102,7 +104,7 @@ const SettingsContainer = ({projectData}) => {
 
   // TODO: Problems when updateing tags
   return (
-    <Box m="20px">
+    <Box m="20px" maxWidth={{ xl: '1250px' }} mx={{ xl: 'auto' }}>
       <Toaster />
       <Header title="PROJECT SETTINGS" subtitle="Customizable settings and parameters for the project." />
         <Box>
@@ -141,6 +143,7 @@ const SettingsContainer = ({projectData}) => {
                   multiple
                   freeSolo
                 />
+                <RangeDatePicker update={handleUpdate} projectDuration={data?.project?.duration} />
                 {/* <AutoComplete 
                   label="Tags" 
                   name="tags"
