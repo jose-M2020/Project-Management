@@ -3,7 +3,6 @@ import { Sidebar as ProSidebar, Menu, MenuItem, useProSidebar } from "react-pro-
 import { Box, IconButton, Tooltip, Typography, styled, tooltipClasses, useTheme } from "@mui/material";
 import { Link, useLocation, useParams } from "react-router-dom";
 // import "react-pro-sidebar/dist/css/styles.css";
-import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import LastPageIcon from '@mui/icons-material/LastPage';
@@ -11,6 +10,9 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import SettingsIcon from '@mui/icons-material/Settings';
 import InfoIcon from '@mui/icons-material/Info';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+
+import { tokens } from "../../../theme";
 import { useProject } from "../../../context/ProjectContext";
 import ProfileAvatar from "../../../components/user/ProfileAvatar";
 import useProjectStatus from "../../../hooks/useProjectStatus";
@@ -202,6 +204,13 @@ const Sidebar = ({setSidebarWidth, ...props}) => {
               title="Users"
               path={`projects/${id}/users`}
               icon={<CalendarTodayOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Requirements"
+              path={`projects/${id}/requirements`}
+              icon={<AccountTreeIcon />}
               selected={selected}
               setSelected={setSelected}
             />
