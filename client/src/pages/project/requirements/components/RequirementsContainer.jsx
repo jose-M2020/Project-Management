@@ -3,6 +3,8 @@ import React from 'react'
 import Header from '../../../../components/Header'
 import Menu from './tree/Menu'
 import { tokens } from '../../../../theme'
+import TreeBuilder from './tree/TreeBuilder'
+import { treeData } from '../../../../fakeData'
 
 const RequirementsContainer = () => {
   const theme = useTheme();

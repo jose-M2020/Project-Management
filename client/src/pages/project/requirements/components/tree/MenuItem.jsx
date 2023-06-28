@@ -11,10 +11,11 @@ import {
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 import MenuItemContainer from "./MenuItemContainer";
+import Dropdown from "../../../../../components/Dropdown";
 
-// React runtime PropTypes
 export const AppMenuItemPropTypes = {
   name: PropTypes.string.isRequired,
   link: PropTypes.string,
@@ -22,51 +23,68 @@ export const AppMenuItemPropTypes = {
   items: PropTypes.array
 }
 
-const MenuItem = props => {
-  const { name, link, Icon, items = [] } = props;
+const MenuItem = ({ itemData, handleInsertChild, handleDeleteItem }) => {
+  const { id, name, link, items = [] } = itemData;
   const isExpandable = items && items.length > 0
   const [open, setOpen] = useState(false)
 
-  function handleClick() {
+  const handleClick = () => {
     setOpen(!open)
   }
 
   const MenuItemRoot = (
-    <MenuItemContainer
-      link={link}
-      onClick={handleClick}
+    <Box
+      display='flex'
+      alignItems='center'
+      justifyContent='space-between'
       sx={{
-        '&.active': {
-          background: 'rgba(0, 0, 0, 0.08)',
-          '& .MuiListItemIcon-root': {
-            color: '#fff',
-          }
-        },
         '& .addIcon': { display: 'none' },
         '&:hover .addIcon': { display: 'block' }
       }}
     >
-      {/* Display an icon if any */}
-      {/* {!!Icon && (
+      <MenuItemContainer
+        link={link}
+        onClick={handleClick}
+        sx={{
+          '&.active': {
+            background: 'rgba(0, 0, 0, 0.08)',
+            '& .MuiListItemIcon-root': {
+              color: '#fff',
+            }
+          },
+          '.MuiListItemButton-root:hover': {
+            bgColor: 'transparent'
+          }
+        }}
+      >
+        {/* Display an icon if any */}
+        {/* {!!Icon && (
+          <ListItemIcon sx={{ minWidth: '33px' }}>
+            <Icon />
+          </ListItemIcon>
+        )} */}
         <ListItemIcon sx={{ minWidth: '33px' }}>
-          <Icon />
+          {isExpandable && (
+            !open ? <ExpandMoreIcon /> : <ExpandLessIcon />
+          )}
         </ListItemIcon>
-      )} */}
-
-      <ListItemIcon sx={{ color: "#97c05c", minWidth: '33px' }}>
-        {isExpandable && (
+        <ListItemText primary={name}  />
+        {/* Display the expand menu if the item has children */}
+        {/* {isExpandable && (
           !open ? <ExpandMoreIcon /> : <ExpandLessIcon />
-        )}
-      </ListItemIcon>
-      <ListItemText primary={name}  />
-      <Box className='addIcon' >
-        <ControlPointIcon onClick={() => console.log('add')} />
+        )} */}
+      </MenuItemContainer>
+      <Box className='addIcon' sx={{ '&:hover': { cursor: 'pointer' } }}>
+        {/* <ControlPointIcon onClick={() => handleInsertChild(id)} /> */}
+        <Dropdown
+          button={<MoreVertIcon />}
+          options={[
+            {title: 'Add Children', onClick: () => handleInsertChild(id) },
+            {title: 'Delete', onClick: () => handleDeleteItem(id) }
+          ]}
+        />
       </Box>
-      {/* Display the expand menu if the item has children */}
-      {/* {isExpandable && (
-        !open ? <ExpandMoreIcon /> : <ExpandLessIcon />
-      )} */}
-    </MenuItemContainer>
+    </Box>
   )
 
   const MenuItemChildren = isExpandable ? (
@@ -74,7 +92,12 @@ const MenuItem = props => {
       <Divider />
       <List component="div" disablePadding>
         {items.map((item, index) => (
-          <MenuItem {...item} key={index} />
+          <MenuItem
+            key={index}
+            itemData={item}
+            handleInsertChild={handleInsertChild}
+            handleDeleteItem={handleDeleteItem}
+          />
         ))}
       </List>
     </Collapse>

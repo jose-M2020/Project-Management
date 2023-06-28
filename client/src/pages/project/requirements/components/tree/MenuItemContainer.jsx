@@ -1,33 +1,48 @@
 import { forwardRef } from "react"
-import { ListItem, ListItemButton } from "@mui/material"
+import { Box, ListItem, useTheme } from "@mui/material"
 import { NavLink } from "react-router-dom"
+import { tokens } from "../../../../../theme";
 
-const MenuItemContainer = props => {
-  const { className, onClick, link, children } = props
+const MenuItemContainer = ({
+  className,
+  onClick,
+  link,
+  children,
+  ...props
+}) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
-  // If link is not set return the orinary ListItem
-  if (!link || typeof link !== "string") {
-    return (
-      <ListItemButton
+  return (
+    <Box sx={{
+      '&:hover': {
+        color: colors.greenAccent[400],
+        cursor: 'pointer',
+        transition: '.2s',
+        '.MuiSvgIcon-root' : {
+          color: colors.greenAccent[400],
+          transition: '.2s',
+        }
+      }
+    }}>
+      <ListItem
         className={className}
         children={children}
-        onClick={onClick}
+        
+
+        // Link component
+        {...(!link || typeof link !== "string") ? (
+          { onClick: onClick }
+        ) : ({
+          component: forwardRef((props, ref) => (
+            <NavLink exact {...props} innerRef={ref} />
+          )),
+          to: link
+        })}
+        
         {...props}
       />
-    )
-  }
-
-  // Return a LitItem with a link component
-  return (
-    <ListItem
-      button
-      className={className}
-      children={children}
-      component={forwardRef((props, ref) => (
-        <NavLink exact {...props} innerRef={ref} />
-      ))}
-      to={link}
-    />
+    </Box>
   )
 }
 

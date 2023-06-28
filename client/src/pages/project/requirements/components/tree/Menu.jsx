@@ -1,139 +1,60 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { List } from "@mui/material"
-import WidgetsIcon from '@mui/icons-material/Widgets';
 
 import MenuItem from "./MenuItem"
-
-const appMenuItems = [
-  {
-    name: "Dashboard",
-    // link: "/",
-    Icon: WidgetsIcon
-  },
-  {
-    name: "Orders",
-    Icon: WidgetsIcon
-  },
-  {
-    name: "Customers",
-    Icon: WidgetsIcon
-  },
-  {
-    name: "Reports",
-    Icon: WidgetsIcon
-  },
-  {
-    name: "Nested Pages",
-    Icon: WidgetsIcon,
-    items: [
-      {
-        name: "Level 2",
-        Icon: WidgetsIcon
-      },
-      {
-        name: "Level 2 - Nested Pages",
-        items: [
-          {
-            name: "Level 3"
-          },
-          {
-            name: "Level 3"
-          },
-          {
-            name: "Level 3- Nested Pages",
-            // Icon: WidgetsIcon,
-            items: [
-              {
-                name: "Level 4"
-              },
-              {
-                name: "Level 4 - Nested Pages",
-                items: [
-                  {
-                    name: "Level 5"
-                  },
-                  {
-                    name: "Level 5"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    name: "Nested Pages",
-    Icon: WidgetsIcon,
-    items: [
-      {
-        name: "Level 2",
-        Icon: WidgetsIcon
-      },
-      {
-        name: "Level 2 - Nested Pages",
-        items: [
-          {
-            name: "Level 3"
-          },
-          {
-            name: "Level 3"
-          },
-          {
-            name: "Level 3- Nested Pages",
-            // Icon: WidgetsIcon,
-            items: [
-              {
-                name: "Level 4"
-              },
-              {
-                name: "Level 4 - Nested Pages",
-                items: [
-                  {
-                    name: "Level 5"
-                  },
-                  {
-                    name: "Level 5"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-]
+import buildTree from "../../../../../helpers/buildTree";
+import { treeData } from "../../../../../fakeData";
+import generateUniqueId from "../../../../../helpers/generateUniqueId";
 
 const Menu = () => {
+  const [data, setData] = useState(treeData)
+  const [menuItems, setMenuItems] = useState([])
+
+  useEffect(() => {
+    setMenuItems(buildTree(data));
+  }, [data])
+  
+  const handleInsertChild = (parentId) => {
+    if(data?.length){
+      const newData = [
+        ...data,
+        {
+          id: generateUniqueId(),
+          parentId: parentId,
+          name: "Functional 1.2.2",
+        },
+      ]
+      setData(newData)
+    }
+  }
+  
+  const handleDeleteItem = (itemId) => {
+    const updatedTree = data.filter(
+      (item) => !isItemOrChild(item, itemId)
+    );
+    setMenuItems(buildTree(updatedTree));
+  };
+
+  const isItemOrChild = (item, itemId) => {
+    if (item.id === itemId) {
+      return true;
+    }
+    console.log(item)
+    return item.items.some((child) => isItemOrChild(child, itemId));
+  };
+
   return (
     <List component="nav" sx={{ width: "100%" }} disablePadding>
-      {/* <AppMenuItem {...appMenuItems[0]} /> */}
-      {appMenuItems.map((item, index) => (
-        <MenuItem {...item} key={index} />
+      {menuItems?.map((item, index) => (
+        <MenuItem
+          key={index}
+          itemData={item}
+          handleInsertChild={handleInsertChild}
+          handleDeleteItem={handleDeleteItem}
+        />
       ))}
     </List>
   )
 }
-
-// const drawerWidth = 240
-
-// const useStyles = makeStyles(theme =>
-//   createStyles({
-//     appMenu: {
-//       width: "100%"
-//     },
-//     navList: {
-//       width: drawerWidth
-//     },
-//     menuItem: {
-//       width: drawerWidth
-//     },
-//     menuItemIcon: {
-//       color: "#97c05c"
-//     }
-//   })
-// )
 
 export default Menu
