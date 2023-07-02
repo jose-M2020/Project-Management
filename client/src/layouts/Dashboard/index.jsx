@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Box, Drawer, useMediaQuery } from '@mui/material';
 import { useQuery } from '@apollo/client';
 import { Outlet, useParams } from 'react-router-dom';
@@ -47,8 +47,13 @@ const DashboardLayout = () => {
           ) : (
             <Sidebar setSidebarWidth={setSidebarWidth} />
           )}
+          
         </Box>
-        <Box component='main' height='100%' width={`calc(100vw - ${sidebarWidth}px)`}>
+        <Box
+          component='main'
+          height='100%'
+          width={`calc(100vw - ${sidebarWidth}px)`}
+        >
           <Outlet />
         </Box>
       </Box>

@@ -144,7 +144,7 @@ const Calendar = () => {
 
   return (
     <Box m="20px">
-      <Header title="CALENDAR" subtitle="Managing events" />
+      <Header title="CALENDAR" subtitle="Event planning and management." />
       
       {!loading ? (
         <Box display="flex" justifyContent="space-between">

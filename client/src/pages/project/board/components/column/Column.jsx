@@ -1,6 +1,6 @@
 import React from "react";
-import { Draggable, Droppable } from "react-beautiful-dnd";
-import { Box, IconButton, Stack, Typography, useTheme } from "@mui/material";
+import { Draggable } from "react-beautiful-dnd";
+import { Box, IconButton, Stack, useTheme } from "@mui/material";
 import DoneIcon from '@mui/icons-material/Done';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { tokens } from "../../../../../theme";

@@ -21,6 +21,7 @@ import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
 import { ColorModeContext, useMode } from './theme';
 import DashboardLayout from './layouts/Dashboard';
+import Requirements from './pages/project/requirements';
 
 const cache = new InMemoryCache({
   typePolicies: {
@@ -91,6 +92,7 @@ function App() {
                   <Route path='/projects/:id/board' element={<Board />} />
                   <Route path='/projects/:id/calendar' element={<Calendar />} />
                   <Route path='/projects/:id/bugs' element={<Bugs />} />
+                  <Route path='/projects/:id/requirements' element={<Requirements />} />
                   <Route path='/bar' element={<Bar />} />
                   <Route path='/pie' element={<Pie />} />
                   <Route path='/line' element={<Line />} />

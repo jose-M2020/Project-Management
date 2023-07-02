@@ -33,7 +33,21 @@ const ProjectSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client',
   },
-  tags: { type: [String]}
+  tags: { type: [String]},
+
+  managerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Developer',
+  },
+  logo: {
+    type: String,
+  },
+  budget: {
+    type: Number,
+  },
+  duration: { 
+    type: [Date]
+  },
 }, { timestamps: true });
 
 export default mongoose.model('Project', ProjectSchema);

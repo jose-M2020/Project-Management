@@ -14,6 +14,9 @@ export const GET_PROJECTS = gql`
         firstname,
         lastname
       }
+      logo
+      budget
+      duration
       # tasks{
       #   _id,
       #   status
@@ -58,6 +61,7 @@ export const GET_PROJECT = gql`
         _id
         title
       }
+      duration
       createdAt
     }
   }
@@ -68,6 +72,7 @@ export const GET_PROJECTOVERVIEW = gql`
     project(_id: $id) {
       _id
       name
+      description
       type
       status
       createdAt

@@ -1,16 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { Sidebar as ProSidebar, Menu, MenuItem, useProSidebar } from "react-pro-sidebar";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, IconButton, Tooltip, Typography, styled, tooltipClasses, useTheme } from "@mui/material";
 import { Link, useLocation, useParams } from "react-router-dom";
 // import "react-pro-sidebar/dist/css/styles.css";
-import { tokens } from "../../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import LastPageIcon from '@mui/icons-material/LastPage';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import SettingsIcon from '@mui/icons-material/Settings';
+import InfoIcon from '@mui/icons-material/Info';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+
+import { tokens } from "../../../theme";
 import { useProject } from "../../../context/ProjectContext";
+import ProfileAvatar from "../../../components/user/ProfileAvatar";
+import useProjectStatus from "../../../hooks/useProjectStatus";
+import { hexToRgba } from "../../../helpers/colors";
 
 const Item = ({ title, path, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -30,6 +36,18 @@ const Item = ({ title, path, icon, selected, setSelected }) => {
   );
 };
 
+const ProjectTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} arrow classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.arrow}`]: {
+    color: theme.palette.common.black,
+  },
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: theme.palette.common.black,
+    fontSize: '14px'
+  },
+}));
+
 const Sidebar = ({setSidebarWidth, ...props}) => {
   const { pathname } = useLocation();
   const { id } = useParams();
@@ -39,6 +57,7 @@ const Sidebar = ({setSidebarWidth, ...props}) => {
   const { collapseSidebar, collapsed } = useProSidebar();
   
   const project = useProject();
+  const { color: statusColor, icon } = useProjectStatus(project.status)
   
   const sidebarRef = useRef();
 
@@ -86,10 +105,7 @@ const Sidebar = ({setSidebarWidth, ...props}) => {
           <Box position='relative'>
             {!collapsed && (
               <Box paddingX='20px'>
-                <Box
-                  textAlign='right'
-                  marginTop='15px'
-                >
+                <Box textAlign='right' marginTop='15px' position='absolute' right='0'>
                   <IconButton 
                     onClick={() => collapseSidebar(!collapsed)}
                     sx={{ backgroundColor: colors.blueAccent[900] }}
@@ -97,13 +113,35 @@ const Sidebar = ({setSidebarWidth, ...props}) => {
                       <FirstPageIcon />
                     </IconButton>
                 </Box>
+                {/* APP INFO */}
                 <Box my="15px" >
+                  <Box mb='12px' display='flex' justifyContent='center' >
+                    <ProfileAvatar userData={{firstname: project.name}} size='lg' />
+                  </Box>
                   <Box>
                     <Box
-                      backgroundColor={colors.blueAccent[700]}
-                      padding={1}
+                      padding='12px'
                       borderRadius={2}
+                      boxShadow={`0 0 7px ${colors.primary[700]}`}
                     >
+
+                      <Box display='flex' alignItems='center' justifyContent='space-between' gap='3px' mb='8px'>
+                        <Typography 
+                          variant="span"
+                          color={statusColor}
+                          bgcolor={hexToRgba(statusColor, .2)}
+                          p='5px'
+                          borderRadius='7px'
+                          display='flex'
+                          alignItems='center'
+                        >
+                          { icon }
+                          <strong>{ project.status }</strong>
+                        </Typography>
+                        <ProjectTooltip title={ project?.description } sx={{ marginLeft: '6px' }} >
+                          <InfoIcon sx={{ color: colors.grey[100] }} />
+                        </ProjectTooltip>
+                      </Box>
                       <Typography
                         variant="h2"
                         fontSize='1.2rem'
@@ -113,7 +151,7 @@ const Sidebar = ({setSidebarWidth, ...props}) => {
                       >
                         {project?.name}
                       </Typography>
-                      <Typography variant="h5" color={colors.greenAccent[500]}>
+                      <Typography variant="h5" color={colors.greenAccent[500]} >
                         {project?.type}
                       </Typography>
                     </Box>
@@ -141,13 +179,13 @@ const Sidebar = ({setSidebarWidth, ...props}) => {
               setSelected={setSelected}
             />
 
-            <Typography
+            {/* <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
               Activity
-            </Typography>
+            </Typography> */}
             <Item
               title="Board"
               path={`projects/${id}/board`}
@@ -159,6 +197,20 @@ const Sidebar = ({setSidebarWidth, ...props}) => {
               title="Calendar"
               path={`projects/${id}/calendar`}
               icon={<CalendarTodayOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Users"
+              path={`projects/${id}/users`}
+              icon={<CalendarTodayOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Requirements"
+              path={`projects/${id}/requirements`}
+              icon={<AccountTreeIcon />}
               selected={selected}
               setSelected={setSelected}
             />

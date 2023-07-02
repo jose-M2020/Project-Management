@@ -135,7 +135,7 @@ const BoardContainer = ({board, projectId}) => {
         flexDirection='column'
         width='100%'
       >
-        <Header title="BOARD" subtitle="All project tasks" px={padding} />
+        <Header title="BOARD" subtitle="Task management and monitoring." px={padding} />
         <BoardHeader members={board.members} tasks={tasks} px={padding} />
         {board && (
           <Box

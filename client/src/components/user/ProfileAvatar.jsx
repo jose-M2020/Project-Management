@@ -148,6 +148,7 @@ const ProfileAvatar = ({
   const theme = useTheme();
   const colors = tokens(theme.palette.mode)
   const nameArray = userData?.firstname?.split(' ');
+  const name = (`${ nameArray[0][0] }${nameArray.length > 1 ? nameArray[1][0] : ''}`).toUpperCase();
 
   const sizes = {
     sm: {
@@ -159,6 +160,11 @@ const ProfileAvatar = ({
       width: 40,
       height: 40,
       fontSize: '14px',
+    },
+    lg: {
+      width: 70,
+      height: 70,
+      fontSize: '35px',
     },
   }
 
@@ -188,7 +194,7 @@ const ProfileAvatar = ({
               
             }}
           >
-            { nameArray[0][0] }{ nameArray.length > 1 && nameArray[1][0] }
+            { name }
           </Box>
         </ProfilePopover>
       </Avatar>

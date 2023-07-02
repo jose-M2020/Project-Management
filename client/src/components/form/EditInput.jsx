@@ -1,50 +1,68 @@
-import { useState } from "react";
-import { Box, Button, Fab, TextField, useTheme } from "@mui/material";
+import { Box, TextField, useTheme } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import { tokens } from "../../theme";
 import AutoComplete from "./AutoComplete";
-import { arraysEqual } from "../../helpers/array";
 import CustomButton from "../CustomButton";
+import useEditEvent from "../../hooks/useEditEvent";
 
-const EditInput = ({onAccept, value = '', children, ...props}) => {
+const EditInput = ({
+  onAccept,
+  value = '',
+  children,
+  ...props
+}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [loading, setLoading] = useState(false);
-  const [activeEdit, setActiveEdit] = useState(false);
-  const [inputValue, setInputValue] = useState(value)
   
-  const handleChange = (fieldValue) => {
-    const isChanged = Array.isArray(fieldValue) ? (
-      !arraysEqual(fieldValue, value)
-    ) : (
-      fieldValue !== value
-    )
+  const {
+    loading,
+    inputValue,
+    activeEdit,
+    handleChange,
+    handleBlur,
+    handleClickAccept
+  } = useEditEvent({
+    fieldName: props.name,
+    value,
+    onAccept
+  });
 
-    setInputValue(fieldValue)
-    isChanged ? setActiveEdit(true) : setActiveEdit(false);
-  }
+  // const [loading, setLoading] = useState(false);
+  // const [activeEdit, setActiveEdit] = useState(false);
+  // const [inputValue, setInputValue] = useState(value)
 
-  const setDefaultValue = (e) => {
-    setInputValue(value)
-    setActiveEdit(false)
-  }
+  // const handleChange = (fieldValue) => {
+  //   const isChanged = Array.isArray(fieldValue) ? (
+  //     !arraysEqual(fieldValue, value)
+  //   ) : (
+  //     fieldValue !== value
+  //   )
 
-  const handleBlur = (e) => {
-    if(e?.relatedTarget?.id === 'input-actions' || !activeEdit){
-      return
-    }
+  //   setInputValue(fieldValue)
+  //   isChanged ? setActiveEdit(true) : setActiveEdit(false);
+  // }
+
+  // const setDefaultValue = (e) => {
+  //   setInputValue(value)
+  //   setActiveEdit(false)
+  // }
+
+  // const handleBlur = (e) => {
+  //   if(e?.relatedTarget?.id === 'input-actions' || !activeEdit){
+  //     return
+  //   }
     
-    setDefaultValue();
-  }
+  //   setDefaultValue();
+  // }
   
-  const handleClickAccept = async () => {
-    setLoading(true);
-    setActiveEdit(false);
-    const status = await onAccept(inputValue, props.name);
-    // status ? setInputValue()
-    setLoading(false);
-  }
+  // const handleClickAccept = async () => {
+  //   setLoading(true);
+  //   setActiveEdit(false);
+  //   const status = await onAccept(inputValue, props.name);
+  //   // status ? setInputValue()
+  //   setLoading(false);
+  // }
 
   return (
     <Box position='relative' onBlur={handleBlur} >
